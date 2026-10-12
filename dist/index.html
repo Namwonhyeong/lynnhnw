@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b3b66">
+  <meta name="description" content="오프라인 우선형 건설 현장 하자 등록·배정·보수·검수 앱">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="styles.css">
+  <title>린 하자 ON</title>
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <p class="eyebrow">현장 품질관리</p>
+      <h1>린 하자 <span>ON</span></h1>
+    </div>
+    <div class="network" id="networkState" aria-live="polite"><i></i><span>온라인</span></div>
+  </header>
+
+  <main>
+    <section class="view active" id="dashboardView" aria-labelledby="dashboardTitle">
+      <div class="section-heading">
+        <div><p class="eyebrow">오늘의 현황</p><h2 id="dashboardTitle">처리 대시보드</h2></div>
+        <button class="ghost-button" id="refreshButton" type="button">새로고침</button>
+      </div>
+
+      <div class="summary-grid" id="summaryGrid">
+        <button class="summary-card blue" data-filter="등록"><span>등록</span><strong id="countRegistered">0</strong><small>검토 필요</small></button>
+        <button class="summary-card amber" data-filter="진행중"><span>진행 중</span><strong id="countProgress">0</strong><small>업체 보수</small></button>
+        <button class="summary-card violet" data-filter="확인대기"><span>확인 대기</span><strong id="countReview">0</strong><small>관리자 점검</small></button>
+        <button class="summary-card green" data-filter="완료"><span>완료</span><strong id="countDone">0</strong><small>최종 종결</small></button>
+      </div>
+
+      <div class="panel chart-panel">
+        <div class="panel-title"><div><h3>공종별 미완료 현황</h3><p>등록·진행·확인 대기 건</p></div><span id="openTotal">0건</span></div>
+        <div class="bar-chart" id="tradeChart"><p class="empty-inline">하자를 등록하면 공종별 현황이 표시됩니다.</p></div>
+      </div>
+
+      <div class="panel quick-panel">
+        <h3>빠른 업무</h3>
+        <div class="quick-actions">
+          <button type="button" data-go="registerView"><span class="quick-icon">＋</span><b>하자 등록</b><small>사진·음성·도면</small></button>
+          <button type="button" data-go="listView" data-status="확인대기"><span class="quick-icon">✓</span><b>완료 점검</b><small>관리자 승인</small></button>
+          <button type="button" id="exportAllButton"><span class="quick-icon">⇩</span><b>엑셀 출력</b><small>사진대지 목록</small></button>
+        </div>
+      </div>
+
+      <p class="sync-note" id="syncNote">이 기기에 안전하게 저장됩니다.</p>
+    </section>
+
+    <section class="view" id="registerView" aria-labelledby="registerTitle">
+      <div class="section-heading">
+        <div><p class="eyebrow">현장 기록</p><h2 id="registerTitle">하자 등록</h2></div>
+        <button class="ghost-button" id="clearFormButton" type="button">초기화</button>
+      </div>
+
+      <form id="defectForm">
+        <div class="panel form-panel">
+          <div class="voice-box">
+            <div><h3>말로 한 번에 입력</h3><p>순서 없이 평소처럼 말해도 됩니다.</p></div>
+            <button class="voice-button" id="voiceButton" type="button" aria-pressed="false"><span>●</span> 음성 입력</button>
+            <textarea id="voiceText" rows="3" placeholder="예: 101동 3층 302호 안방 창틀 오른쪽 코킹 누락, 창호 업체 보수 필요"></textarea>
+            <button class="text-button" id="parseVoiceButton" type="button">내용 분석해 입력하기</button>
+            <p class="voice-status" id="voiceStatus" aria-live="polite"></p>
+          </div>
+
+          <h3 class="subheading">위치</h3>
+          <div class="form-grid four">
+            <label><span>동</span><input id="building" name="building" placeholder="101동" required></label>
+            <label><span>층</span><input id="floor" name="floor" placeholder="3층" required></label>
+            <label><span>호</span><input id="unit" name="unit" placeholder="302호"></label>
+            <label><span>실명</span><input id="room" name="room" placeholder="안방" required></label>
+          </div>
+          <label class="checkbox-row"><input id="keepLocation" type="checkbox" checked><span>다음 등록에도 위치 유지</span></label>
+
+          <h3 class="subheading">도면 위치</h3>
+          <div class="drawing-tools">
+            <label class="file-button">도면 불러오기<input id="drawingInput" type="file" accept="image/*"></label>
+            <span id="pinStatus">도면에서 위치를 누르세요.</span>
+          </div>
+          <div class="drawing-board" id="drawingBoard" role="button" tabindex="0" aria-label="도면 위치 선택">
+            <img id="drawingImage" alt="현장 도면" hidden>
+            <span class="drawing-placeholder">도면을 미리 불러오면 오프라인에서도 위치를 지정할 수 있습니다.</span>
+            <i class="drawing-pin" id="drawingPin" hidden></i>
+          </div>
+          <input id="pinX" type="hidden"><input id="pinY" type="hidden">
+
+          <h3 class="subheading">사진과 하자 내용</h3>
+          <label class="photo-drop" id="photoDrop">
+            <input id="photoInput" type="file" accept="image/*" capture="environment" multiple>
+            <span class="camera-icon">▣</span><b>사진 촬영 또는 선택</b><small>긴 변 1,920px, JPEG 품질 82%로 자동 최적화</small>
+          </label>
+          <div class="photo-grid" id="photoPreview"></div>
+
+          <div class="form-grid two">
+            <label><span>하자 유형</span><select id="defectType" required><option value="">선택</option><option>코킹 누락</option><option>타일 파손</option><option>도배 들뜸</option><option>도장 불량</option><option>누수</option><option>문·창호 불량</option><option>설비 불량</option><option>기타</option></select></label>
+            <label><span>공종</span><select id="trade" required><option value="">선택</option><option>창호</option><option>방수</option><option>타일</option><option>도배</option><option>도장</option><option>설비</option><option>전기</option><option>기타</option></select></label>
+          </div>
+          <label><span>지적 내용</span><textarea id="description" rows="4" required placeholder="부위와 상태를 구체적으로 적어주세요."></textarea></label>
+          <label><span>보수업체</span><input id="vendor" list="vendorList" placeholder="관리자가 지정 또는 수정"><datalist id="vendorList"></datalist></label>
+
+          <button class="primary-button" type="submit">하자 등록하기</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="view" id="listView" aria-labelledby="listTitle">
+      <div class="section-heading">
+        <div><p class="eyebrow">통합 관리</p><h2 id="listTitle">하자 목록</h2></div>
+        <button class="ghost-button" id="exportSelectedButton" type="button">선택 출력</button>
+      </div>
+      <div class="filter-panel panel">
+        <input id="searchInput" type="search" placeholder="동·층·호·실·내용 검색">
+        <div class="filter-row">
+          <select id="statusFilter"><option value="">전체 상태</option><option>등록</option><option>진행중</option><option>확인대기</option><option>완료</option><option>반려</option></select>
+          <select id="tradeFilter"><option value="">전체 공종</option><option>창호</option><option>방수</option><option>타일</option><option>도배</option><option>도장</option><option>설비</option><option>전기</option><option>기타</option></select>
+        </div>
+      </div>
+      <div class="list-toolbar"><label><input id="selectAll" type="checkbox"> 전체 선택</label><span id="resultCount">0건</span></div>
+      <div class="defect-list" id="defectList"></div>
+    </section>
+
+    <section class="view" id="settingsView" aria-labelledby="settingsTitle">
+      <div class="section-heading"><div><p class="eyebrow">현장 설정</p><h2 id="settingsTitle">기준정보</h2></div></div>
+      <div class="panel form-panel">
+        <h3>현재 현장</h3>
+        <label><span>현장명</span><input id="siteName" value="우미건설 시범현장"></label>
+        <label><span>현장 코드</span><input id="siteCode" value="WMI-001"></label>
+        <h3 class="subheading">협력업체</h3>
+        <div class="inline-form"><input id="newVendor" placeholder="업체명 입력"><button id="addVendorButton" type="button">추가</button></div>
+        <div class="chip-list" id="vendorChips"></div>
+        <h3 class="subheading">데이터 관리</h3>
+        <button class="secondary-button" id="downloadBackupButton" type="button">JSON 백업 다운로드</button>
+        <label class="secondary-button file-button center">백업 복원<input id="restoreInput" type="file" accept="application/json"></label>
+        <button class="danger-button" id="clearDataButton" type="button">이 기기의 하자 데이터 모두 삭제</button>
+      </div>
+    </section>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <nav class="bottom-nav" aria-label="주요 메뉴">
+    <button class="active" data-view="dashboardView"><span>▦</span>현황</button>
+    <button data-view="registerView"><span>＋</span>등록</button>
+    <button data-view="listView"><span>☷</span>하자관리</button>
+    <button data-view="settingsView"><span>⚙</span>설정</button>
+  </nav>
+
+  <template id="defectCardTemplate">
+    <article class="defect-card">
+      <label class="card-select"><input type="checkbox" class="row-check"><span class="sr-only">선택</span></label>
+      <div class="card-photo"><span>사진 없음</span></div>
+      <div class="card-main">
+        <div class="card-top"><span class="status-badge"></span><small class="card-time"></small></div>
+        <h3 class="card-location"></h3><p class="card-description"></p>
+        <div class="card-meta"></div>
+        <div class="card-actions"></div>
+      </div>
+    </article>
+  </template>
+  <script src="app.js" defer></script>
+</body>
+</html>
