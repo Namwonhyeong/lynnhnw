@@ -15,6 +15,10 @@ const $ = id => document.getElementById(id);
 const escapeHtml = value => String(value ?? "").replace(/[&<>'"]/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[ch]));
 const formatDate = value => new Intl.DateTimeFormat("ko-KR", {month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit"}).format(new Date(value));
 const makeId = () => crypto.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+const getSeason = value => {
+  const month = new Date(value).getMonth() + 1;
+  return month >= 3 && month <= 5 ? "봄" : month >= 6 && month <= 8 ? "여름" : month >= 9 && month <= 11 ? "가을" : "겨울";
+};
 
 function openDb() {
   return new Promise((resolve, reject) => {
@@ -58,6 +62,7 @@ function showView(id) {
   document.querySelectorAll(".bottom-nav button").forEach(button => button.classList.toggle("active", button.dataset.view === id));
   if (id === "dashboardView") renderDashboard();
   if (id === "listView") renderList();
+  if (id === "analyticsView") renderAnalytics();
   if (id === "settingsView") renderSettings();
   window.scrollTo({top:0, behavior:"smooth"});
 }
@@ -108,6 +113,9 @@ function parseVoice(text) {
   ];
   const rule = rules.find(item => item.words.some(word => cleaned.includes(word)));
   if (rule) Object.assign(result, rule);
+  const temperature = cleaned.match(/(-?\d{1,2}(?:\.\d+)?)\s*도/);
+  if (temperature) result.temperature = temperature[1];
+  result.weather = ["고온다습","맑음","흐림","비","눈","한파","실내"].find(value => cleaned.includes(value)) || "";
   result.description = cleaned;
   return result;
 }
@@ -116,7 +124,7 @@ function applyVoiceText() {
   const text = $("voiceText").value.trim();
   if (!text) return toast("먼저 내용을 말하거나 입력해주세요.");
   const parsed = parseVoice(text);
-  ["building","floor","unit","room","defectType","trade","description"].forEach(key => {
+  ["building","floor","unit","room","defectType","trade","description","temperature","weather"].forEach(key => {
     if (parsed[key]) $(key).value = parsed[key];
   });
   if (parsed.trade) {
@@ -205,6 +213,7 @@ async function submitDefect(event) {
     building: $("building").value.trim(), floor: $("floor").value.trim(), unit: $("unit").value.trim(), room: $("room").value.trim(),
     pinX: $("pinX").value, pinY: $("pinY").value,
     defectType: $("defectType").value, trade: $("trade").value, description: $("description").value.trim(), vendor: $("vendor").value.trim(),
+    temperature: $("temperature").value === "" ? null : Number($("temperature").value), weather: $("weather").value, season: $("season").value,
     photos: [...draftPhotos], completionPhotos: [], opinions: [], voiceText: $("voiceText").value.trim()
   };
   state.defects.unshift(defect);
@@ -220,6 +229,7 @@ async function submitDefect(event) {
 function clearForm() {
   $("defectForm").reset();
   $("keepLocation").checked = true;
+  $("season").value = getSeason(new Date());
   draftPhotos = [];
   renderPhotoPreview();
   $("voiceStatus").textContent = "";
@@ -258,7 +268,7 @@ function renderList() {
     node.querySelector(".card-time").textContent = formatDate(defect.createdAt);
     node.querySelector(".card-location").textContent = [defect.building,defect.floor,defect.unit,defect.room].filter(Boolean).join(" ");
     node.querySelector(".card-description").textContent = defect.description;
-    node.querySelector(".card-meta").innerHTML = [defect.defectType,defect.trade,defect.vendor || "업체 미지정"].map(value => `<span>${escapeHtml(value)}</span>`).join("");
+    node.querySelector(".card-meta").innerHTML = [defect.defectType,defect.trade,defect.vendor || "업체 미지정",defect.season || getSeason(defect.createdAt),Number.isFinite(defect.temperature) ? `${defect.temperature}°C` : "",defect.weather || ""].filter(Boolean).map(value => `<span>${escapeHtml(value)}</span>`).join("");
     const actions = [];
     actions.push(`<button data-action="vendor">업체 변경</button>`);
     actions.push(`<button data-action="opinion">의견 ${defect.opinions?.length || 0}</button>`);
@@ -319,8 +329,8 @@ async function updateDefectAction(id, action) {
 
 function exportExcel(defects, filename = "하자사진대지") {
   if (!defects.length) return toast("출력할 하자를 선택해주세요.");
-  const rows = defects.map((d, index) => `<tr><td>${index+1}</td><td>${escapeHtml([d.building,d.floor,d.unit,d.room].filter(Boolean).join(" "))}</td><td>${escapeHtml(d.defectType)}</td><td>${escapeHtml(d.description)}</td><td>${escapeHtml(d.trade)}</td><td>${escapeHtml(d.vendor || "")}</td><td>${escapeHtml(d.status)}</td><td>${d.photos?.[0] ? `<img src="${d.photos[0]}" width="180">` : ""}</td><td>${d.completionPhotos?.[0] ? `<img src="${d.completionPhotos[0]}" width="180">` : ""}</td><td>${escapeHtml(formatDate(d.createdAt))}</td></tr>`).join("");
-  const html = `<!doctype html><html><head><meta charset="utf-8"><style>table{border-collapse:collapse;font-family:Arial,sans-serif}th,td{border:1px solid #999;padding:8px;vertical-align:middle}th{background:#dce6f1}img{max-width:180px;max-height:140px}</style></head><body><table><tr><th>No</th><th>위치</th><th>하자유형</th><th>지적내용</th><th>공종</th><th>업체</th><th>상태</th><th>보수 전</th><th>보수 후</th><th>등록일</th></tr>${rows}</table></body></html>`;
+  const rows = defects.map((d, index) => `<tr><td>${index+1}</td><td>${escapeHtml([d.building,d.floor,d.unit,d.room].filter(Boolean).join(" "))}</td><td>${escapeHtml(d.defectType)}</td><td>${escapeHtml(d.description)}</td><td>${escapeHtml(d.trade)}</td><td>${escapeHtml(d.vendor || "")}</td><td>${escapeHtml(d.status)}</td><td>${escapeHtml(d.season || getSeason(d.createdAt))}</td><td>${Number.isFinite(d.temperature) ? d.temperature : ""}</td><td>${escapeHtml(d.weather || "")}</td><td>${d.photos?.[0] ? `<img src="${d.photos[0]}" width="180">` : ""}</td><td>${d.completionPhotos?.[0] ? `<img src="${d.completionPhotos[0]}" width="180">` : ""}</td><td>${escapeHtml(formatDate(d.createdAt))}</td></tr>`).join("");
+  const html = `<!doctype html><html><head><meta charset="utf-8"><style>table{border-collapse:collapse;font-family:Arial,sans-serif}th,td{border:1px solid #999;padding:8px;vertical-align:middle}th{background:#dce6f1}img{max-width:180px;max-height:140px}</style></head><body><table><tr><th>No</th><th>위치</th><th>하자유형</th><th>지적내용</th><th>공종</th><th>업체</th><th>상태</th><th>계절</th><th>기온 °C</th><th>날씨</th><th>보수 전</th><th>보수 후</th><th>등록일</th></tr>${rows}</table></body></html>`;
   downloadBlob(new Blob(["\ufeff", html], {type:"application/vnd.ms-excel"}), `${filename}_${new Date().toISOString().slice(0,10)}.xls`);
   toast(`${defects.length}건을 엑셀 파일로 만들었습니다.`);
 }
@@ -329,6 +339,56 @@ function downloadBlob(blob, name) {
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a"); link.href = url; link.download = name; link.click();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function countBy(items, keyFn) {
+  return items.reduce((acc, item) => { const key = keyFn(item); if (key) acc[key] = (acc[key] || 0) + 1; return acc; }, {});
+}
+
+function renderAnalysisBars(targetId, groups, emptyText) {
+  const entries = Object.entries(groups).sort((a,b) => b[1] - a[1]);
+  const max = Math.max(1, ...entries.map(([,count]) => count));
+  $(targetId).innerHTML = entries.length ? entries.map(([label,count]) => `<div class="bar-row"><span>${escapeHtml(label)}</span><div class="bar-track"><div class="bar-fill" style="width:${count/max*100}%"></div></div><b>${count}</b></div>`).join("") : `<p class="empty-inline">${escapeHtml(emptyText)}</p>`;
+}
+
+function renderAnalytics() {
+  const selected = $("analyticsTypeFilter").value;
+  const types = [...new Set(state.defects.map(d => d.defectType).filter(Boolean))].sort();
+  $("analyticsTypeFilter").innerHTML = '<option value="">전체 하자</option>' + types.map(type => `<option ${type === selected ? "selected" : ""}>${escapeHtml(type)}</option>`).join("");
+  const defects = selected ? state.defects.filter(d => d.defectType === selected) : state.defects;
+  const environmentCount = defects.filter(d => Number.isFinite(d.temperature) || d.weather).length;
+  const typeCounts = countBy(defects, d => d.defectType || "기타");
+  const top = Object.entries(typeCounts).sort((a,b) => b[1]-a[1])[0];
+  $("analysisTotal").textContent = defects.length;
+  $("analysisCoverage").textContent = defects.length ? `${Math.round(environmentCount / defects.length * 100)}%` : "0%";
+  $("analysisTopType").textContent = top?.[0] || "-";
+  $("analysisTopTypeCount").textContent = top ? `${top[1]}건` : "표본 없음";
+  renderAnalysisBars("typeFrequencyChart", typeCounts, "등록된 하자가 없습니다.");
+  renderAnalysisBars("seasonChart", countBy(defects, d => d.season || getSeason(d.createdAt)), "계절 데이터가 없습니다.");
+  renderAnalysisBars("weatherChart", countBy(defects, d => d.weather), "날씨 정보가 없습니다.");
+  const temperatureGroups = countBy(defects.filter(d => Number.isFinite(d.temperature)), d => d.temperature < 0 ? "영하" : d.temperature < 10 ? "0~9°C" : d.temperature < 20 ? "10~19°C" : d.temperature < 30 ? "20~29°C" : "30°C 이상");
+  renderAnalysisBars("temperatureChart", temperatureGroups, "기온 정보가 없습니다.");
+
+  const insights = [];
+  const byType = Object.groupBy ? Object.groupBy(defects, d => d.defectType || "기타") : defects.reduce((acc,d) => ((acc[d.defectType || "기타"] ||= []).push(d),acc),{});
+  Object.entries(byType).forEach(([type, rows]) => {
+    if (rows.length < 3) return;
+    const seasons = countBy(rows, d => d.season || getSeason(d.createdAt));
+    const [season, seasonCount] = Object.entries(seasons).sort((a,b) => b[1]-a[1])[0] || [];
+    if (season && seasonCount / rows.length >= .5) insights.push(`<div class="insight-item"><b>${escapeHtml(type)}</b> ${rows.length}건 중 ${seasonCount}건(${Math.round(seasonCount/rows.length*100)}%)이 ${season}에 등록됐습니다.</div>`);
+    const weathers = countBy(rows, d => d.weather);
+    const [weather, weatherCount] = Object.entries(weathers).sort((a,b) => b[1]-a[1])[0] || [];
+    if (weather && weatherCount >= 2) insights.push(`<div class="insight-item"><b>${escapeHtml(type)}</b>은(는) ‘${escapeHtml(weather)}’ 조건에서 ${weatherCount}건 등록됐습니다.</div>`);
+    const temperatures = rows.map(d => d.temperature).filter(Number.isFinite);
+    if (temperatures.length >= 3) insights.push(`<div class="insight-item"><b>${escapeHtml(type)}</b> 등록 당시 평균기온은 ${(temperatures.reduce((a,b)=>a+b,0)/temperatures.length).toFixed(1)}°C입니다.</div>`);
+  });
+  $("associationInsights").innerHTML = insights.length ? insights.join("") : '<p class="empty-inline">같은 하자유형 데이터가 3건 이상 쌓이면 계절·날씨·기온의 반복 패턴을 보여줍니다.</p>';
+
+  $("seasonMatrix").innerHTML = types.length ? types.map(type => {
+    const rows = state.defects.filter(d => d.defectType === type);
+    const seasons = countBy(rows, d => d.season || getSeason(d.createdAt));
+    return `<tr><td>${escapeHtml(type)}</td>${["봄","여름","가을","겨울"].map(season => `<td>${seasons[season] || 0}</td>`).join("")}</tr>`;
+  }).join("") : '<tr><td colspan="5">분석할 데이터가 없습니다.</td></tr>';
 }
 
 function renderSettings() {
@@ -358,6 +418,7 @@ function bindEvents() {
   $("defectForm").addEventListener("submit", submitDefect);
   $("clearFormButton").addEventListener("click", clearForm);
   ["searchInput","statusFilter","tradeFilter"].forEach(id => $(id).addEventListener(id === "searchInput" ? "input" : "change", renderList));
+  $("analyticsTypeFilter").addEventListener("change", renderAnalytics);
   $("defectList").addEventListener("click", event => { const action = event.target.dataset.action; if (action) updateDefectAction(event.target.closest("article").dataset.id, action); });
   $("selectAll").addEventListener("change", event => document.querySelectorAll(".row-check").forEach(box => box.checked = event.target.checked));
   $("exportSelectedButton").addEventListener("click", () => exportExcel(state.defects.filter(d => document.querySelector(`.row-check[data-id="${d.id}"]`)?.checked), "선택_하자사진대지"));
@@ -374,7 +435,7 @@ function bindEvents() {
 
 async function init() {
   try { await loadState(); } catch (error) { console.error(error); toast("로컬 저장소를 열 수 없습니다."); }
-  bindEvents(); setupVoice(); updateNetwork(); renderDashboard(); renderSettings();
+  bindEvents(); setupVoice(); updateNetwork(); $("season").value = getSeason(new Date()); renderDashboard(); renderSettings();
   if (state.settings.drawing) { $("drawingImage").src = state.settings.drawing; $("drawingImage").hidden = false; document.querySelector(".drawing-placeholder").hidden = true; }
   if ("serviceWorker" in navigator) navigator.serviceWorker.register("./sw.js").catch(console.error);
 }

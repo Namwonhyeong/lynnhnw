@@ -43,6 +43,7 @@
           <button type="button" data-go="registerView"><span class="quick-icon">＋</span><b>하자 등록</b><small>사진·음성·도면</small></button>
           <button type="button" data-go="listView" data-status="확인대기"><span class="quick-icon">✓</span><b>완료 점검</b><small>관리자 승인</small></button>
           <button type="button" id="exportAllButton"><span class="quick-icon">⇩</span><b>엑셀 출력</b><small>사진대지 목록</small></button>
+          <button type="button" data-go="analyticsView"><span class="quick-icon">⌁</span><b>환경 분석</b><small>계절·기온·날씨</small></button>
         </div>
       </div>
 
@@ -71,6 +72,11 @@
             <label><span>층</span><input id="floor" name="floor" placeholder="3층" required></label>
             <label><span>호</span><input id="unit" name="unit" placeholder="302호"></label>
             <label><span>실명</span><input id="room" name="room" placeholder="안방" required></label>
+          </div>
+          <div class="form-grid three environment-fields">
+            <label><span>기온 °C</span><input id="temperature" name="temperature" type="number" step="0.1" min="-40" max="60" placeholder="예: 24.5"></label>
+            <label><span>날씨</span><select id="weather"><option value="">선택</option><option>맑음</option><option>흐림</option><option>비</option><option>눈</option><option>고온다습</option><option>한파</option><option>실내</option></select></label>
+            <label><span>계절</span><input id="season" readonly aria-readonly="true"></label>
           </div>
           <label class="checkbox-row"><input id="keepLocation" type="checkbox" checked><span>다음 등록에도 위치 유지</span></label>
 
@@ -121,6 +127,33 @@
       <div class="defect-list" id="defectList"></div>
     </section>
 
+    <section class="view" id="analyticsView" aria-labelledby="analyticsTitle">
+      <div class="section-heading">
+        <div><p class="eyebrow">품질 데이터</p><h2 id="analyticsTitle">하자 환경 분석</h2></div>
+        <select id="analyticsTypeFilter" aria-label="분석할 하자유형"><option value="">전체 하자</option></select>
+      </div>
+      <div class="analysis-summary">
+        <div class="analysis-kpi"><span>누적 하자</span><strong id="analysisTotal">0</strong><small>등록 데이터</small></div>
+        <div class="analysis-kpi"><span>환경정보 포함</span><strong id="analysisCoverage">0%</strong><small>기온·날씨 중 1개 이상</small></div>
+        <div class="analysis-kpi"><span>가장 잦은 하자</span><strong id="analysisTopType">-</strong><small id="analysisTopTypeCount">표본 없음</small></div>
+      </div>
+      <div class="analysis-grid">
+        <div class="panel analysis-panel"><div class="panel-title"><div><h3>하자유형별 빈도</h3><p>선택 조건의 누적 등록 건수</p></div></div><div class="bar-chart" id="typeFrequencyChart"></div></div>
+        <div class="panel analysis-panel"><div class="panel-title"><div><h3>계절별 발생 분포</h3><p>발견일 기준 자동 분류</p></div></div><div class="bar-chart seasonal" id="seasonChart"></div></div>
+        <div class="panel analysis-panel"><div class="panel-title"><div><h3>기온 구간별 분포</h3><p>등록 당시 입력된 기온 기준</p></div></div><div class="bar-chart" id="temperatureChart"></div></div>
+        <div class="panel analysis-panel"><div class="panel-title"><div><h3>날씨별 발생 분포</h3><p>등록 당시 현장 조건</p></div></div><div class="bar-chart" id="weatherChart"></div></div>
+      </div>
+      <div class="panel insight-panel">
+        <div class="panel-title"><div><h3>관찰된 연관 신호</h3><p>표본이 3건 이상인 항목만 요약합니다.</p></div></div>
+        <div id="associationInsights" class="insight-list"></div>
+        <p class="analysis-warning">이 화면은 등록 빈도의 분포를 보여줍니다. 온도나 계절이 하자의 원인임을 증명하지 않으며, 공사물량·점검횟수·공정단계가 함께 기록돼야 발생률 비교가 가능합니다.</p>
+      </div>
+      <div class="panel matrix-panel">
+        <div class="panel-title"><div><h3>하자유형과 계절 교차표</h3><p>셀의 숫자는 등록 건수입니다.</p></div></div>
+        <div class="table-wrap"><table><thead><tr><th>하자유형</th><th>봄</th><th>여름</th><th>가을</th><th>겨울</th></tr></thead><tbody id="seasonMatrix"></tbody></table></div>
+      </div>
+    </section>
+
     <section class="view" id="settingsView" aria-labelledby="settingsTitle">
       <div class="section-heading"><div><p class="eyebrow">현장 설정</p><h2 id="settingsTitle">기준정보</h2></div></div>
       <div class="panel form-panel">
@@ -144,6 +177,7 @@
     <button class="active" data-view="dashboardView"><span>▦</span>현황</button>
     <button data-view="registerView"><span>＋</span>등록</button>
     <button data-view="listView"><span>☷</span>하자관리</button>
+    <button data-view="analyticsView"><span>⌁</span>분석</button>
     <button data-view="settingsView"><span>⚙</span>설정</button>
   </nav>
 
