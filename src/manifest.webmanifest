@@ -1,0 +1,10 @@
+{
+  "name": "현장노트 Voice",
+  "short_name": "현장노트",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#f6f7f9",
+  "theme_color": "#f6f7f9",
+  "lang": "ko",
+  "description": "현장 사진과 자유발화 한국어 음성을 함께 기록하는 하자 점검 도구"
+}

@@ -1,0 +1,2 @@
+# Optional UI tests only; the application and build do not require this package.
+playwright==1.57.0

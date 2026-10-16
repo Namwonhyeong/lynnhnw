@@ -1,0 +1,174 @@
+{
+  "project": "현장노트 v2 — 원본 개발자 패키지 명세",
+  "packaged_on": "2026-10-16",
+  "source": "field_photo_voice_v2.html supplied in the conversation",
+  "original_sha256": "520bcf1cbc46630895fd80b0348cb748fab23ec7276905496a2624ae03cf897c",
+  "scope": "2026-10-16에 가져온 원본 패키지의 파일 목록과 해시입니다. 이후 Voice Beta 구현으로 변경된 파일의 현재 해시는 나타내지 않습니다.",
+  "files": [
+    {
+      "path": ".gitignore",
+      "bytes": 120,
+      "sha256": "fa8c426b7c034ad7c5ddbc8e60d7c609cb41e4e9aec42904547bf3afa6ee354f"
+    },
+    {
+      "path": "README.md",
+      "bytes": 8861,
+      "sha256": "29034163a2cb3eab0723b24f5197f7c4a44ac0d1db9d42e8c8439dca660a1972"
+    },
+    {
+      "path": "START_HERE.txt",
+      "bytes": 1222,
+      "sha256": "b2001f8338ff8469e1a47e3f738459b54c9c67d598118582c7a0e88d2332a690"
+    },
+    {
+      "path": "dist/field_photo_voice_v2_developer.html",
+      "bytes": 198708,
+      "sha256": "4f48737c9c8b7d4df99140ee8d7a51a3111158ccd8eb2c6b5b6268f1ed7cc0df"
+    },
+    {
+      "path": "docs/DEVELOPER_GUIDE.md",
+      "bytes": 10597,
+      "sha256": "250d4e01b7928bb72827b3e0d775e6580a51cf858956e79e4fbf21eab2634f3e"
+    },
+    {
+      "path": "docs/NEXT_STEPS.md",
+      "bytes": 7308,
+      "sha256": "af4ced6e1c9755ba91fa7b7437ee71c8c71a5b632a01fa198a70c4c5de05b0bb"
+    },
+    {
+      "path": "docs/ORIGINAL_README.txt",
+      "bytes": 6257,
+      "sha256": "cc960cfc3d45e05b404e6478d26c74cba110ce30be9e0287d0807ef7d3df808e"
+    },
+    {
+      "path": "docs/REQUIREMENTS.md",
+      "bytes": 5081,
+      "sha256": "54bf5f9d040321c7aa8f7b628902094a972df876073a8c4e52b36698dfcb0c1c"
+    },
+    {
+      "path": "docs/TEST_REPORT.md",
+      "bytes": 4247,
+      "sha256": "b02dd25ca7fe21fbdc59d2828561b150ddd797805555a07da05f16bff347ed8b"
+    },
+    {
+      "path": "docs/UI_TEST_RESULTS.json",
+      "bytes": 1829,
+      "sha256": "22326b49900e764af616e6ece593b4f989c1c4f5b94b293ab64a036c362d0d42"
+    },
+    {
+      "path": "original/field_photo_voice_v2.html",
+      "bytes": 183168,
+      "sha256": "520bcf1cbc46630895fd80b0348cb748fab23ec7276905496a2624ae03cf897c"
+    },
+    {
+      "path": "preview/analytics.png",
+      "bytes": 303907,
+      "sha256": "ca4ac6699a393cc421416f191f58c704c046d669dbbcec804fafaee0076f5a01"
+    },
+    {
+      "path": "preview/list.png",
+      "bytes": 167227,
+      "sha256": "5fde3e56274c2979046d8f4e499a5ef6c61395d3530d4f1f287a0c73440ba2cf"
+    },
+    {
+      "path": "preview/mobile.png",
+      "bytes": 76478,
+      "sha256": "d5d1163a959500ce076e076526224207f4c63dbfcfec3c5bb7e6b83035bf4380"
+    },
+    {
+      "path": "sample/photo-list-example.xlsx",
+      "bytes": 571366,
+      "sha256": "f48b452da4236cb6500dad4f9095928a7f6d486d8c22a51de79e7c717faf433f"
+    },
+    {
+      "path": "scripts/build.py",
+      "bytes": 1165,
+      "sha256": "075c1f5cf5a4e8b1961ede92c48a939aaa10f5e39b09b77a8f870b1b6129f5a6"
+    },
+    {
+      "path": "scripts/serve.py",
+      "bytes": 2101,
+      "sha256": "a840359c9c125c1b358b2186ae28eda0413260250222a12f99189dcd30bf42ca"
+    },
+    {
+      "path": "src/css/styles.css",
+      "bytes": 39803,
+      "sha256": "cddf0cefe4a38c8315ebd0b82ffc380c228dd1f80f1ec39b5c573ec286f3fe92"
+    },
+    {
+      "path": "src/index.html",
+      "bytes": 19263,
+      "sha256": "38c113b321556e1d5d6a0d542613d320ef56c7e05efdfdabff5d3ea4541cb7f3"
+    },
+    {
+      "path": "src/js/analytics.js",
+      "bytes": 12081,
+      "sha256": "da87d0696d685222863f2662a16bbf8321047204d5ed9b75fe3622c333647f77"
+    },
+    {
+      "path": "src/js/backup-import.js",
+      "bytes": 8342,
+      "sha256": "9842a86fe0fa2b495e8c0eeb7afeb8960999e4c492bf7d93ed7fbe53aca01271"
+    },
+    {
+      "path": "src/js/core.js",
+      "bytes": 39059,
+      "sha256": "cc1bd4f4ef82139282915d902afb393f5e6d170b02e486d2db80f593af7a230b"
+    },
+    {
+      "path": "src/js/excel.js",
+      "bytes": 14820,
+      "sha256": "af1effb6314008b713730dc189ec5075a6b1f15f5e17e6fed673457f1c91992a"
+    },
+    {
+      "path": "src/js/main.js",
+      "bytes": 7425,
+      "sha256": "05f3d9f1d9146a47bf7cf8443d4e9f05d6f1c425a9bf8ce9f1dc45d45ab8764f"
+    },
+    {
+      "path": "src/js/records.js",
+      "bytes": 15325,
+      "sha256": "5759ac394b647f63d109d9c12415c0c31ecbab3018878c9613c83c5b9e86fff7"
+    },
+    {
+      "path": "src/js/xlsx-template.js",
+      "bytes": 42750,
+      "sha256": "06f4d6441e5dc5d266cab0e9ea194ccb280d591d232fa202417b915fde97c182"
+    },
+    {
+      "path": "start-local.bat",
+      "bytes": 299,
+      "sha256": "89f7d46f43bdf931229bb12368853fcf9aac76a91346f4b7bcb8e71a7fe75644"
+    },
+    {
+      "path": "start-local.sh",
+      "bytes": 82,
+      "sha256": "09520df75d0c52aae8e126c85a8595941943f56dcb6da4403bde77f47eba1047"
+    },
+    {
+      "path": "tests/memory_store_adapter.js",
+      "bytes": 1896,
+      "sha256": "bac3dde04a4c2a079be527e4466ec67ddbb29a1ac872ca3309068df42bf90d3b"
+    },
+    {
+      "path": "tests/requirements.txt",
+      "bytes": 100,
+      "sha256": "31fb46df0360dab81faa50e98271d72924d2a8604d5549de07cd2f73605ff52c"
+    },
+    {
+      "path": "tests/smoke_test.py",
+      "bytes": 13101,
+      "sha256": "2eea017cd4e70ad0a5eb121e9cdff76415ddeeade20d706afcfa466c082581a6"
+    },
+    {
+      "path": "tests/ui_harness.py",
+      "bytes": 8646,
+      "sha256": "577e094aa122e8b15aa18d33d8f4c538bdbc36545955d16bdadc36e9892fb271"
+    },
+    {
+      "path": "types/current-data-model.d.ts",
+      "bytes": 2131,
+      "sha256": "2150810615776d0e12937462c499b02a17a6608977a0ca50b978bb8ee2048bd5"
+    }
+  ]
+}

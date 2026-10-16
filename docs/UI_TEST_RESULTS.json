@@ -1,0 +1,60 @@
+{
+  "method": "in-memory UI harness; NOT native IndexedDB or hardware validation",
+  "tests": [
+    {
+      "test": "분리 소스 화면 초기화",
+      "status": "PASS",
+      "details": "로컬 HTML 렌더링 + 메모리 테스트 저장소; 네이티브 저장 검증 아님"
+    },
+    {
+      "test": "체험 36건 생성·중복 방지",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "test": "집계·규칙 요약·실제/체험 분리",
+      "status": "PASS",
+      "details": "욕실 12건; 반복 단차 8건; 실제 기록 0건 분리"
+    },
+    {
+      "test": "사진 포함 엑셀 36건",
+      "status": "PASS",
+      "details": "7열 순서, 2시트, 36개 이미지, XML·캐시·수식 구조"
+    },
+    {
+      "test": "조회 필터·선택 내보내기",
+      "status": "PASS",
+      "details": "욕실 12건 중 선택 1건만 사진 포함 출력"
+    },
+    {
+      "test": "상세 수정·테스트 저장소 반영",
+      "status": "PASS",
+      "details": "네이티브 디스크 저장/새로고침 검증 아님"
+    },
+    {
+      "test": "ZIP 백업·빈 테스트 저장소로 복원·중복 방지",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "test": "체험 연속 촬영·위치 유지·변경",
+      "status": "PASS",
+      "details": "별도 등록 버튼 없이 3건 생성, 이전 기록 위치 불변"
+    },
+    {
+      "test": "모바일 390px 화면 렌더링",
+      "status": "PASS",
+      "details": "문서 가로 넘침 없음"
+    },
+    {
+      "test": "단일 HTML 빌드 산출물 UI",
+      "status": "PASS",
+      "details": "동일 테스트 저장소 어댑터로 화면·예시 생성 확인"
+    },
+    {
+      "test": "시험 중 처리되지 않은 JS 오류 없음",
+      "status": "PASS",
+      "details": ""
+    }
+  ]
+}

@@ -1,6 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="640" height="480" viewBox="0 0 640 480">
-  <rect width="640" height="480" fill="#e6edf3"/>
-  <rect x="90" y="90" width="460" height="300" rx="12" fill="#ffffff" stroke="#0b3b66" stroke-width="8"/>
-  <path d="M220 250l70 70 145-165" fill="none" stroke="#19865c" stroke-width="28" stroke-linecap="round" stroke-linejoin="round"/>
-  <text x="320" y="430" text-anchor="middle" font-family="Arial" font-size="28" fill="#0b3b66">TEST COMPLETION</text>
-</svg>

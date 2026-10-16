@@ -1,10 +1,10 @@
 {
-  "name": "린 하자 ON",
-  "short_name": "하자 ON",
+  "name": "현장노트 Voice",
+  "short_name": "현장노트",
   "start_url": ".",
   "display": "standalone",
-  "background_color": "#f3f6f9",
-  "theme_color": "#0b3b66",
+  "background_color": "#f6f7f9",
+  "theme_color": "#f6f7f9",
   "lang": "ko",
-  "description": "오프라인 우선형 건설 현장 하자관리 앱"
+  "description": "현장 사진과 자유발화 한국어 음성을 함께 기록하는 하자 점검 도구"
 }
