@@ -1413,6 +1413,7 @@ function stopSpeechRecognition(clear = false) {
     speechState.recognition = null;
     speechState.listening = false;
     if (clear) {
+        speechState.manualPaused = true;
         speechState.finalText = '';
         speechState.interimText = '';
         speechState.lastCapture = null;
