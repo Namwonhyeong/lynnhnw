@@ -1,4 +1,4 @@
-const CACHE = 'field-note-voice-v1';
+const CACHE = 'field-note-voice-v2';
 const ASSETS = ['./', './index.html', './manifest.webmanifest'];
 
 self.addEventListener('install', event => {

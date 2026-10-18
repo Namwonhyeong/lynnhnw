@@ -111,7 +111,7 @@ window.addEventListener('pagehide', () => { stopSpeechRecognition(true); state.s
     state.demoLocation = readSetting('demoLocation', '');
     state.liveLocation = readSetting('liveLocation', '');
     state.keep = readSetting('keep', true);
-    setMode('demo');
+    setMode('live');
     renderRecords();
 }
 catch (e) {
