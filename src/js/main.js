@@ -32,6 +32,11 @@ function wireV2() {
         openDetail(b.dataset.record); };
     $('tableViewBtn').onclick = () => { state.listFormat = 'table'; renderListV2(); };
     $('cardViewBtn').onclick = () => { state.listFormat = 'cards'; renderListV2(); };
+    $('calendarViewBtn').onclick = () => { state.listFormat = 'calendar'; renderListV2(); };
+    $('calendarPrev').onclick = () => { state.calendarMonth = new Date(state.calendarMonth.getFullYear(), state.calendarMonth.getMonth() - 1, 1); renderListV2(); };
+    $('calendarNext').onclick = () => { state.calendarMonth = new Date(state.calendarMonth.getFullYear(), state.calendarMonth.getMonth() + 1, 1); renderListV2(); };
+    $('calendarToday').onclick = () => { const now = new Date(); state.calendarMonth = new Date(now.getFullYear(), now.getMonth(), 1); renderListV2(); };
+    $('calendarGrid').onclick = e => { const b = e.target.closest('[data-record]'); if (b) openDetail(b.dataset.record); };
     $('analyticsLive').onclick = () => { state.analyticsMode = 'live'; $('analysisUnit').value = ''; renderAnalytics(); };
     $('analyticsDemo').onclick = () => { state.analyticsMode = 'demo'; $('analysisUnit').value = ''; renderAnalytics(); };
     for (const id of ['analysisUnit', 'analysisFrom', 'analysisTo'])

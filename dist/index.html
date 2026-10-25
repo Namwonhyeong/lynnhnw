@@ -413,6 +413,22 @@ select{font:inherit;color:var(--ink)}
 .cards-v2 .photo-index{left:auto;right:10px}
 .card-classification{display:flex;gap:5px;flex-wrap:wrap;margin:8px 0}
 .cards-v2 .grid-desc{min-height:34px}
+.calendar-shell{margin-top:15px;background:white;border:1px solid var(--line);border-radius:15px;overflow:hidden}
+.calendar-head{display:flex;align-items:center;justify-content:center;gap:10px;padding:15px;border-bottom:1px solid var(--line)}
+.calendar-head h2{font-size:17px;margin:0;min-width:110px;text-align:center}
+.calendar-head .text-button{margin-left:8px}
+.calendar-nav{border:1px solid var(--line);background:white;border-radius:8px;width:32px;height:32px;font-size:22px;line-height:1;color:#5d6e75}
+.calendar-week,.calendar-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr))}
+.calendar-week{background:#f7f9f9;border-bottom:1px solid var(--line)}
+.calendar-week span{text-align:center;padding:9px 4px;font-size:10px;font-weight:700;color:#7b898f}
+.calendar-week span:first-child{color:#c55d45}.calendar-week span:last-child{color:#4776a0}
+.calendar-day{min-height:126px;padding:8px;border-right:1px solid #edf0f1;border-bottom:1px solid #edf0f1;overflow:hidden}
+.calendar-day:nth-child(7n){border-right:0}.calendar-day.outside{background:#f8fafa;color:#aeb7bb}.calendar-day.today{box-shadow:inset 0 0 0 2px var(--accent)}
+.calendar-date{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;font-size:11px}
+.calendar-date b{font-size:12px}.calendar-date span{background:var(--green-bg);color:var(--green);border-radius:10px;padding:2px 6px;font-size:9px;font-weight:700}
+.calendar-items{display:flex;flex-direction:column;gap:4px}
+.calendar-items button{display:flex;align-items:center;gap:5px;width:100%;border:0;background:#f1f5f4;border-radius:6px;padding:3px;text-align:left;color:var(--ink);min-width:0}
+.calendar-items img{width:25px;height:25px;border-radius:4px;object-fit:cover;flex:0 0 auto}.calendar-items span{font-size:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.calendar-items small{font-size:9px;color:var(--muted);padding-left:3px}
 .data-empty{padding:55px 20px;text-align:center;background:white;border:1px solid var(--line);border-radius:14px;grid-column:1/-1}
 .data-empty .icon{width:32px;height:32px;color:#93a8a0}
 .data-empty h3{font-size:17px;margin:16px 0 8px}
@@ -604,6 +620,7 @@ select{font:inherit;color:var(--ink)}
 .classification-note{margin-bottom:12px}
 .list-heading p{font-size:10px}
 .record-grid.cards-v2 .grid-card .photo{height:137px}
+.calendar-shell{overflow-x:auto}.calendar-head,.calendar-week,.calendar-grid{min-width:720px}.calendar-day{min-height:116px}
 }
 
 
@@ -664,9 +681,10 @@ select{font:inherit;color:var(--ink)}
   <div class="data-filters"><div class="filter-field"><label for="filterUnit">동호수</label><select id="filterUnit"><option value="">전체 동호수</option></select></div><div class="filter-field"><label for="filterPosition">위치</label><select id="filterPosition"><option value="">전체 위치</option></select></div><div class="filter-field"><label for="filterTrade">공종</label><select id="filterTrade"><option value="">전체 공종</option></select></div><div class="filter-field"><label for="filterFrom">시작일</label><input type="date" id="filterFrom"></div><div class="filter-field"><label for="filterTo">종료일</label><input type="date" id="filterTo"></div><button class="text-button" id="resetFilters">초기화</button></div>
   <p class="classification-note"><i data-icon="info"></i><span>동호수는 유지된 위치를 사용합니다. ‘욕실·거실’과 공종은 내용의 키워드로 자동 분류한 초안입니다. 사진을 열어 수정할 수 있고, 담당 업체는 내용에 그대로 남습니다.</span></p>
   </div>
-  <div class="selection-bar"><div class="selection-left"><label class="select-check"><input id="selectVisible" type="checkbox">조회 <b id="visibleCount">0</b>건</label><span id="selectedLabel">선택 0건</span><button class="text-button hidden" id="clearSelection">선택 해제</button></div><div class="mini-segment" aria-label="목록 보기 형식"><button id="tableViewBtn" class="active">표</button><button id="cardViewBtn">사진</button></div></div>
+  <div class="selection-bar"><div class="selection-left"><label class="select-check"><input id="selectVisible" type="checkbox">조회 <b id="visibleCount">0</b>건</label><span id="selectedLabel">선택 0건</span><button class="text-button hidden" id="clearSelection">선택 해제</button></div><div class="mini-segment" aria-label="목록 보기 형식"><button id="tableViewBtn" class="active">표</button><button id="cardViewBtn">사진</button><button id="calendarViewBtn">달력</button></div></div>
   <div id="recordTableWrap" class="table-shell"><table class="records-table"><thead><tr><th class="row-selection"></th><th>날짜</th><th>동호수</th><th>위치</th><th>공종</th><th>내용</th><th>비고</th><th>해당사진</th></tr></thead><tbody id="recordTableBody"></tbody></table></div>
   <div class="record-grid cards-v2 hidden" id="recordGrid"></div>
+  <div class="calendar-shell hidden" id="calendarView"><div class="calendar-head"><button class="calendar-nav" id="calendarPrev" aria-label="이전 달">‹</button><h2 id="calendarTitle"></h2><button class="calendar-nav" id="calendarNext" aria-label="다음 달">›</button><button class="text-button" id="calendarToday">오늘</button></div><div class="calendar-week"><span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span></div><div class="calendar-grid" id="calendarGrid"></div></div>
   <div class="after-list"><span id="listFootnote">엑셀 순서: 날짜 / 동호수 / 위치 / 공종 / 내용 / 비고 / 해당사진</span><button class="text-button" id="seedListBtn">예시 36건으로 기능 체험</button></div>
  </section>
  <section id="analyticsView" class="hidden">
@@ -1496,7 +1514,7 @@ const XLSX_TEMPLATE = { "parts": { "xl/workbook.xml": "<?xml version=\"1.0\" enc
    Excel styles/template generated with artifact_tool; variable rows and image parts
    are serialized locally as OOXML, using the existing offline ZIP writer. */
 Object.assign(icons, { chart: '<path d="M4 3v18h17M8 16v-5M13 16V7M18 16V4"/>', sheet: '<path d="M14 2H5v20h14V7Z M14 2v5h5M8 11h8M8 15h8M8 19h8M11 11v8"/>', upload: '<path d="M12 16V3m-5 5 5-5 5 5M4 16v5h16v-5"/>' });
-Object.assign(state, { selected: new Set(), listFormat: matchMedia('(max-width:600px)').matches ? 'cards' : 'table', analyticsMode: 'live', exporting: false, importing: false });
+Object.assign(state, { selected: new Set(), listFormat: matchMedia('(max-width:600px)').matches ? 'cards' : 'table', calendarMonth: new Date(new Date().getFullYear(), new Date().getMonth(), 1), analyticsMode: 'live', exporting: false, importing: false });
 const POSITION_RULES = [['공용욕실', /공용\s*욕실|거실\s*욕실/], ['안방욕실', /안방\s*욕실|부부\s*욕실/], ['욕실', /욕실|화장실/], ['거실', /거실/], ['안방', /안방/], ['작은방', /작은\s*방/], ['침실', /침실/], ['주방', /주방|부엌/], ['현관', /현관/], ['발코니', /발코니|베란다/], ['다용도실', /다용도실|세탁실/], ['드레스룸', /드레스\s*룸/], ['복도', /복도/], ['계단실', /계단실/], ['지하주차장', /지하\s*주차장/]];
 const TRADE_RULES = [['타일', /타일|줄눈|메지/], ['도배', /도배|벽지/], ['창호', /창호|창틀|창짝|방충망|유리/], ['내장', /문선|몰딩|내장|걸레받이|문틀|문짝/], ['가구', /가구|싱크대|붙박이|수납장|주방\s*걸레받이/], ['방수', /방수/], ['도장', /도장|도색|페인트|퍼티/], ['전기', /전기|콘센트|스위치|조명|배선/], ['설비', /설비|배관|수전|배수|환기구|위생도기/], ['골조', /골조|철근|거푸집|알폼|갱폼|콘크리트|동바리/], ['실란트', /코킹|실리콘|실란트/]];
 const TYPE_RULES = [['단차', /단차/], ['들뜸', /들뜸|들뜬/], ['누락·미시공', /누락|미시공|미설치|미충진|미충전/], ['찍힘·파손', /찍힘|파손|깨짐|찍힌/], ['균열', /균열|크랙/], ['틈새', /틈새|벌어짐|이격/], ['누수', /누수|물이\s*샘/], ['오염', /오염|얼룩/], ['수직·수평', /수직|수평/], ['작동 불량', /작동\s*불량|개폐\s*불량|고장/]];
@@ -1549,6 +1567,8 @@ function modeMatches(r) { return state.filter === 'all' || state.filter === 'liv
 function visibleRecords() { const query = $('search').value.trim().toLowerCase(), u = $('filterUnit').value, p = $('filterPosition').value, t = $('filterTrade').value, from = $('filterFrom').value, to = $('filterTo').value; return [...state.records].filter(r => { if (!modeMatches(r))
     return false; const c = classifyRecord(r), day = dayKey(r.createdAt); return (!u || c.unit === u) && (!p || c.position === p) && (!t || c.trade === t) && (!from || day >= from) && (!to || day <= to) && `${c.unit} ${c.position} ${c.trade} ${c.note} ${r.text || ''}`.toLowerCase().includes(query); }).sort((a, b) => b.createdAt - a.createdAt || a.id.localeCompare(b.id)); }
 function selectedRecords() { const rs = visibleRecords(), selected = rs.filter(r => state.selected.has(r.id)); return selected.length ? selected : rs; }
+function calendarCells(year, month) { const first = new Date(year, month, 1), start = new Date(year, month, 1 - first.getDay()); return Array.from({ length: 42 }, (_, i) => { const date = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i); return { year: date.getFullYear(), month: date.getMonth(), date: date.getDate(), key: `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`, current: date.getMonth() === month }; }); }
+function renderCalendar(rs) { const month = state.calendarMonth, year = month.getFullYear(), index = month.getMonth(), groups = new Map(); for (const r of rs) { const key = dayKey(r.createdAt); if (!groups.has(key)) groups.set(key, []); groups.get(key).push(r); } $('calendarTitle').textContent = `${year}년 ${index + 1}월`; const today = dayKey(Date.now()); $('calendarGrid').innerHTML = calendarCells(year, index).map(day => { const items = groups.get(day.key) || []; return `<section class="calendar-day ${day.current ? '' : 'outside'} ${day.key === today ? 'today' : ''}" aria-label="${day.key} ${items.length}건"><div class="calendar-date"><b>${day.date}</b>${items.length ? `<span>${items.length}건</span>` : ''}</div><div class="calendar-items">${items.slice(0, 3).map(r => { const c = classifyRecord(r); return `<button data-record="${esc(r.id)}" title="${esc(c.unit + ' ' + recordDescription(r))}"><img loading="lazy" src="${esc(r.photo)}" alt="${esc(c.unit)} 촬영 사진"><span>${esc(c.unit)}</span></button>`; }).join('')}${items.length > 3 ? `<small>+${items.length - 3}건 더보기</small>` : ''}</div></section>`; }).join(''); }
 function renderRecords() { renderRecordsCore(); renderListV2(); if (state.view === 'analytics')
     renderAnalytics(); }
 function renderListV2() {
@@ -1573,10 +1593,13 @@ function renderListV2() {
     $('excelBtn').innerHTML = icon('sheet') + `사진 포함 엑셀${rs.length ? ' · ' + (n || rs.length) + '건' : ''}`;
     $('tableViewBtn').classList.toggle('active', state.listFormat === 'table');
     $('cardViewBtn').classList.toggle('active', state.listFormat === 'cards');
+    $('calendarViewBtn').classList.toggle('active', state.listFormat === 'calendar');
     $('recordTableWrap').classList.toggle('hidden', state.listFormat !== 'table');
     $('recordGrid').classList.toggle('hidden', state.listFormat !== 'cards');
+    $('calendarView').classList.toggle('hidden', state.listFormat !== 'calendar');
     $('recordTableBody').innerHTML = rs.length ? rs.map(r => { const c = classifyRecord(r), picked = state.selected.has(r.id); return `<tr class="${picked ? 'selected-row' : ''}"><td><input class="row-select" type="checkbox" data-select="${esc(r.id)}" aria-label="${esc(c.unit + ' ' + (r.text || '사진'))} 선택" ${picked ? 'checked' : ''}></td><td class="date-col">${dayKey(r.createdAt)}<br>${fmtTime(r.createdAt)}<br>${r.mode === 'demo' ? '<span class="tag">체험</span>' : ''}</td><td class="unit-col"><button class="cell-link" data-record="${esc(r.id)}">${esc(c.unit)}</button></td><td class="position-col">${classChip(c.position)}</td><td class="trade-col">${classChip(c.trade)}${!c.reviewed ? '<span class="auto-note">자동 분류</span>' : ''}</td><td class="content-col"><button class="cell-link" data-record="${esc(r.id)}">${esc(recordDescription(r))}</button></td><td class="note-col">${esc(recordNote(r) || '—')}</td><td><button class="table-photo" data-record="${esc(r.id)}" aria-label="${esc(c.unit)} 사진 및 분류 수정"><img loading="lazy" src="${esc(r.photo)}" alt="${r.mode === 'demo' ? '체험용 예시' : '촬영'} 사진"></button></td></tr>`; }).join('') : '<tr><td colspan="8"><div class="analytics-empty-inline">조회되는 기록이 없습니다. 필터를 바꾸거나 현장 등록에서 촬영하세요.</div></td></tr>';
     $('recordGrid').innerHTML = rs.length ? rs.map(r => { const c = classifyRecord(r), picked = state.selected.has(r.id); return `<article class="grid-card ${picked ? 'selected-row' : ''}"><label class="card-pick"><input class="row-select" type="checkbox" data-select="${esc(r.id)}" aria-label="${esc(c.unit)} 기록 선택" ${picked ? 'checked' : ''}></label><button class="card-open" data-record="${esc(r.id)}"><div class="photo"><img loading="lazy" src="${esc(r.photo)}" alt="${r.mode === 'demo' ? '체험 예시' : '촬영'} 사진"><span class="photo-index">${r.mode === 'demo' ? '체험' : '촬영'}</span></div><div class="grid-body"><div class="grid-loc">${esc(c.unit)}</div><div class="card-classification">${classChip(c.position)}${classChip(c.trade)}</div><p class="grid-desc">${esc(recordDescription(r))}</p><div class="grid-bottom"><span>${dayKey(r.createdAt)} ${fmtTime(r.createdAt)}</span><span class="auto-note">${c.reviewed ? '분류 확인됨' : '자동 분류 · 확인 전'}</span></div></div></button></article>`; }).join('') : '<div class="data-empty">' + icon('image') + '<h3>조회되는 기록이 없습니다.</h3><p>현장 등록에서 촬영하거나<br>아래 예시 데이터로 엑셀·집계 기능을 체험하세요.</p></div>';
+    renderCalendar(rs);
     const hiddenSelected = state.selected.size - n;
     $('listFootnote').textContent = (hiddenSelected ? `현재 필터 밖 선택 ${hiddenSelected}건은 내보내기에서 제외됩니다. ` : '') + '엑셀: 날짜 / 동호수 / 위치 / 공종 / 내용 / 비고 / 해당사진';
 }
@@ -2046,6 +2069,11 @@ function wireV2() {
         openDetail(b.dataset.record); };
     $('tableViewBtn').onclick = () => { state.listFormat = 'table'; renderListV2(); };
     $('cardViewBtn').onclick = () => { state.listFormat = 'cards'; renderListV2(); };
+    $('calendarViewBtn').onclick = () => { state.listFormat = 'calendar'; renderListV2(); };
+    $('calendarPrev').onclick = () => { state.calendarMonth = new Date(state.calendarMonth.getFullYear(), state.calendarMonth.getMonth() - 1, 1); renderListV2(); };
+    $('calendarNext').onclick = () => { state.calendarMonth = new Date(state.calendarMonth.getFullYear(), state.calendarMonth.getMonth() + 1, 1); renderListV2(); };
+    $('calendarToday').onclick = () => { const now = new Date(); state.calendarMonth = new Date(now.getFullYear(), now.getMonth(), 1); renderListV2(); };
+    $('calendarGrid').onclick = e => { const b = e.target.closest('[data-record]'); if (b) openDetail(b.dataset.record); };
     $('analyticsLive').onclick = () => { state.analyticsMode = 'live'; $('analysisUnit').value = ''; renderAnalytics(); };
     $('analyticsDemo').onclick = () => { state.analyticsMode = 'demo'; $('analysisUnit').value = ''; renderAnalytics(); };
     for (const id of ['analysisUnit', 'analysisFrom', 'analysisTo'])

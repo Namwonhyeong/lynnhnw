@@ -402,6 +402,22 @@ select{font:inherit;color:var(--ink)}
 .cards-v2 .photo-index{left:auto;right:10px}
 .card-classification{display:flex;gap:5px;flex-wrap:wrap;margin:8px 0}
 .cards-v2 .grid-desc{min-height:34px}
+.calendar-shell{margin-top:15px;background:white;border:1px solid var(--line);border-radius:15px;overflow:hidden}
+.calendar-head{display:flex;align-items:center;justify-content:center;gap:10px;padding:15px;border-bottom:1px solid var(--line)}
+.calendar-head h2{font-size:17px;margin:0;min-width:110px;text-align:center}
+.calendar-head .text-button{margin-left:8px}
+.calendar-nav{border:1px solid var(--line);background:white;border-radius:8px;width:32px;height:32px;font-size:22px;line-height:1;color:#5d6e75}
+.calendar-week,.calendar-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr))}
+.calendar-week{background:#f7f9f9;border-bottom:1px solid var(--line)}
+.calendar-week span{text-align:center;padding:9px 4px;font-size:10px;font-weight:700;color:#7b898f}
+.calendar-week span:first-child{color:#c55d45}.calendar-week span:last-child{color:#4776a0}
+.calendar-day{min-height:126px;padding:8px;border-right:1px solid #edf0f1;border-bottom:1px solid #edf0f1;overflow:hidden}
+.calendar-day:nth-child(7n){border-right:0}.calendar-day.outside{background:#f8fafa;color:#aeb7bb}.calendar-day.today{box-shadow:inset 0 0 0 2px var(--accent)}
+.calendar-date{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;font-size:11px}
+.calendar-date b{font-size:12px}.calendar-date span{background:var(--green-bg);color:var(--green);border-radius:10px;padding:2px 6px;font-size:9px;font-weight:700}
+.calendar-items{display:flex;flex-direction:column;gap:4px}
+.calendar-items button{display:flex;align-items:center;gap:5px;width:100%;border:0;background:#f1f5f4;border-radius:6px;padding:3px;text-align:left;color:var(--ink);min-width:0}
+.calendar-items img{width:25px;height:25px;border-radius:4px;object-fit:cover;flex:0 0 auto}.calendar-items span{font-size:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.calendar-items small{font-size:9px;color:var(--muted);padding-left:3px}
 .data-empty{padding:55px 20px;text-align:center;background:white;border:1px solid var(--line);border-radius:14px;grid-column:1/-1}
 .data-empty .icon{width:32px;height:32px;color:#93a8a0}
 .data-empty h3{font-size:17px;margin:16px 0 8px}
@@ -593,5 +609,6 @@ select{font:inherit;color:var(--ink)}
 .classification-note{margin-bottom:12px}
 .list-heading p{font-size:10px}
 .record-grid.cards-v2 .grid-card .photo{height:137px}
+.calendar-shell{overflow-x:auto}.calendar-head,.calendar-week,.calendar-grid{min-width:720px}.calendar-day{min-height:116px}
 }
 
