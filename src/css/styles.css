@@ -103,6 +103,8 @@ svg.icon{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;s
 .shutter-wrap{display:flex;align-items:center;flex-direction:column;gap:6px;position:absolute;left:50%;transform:translateX(-50%);top:12px}
 .shutter{border:2px solid #f5c3ad;background:white;width:77px;height:77px;border-radius:50%;padding:5px;box-shadow:0 2px 10px #f2744220}
 .shutter-inner{width:100%;height:100%;display:grid;place-items:center;background:var(--accent);color:white;border-radius:50%;transition:transform .13s}
+.shutter.review{border-color:#9fd6c2;box-shadow:0 2px 12px #16736635}
+.shutter.review .shutter-inner{background:var(--green)}
 .shutter-inner .icon{width:27px;height:27px}
 .shutter:active .shutter-inner{transform:scale(.90)}
 .shutter-wrap>span{font-size:10px;font-weight:700;color:#7a858c}

@@ -155,20 +155,27 @@ def run() -> None:
             page2.locator('#startBtn').click()
             page2.wait_for_function('state.active && !state.busy')
             page2.locator('#shutter').click()
-            page2.wait_for_function('state.records.length === 37 && !state.busy')
+            page2.wait_for_function('!!state.draftPhoto && state.records.length === 36 && !state.busy')
+            assert page2.locator('#shutterLabel').inner_text() == '녹음 완료 OK'
             page2.locator('#shutter').click()
-            page2.wait_for_function('state.records.length === 38 && !state.busy')
+            page2.wait_for_function('!state.draftPhoto && state.records.length === 37 && !state.busy')
+            page2.locator('#shutter').click()
+            page2.wait_for_function('!!state.draftPhoto && state.records.length === 37 && !state.busy')
+            page2.locator('#shutter').click()
+            page2.wait_for_function('!state.draftPhoto && state.records.length === 38 && !state.busy')
             first_locations = page2.evaluate('state.records.slice(-2).map(r=>r.location)')
             assert first_locations == ['101동 1203호', '101동 1203호']
             page2.locator('#locationBtn').click()
             page2.locator('#locationInput').fill('101동 1204호')
             page2.locator('#locationApply').click()
             page2.locator('#shutter').click()
-            page2.wait_for_function('state.records.length === 39 && !state.busy')
+            page2.wait_for_function('!!state.draftPhoto && state.records.length === 38 && !state.busy')
+            page2.locator('#shutter').click()
+            page2.wait_for_function('!state.draftPhoto && state.records.length === 39 && !state.busy')
             assert page2.evaluate('state.records.slice(-3).map(r=>r.location)') == ['101동 1203호', '101동 1203호', '101동 1204호']
             page2.locator('#finishBtn').click()
             page2.wait_for_function('!state.active && !state.stopping')
-            passed('연속 촬영·위치 유지·새 위치 적용', '별도 등록 버튼 없이 체험 3건; 이전 위치 불변')
+            passed('사진→설명→OK·위치 유지·새 위치 적용', '사진별 OK로 체험 3건; 이전 위치 불변')
 
             page2.locator('#captureTab').click()
             page2.locator('#liveMode').click()
@@ -177,7 +184,9 @@ def run() -> None:
             page2.wait_for_function("document.getElementById('liveVideo').videoWidth > 0")
             page2.wait_for_timeout(1150)
             page2.locator('#shutter').click()
-            page2.wait_for_function('state.records.length === 40 && !state.busy')
+            page2.wait_for_function('!!state.draftPhoto && state.records.length === 39 && !state.busy')
+            page2.locator('#shutter').click()
+            page2.wait_for_function('!state.draftPhoto && state.records.length === 40 && !state.busy')
             assert page2.evaluate('state.recorder.state') == 'recording'
             assert page2.evaluate('state.records.at(-1).text') == ''
             assert page2.evaluate("['pending','not_supported'].includes(state.records.at(-1).transcriptionStatus)")

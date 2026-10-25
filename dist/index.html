@@ -114,6 +114,8 @@ svg.icon{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;s
 .shutter-wrap{display:flex;align-items:center;flex-direction:column;gap:6px;position:absolute;left:50%;transform:translateX(-50%);top:12px}
 .shutter{border:2px solid #f5c3ad;background:white;width:77px;height:77px;border-radius:50%;padding:5px;box-shadow:0 2px 10px #f2744220}
 .shutter-inner{width:100%;height:100%;display:grid;place-items:center;background:var(--accent);color:white;border-radius:50%;transition:transform .13s}
+.shutter.review{border-color:#9fd6c2;box-shadow:0 2px 12px #16736635}
+.shutter.review .shutter-inner{background:var(--green)}
 .shutter-inner .icon{width:27px;height:27px}
 .shutter:active .shutter-inner{transform:scale(.90)}
 .shutter-wrap>span{font-size:10px;font-weight:700;color:#7a858c}
@@ -621,7 +623,7 @@ select{font:inherit;color:var(--ink)}
  <section id="captureView">
   <div class="workspace">
    <div class="main-column">
-    <div class="section-intro"><div><div class="eyebrow">VOICE-FIRST INSPECTION</div><h1>말하면 적고, 찍으면 묶습니다.</h1><p id="modeNote" class="mode-note"><b>음성·카메라 실사용</b> · 자유롭게 말하고 문장이 보이면 촬영하세요.</p></div></div>
+    <div class="section-intro"><div><div class="eyebrow">PHOTO-FIRST INSPECTION</div><h1>찍고 말한 뒤, OK로 저장합니다.</h1><p id="modeNote" class="mode-note"><b>음성·카메라 실사용</b> · 사진을 찍고 설명한 뒤 녹음 완료 OK를 누르세요.</p></div></div>
     <div class="location-card">
      <div class="location-main"><div class="location-icon"><i data-icon="pin"></i></div><div><div class="location-label">현재 위치</div><div class="location-value" id="locationText">점검 시작 시 위치 설정</div></div></div>
      <div class="location-actions"><label class="keep-location"><span>다음 사진에도 유지</span><span class="switch"><input id="keepLocation" type="checkbox" checked aria-label="다음 사진에도 위치 유지"><span></span></span></label><button class="text-button" id="locationBtn">위치 변경</button></div>
@@ -633,13 +635,13 @@ select{font:inherit;color:var(--ink)}
       <div class="hud"><span class="state-badge" id="stateBadge"><span class="state-dot"></span><span id="stateLabel">점검 시작 전</span></span><span class="elapsed mono"><i data-icon="clock"></i><span id="elapsed">00:00</span></span></div>
       <div class="sample-badge" id="sampleBadge">대기 화면 · 시작 시 카메라 연결</div>
       <div class="viewfinder" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
-      <div class="live-caption"><div class="caption-kicker"><i data-icon="mic"></i><span id="captionLabel">사진과 설명을 한 번에</span><span class="wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span></div><p class="caption-text" id="captionText">점검은 시작할 때 한 번만.<br>그다음은 촬영 버튼 하나.</p><p class="caption-sub" id="captionSub">녹음 시작 · 종료 · 등록을 매번 누르지 않습니다.</p></div>
+      <div class="live-caption"><div class="caption-kicker"><i data-icon="mic"></i><span id="captionLabel">사진별 음성 기록</span><span class="wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span></div><p class="caption-text" id="captionText">사진을 찍고 설명한 뒤<br>녹음 완료 OK로 저장합니다.</p><p class="caption-sub" id="captionSub">사진마다 음성 구간을 명확하게 나눕니다.</p></div>
       <div class="flash" id="flash"></div>
      </div>
      <div class="controls">
-      <div class="start-area" id="startArea"><button class="primary" id="startBtn"><i data-icon="camera"></i>카메라·마이크 켜기</button><div class="start-description" id="startDescription">권한을 허용하면 실제 카메라와 한국어 음성인식이 시작됩니다.<br>말한 문장이 화면에 보이면 촬영하세요.</div></div>
+      <div class="start-area" id="startArea"><button class="primary" id="startBtn"><i data-icon="camera"></i>카메라·마이크 켜기</button><div class="start-description" id="startDescription">권한을 허용하고 사진을 먼저 촬영하세요.<br>촬영한 사진에 붙일 음성인식이 바로 시작됩니다.</div></div>
       <button class="last-shortcut hidden" id="lastShortcut" aria-label="방금 저장한 기록 보기"><span class="last-thumb" id="lastThumb"><i data-icon="image"></i></span><span><b id="sessionCount">0건</b><small>이번 점검</small></span></button>
-      <div class="shutter-wrap hidden" id="shutterWrap"><button id="shutter" class="shutter" aria-label="사진 촬영하고 자동 저장"><span class="shutter-inner"><i data-icon="camera"></i></span></button><span>말하면서 촬영</span></div>
+      <div class="shutter-wrap hidden" id="shutterWrap"><button id="shutter" class="shutter" aria-label="사진 촬영"><span class="shutter-inner"><i data-icon="camera"></i></span></button><span id="shutterLabel">사진 촬영</span></div>
       <div class="session-actions hidden" id="sessionActions"><button id="speechBtn" class="pause-btn speech-btn" aria-label="음성인식 다시 시작"><i data-icon="mic"></i></button><button id="pauseBtn" class="pause-btn" aria-label="녹음 일시정지"><i data-icon="pause"></i></button><button id="finishBtn" class="finish-btn">점검 종료</button></div>
      </div>
      <div class="camera-footer"><span class="save-status"><i data-icon="check"></i><span id="saveStatus">촬영하면 이 기기에 자동 저장</span></span><span id="cloudStatus">클라우드 미연결</span></div>
@@ -649,7 +651,7 @@ select{font:inherit;color:var(--ink)}
    <aside class="side">
     <div class="side-title"><h2>방금 등록</h2><span id="recentCounter">0건</span></div><div class="recent-list" id="recentList"></div>
     <button class="view-all" id="viewAll">전체 기록 보기<i data-icon="arrow"></i></button>
-    <div class="workflow-card"><h3>한 세대, 끊김 없는 기록</h3><div class="flow-step"><span class="step-no">1</span><div><strong>카메라·마이크 켜기</strong><p>브라우저 권한을 허용하면 실제 촬영과<br>한국어 음성인식이 함께 시작됩니다.</p></div></div><div class="flow-step active"><span class="step-no">2</span><div><strong>말한 문장을 확인하고 촬영</strong><p>“101동 302호 안방 창틀 코킹 누락”처럼<br>순서와 관계없이 자유롭게 말하세요.</p></div></div><div class="flow-step"><span class="step-no">3</span><div><strong>사진·문장 자동 저장</strong><p>동·호수와 지적 내용을 나눠 사진에 붙이고<br>내 등록과 사진 포함 엑셀에 반영합니다.</p></div></div></div>
+    <div class="workflow-card"><h3>사진별로 끊어 기록</h3><div class="flow-step"><span class="step-no">1</span><div><strong>사진 촬영</strong><p>하자 부위를 먼저 찍으면 화면에<br>해당 사진이 고정됩니다.</p></div></div><div class="flow-step active"><span class="step-no">2</span><div><strong>사진을 보며 설명</strong><p>“101동 302호 안방 창틀 코킹 누락”처럼<br>순서와 관계없이 자유롭게 말하세요.</p></div></div><div class="flow-step"><span class="step-no">3</span><div><strong>녹음 완료 OK</strong><p>OK를 누른 지점까지 한 건으로 저장하고<br>카메라가 다음 사진 촬영 상태로 돌아갑니다.</p></div></div></div>
     <div class="connection-note">현재 버전: 자유발화 한국어 음성인식 / 카메라·연속 녹음 / 사진 엑셀 / 집계<br>음성인식은 지원 브라우저와 네트워크가 필요하며 서버 공유는 연결 전입니다.</div>
    </aside>
   </div>
@@ -736,7 +738,7 @@ function sceneData(index = 0) {
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="780" height="450" viewBox="0 0 780 450"><defs><linearGradient id="light" x2="1" y2="1"><stop stop-color="${p[0]}"/><stop offset="1" stop-color="${p[1]}"/></linearGradient><linearGradient id="floor" x2="0" y2="1"><stop stop-color="${p[2]}"/><stop offset="1" stop-color="#78908b"/></linearGradient></defs><rect width="780" height="450" fill="url(#light)"/><path d="M0 0h86v314L0 383" fill="#829896" opacity=".3"/><path d="M0 365 85 310h626l69 55v85H0" fill="url(#floor)"/><path d="M85 310h625M0 401h780M187 310 107 450M334 310 310 450M481 310 513 450M629 310 718 450" stroke="#ccdad0" opacity=".35" stroke-width="1.4"/>${detail}<path d="M0 361 85 306h60M632 306h78l70 55" stroke="#e1e4d5" stroke-width="8"/><path d="M0 0h780v450H0Z" fill="#173239" opacity=".06"/></svg>`;
     return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
 }
-const state = { mode: 'live', active: false, paused: false, session: null, records: [], sessions: [], db: null, location: '', keep: true, exampleIndex: 0, filter: 'all', stream: null, recorder: null, chunkSeq: 0, chunkChain: Promise.resolve(), timer: null, origin: 0, pauseAt: 0, pausedMs: 0, busy: false, stopping: false, detailId: null, audioURL: null, wake: null, saveFailures: 0, view: 'capture', demoLocation: '', liveLocation: '' };
+const state = { mode: 'live', active: false, paused: false, session: null, records: [], sessions: [], db: null, location: '', keep: true, exampleIndex: 0, filter: 'all', stream: null, recorder: null, chunkSeq: 0, chunkChain: Promise.resolve(), timer: null, origin: 0, pauseAt: 0, pausedMs: 0, busy: false, stopping: false, detailId: null, audioURL: null, wake: null, saveFailures: 0, view: 'capture', demoLocation: '', liveLocation: '', draftPhoto: '', draftCreatedAt: 0, draftAudioOffsetMs: 0 };
 function toast(msg, error = false) { $('toast').textContent = msg; $('toast').classList.toggle('error', error); $('toast').classList.add('visible'); clearTimeout(toast.t); toast.t = setTimeout(() => $('toast').classList.remove('visible'), 3200); }
 function alertBox(msg) { $('runtimeAlert').textContent = msg; $('runtimeAlert').classList.toggle('hidden', !msg); }
 function fmtClock(ms) { const s = Math.floor(Math.max(0, ms) / 1000); return `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`; }
@@ -794,8 +796,9 @@ function updateViewLegacy(view) { state.view = view; $('captureView').classList.
     toast('목록을 보는 동안 녹음을 일시정지합니다.');
 } }
 function setScene() { const ex = examples[state.exampleIndex % examples.length]; $('sceneImage').src = sceneData(ex.scene); }
-function showNextExample() { const ex = examples[state.exampleIndex % examples.length]; setScene(); $('captionLabel').textContent = '음성 입력 예시 · 실제 인식 아님'; $('captionText').textContent = ex.text; $('captionSub').textContent = '촬영을 누르면 이 예시 설명이 사진과 함께 저장됩니다.'; }
+function showNextExample() { setScene(); $('captionLabel').textContent = '다음 기록 준비 · 체험'; $('captionText').textContent = '사진을 먼저 촬영해 주세요.'; $('captionSub').textContent = '촬영 후 예시 설명을 확인하고 녹음 완료 OK를 누릅니다.'; }
 function uiState() {
+    const describing = !!state.draftPhoto;
     document.body.classList.toggle('session-on', state.active);
     $('startArea').classList.toggle('hidden', state.active);
     for (const id of ['lastShortcut', 'shutterWrap', 'sessionActions'])
@@ -804,11 +807,15 @@ function uiState() {
     $('cameraStage').classList.toggle('paused', state.paused);
     $('stateBadge').classList.toggle('recording', state.active && !state.paused);
     $('stateBadge').classList.toggle('paused', state.paused);
-    $('stateLabel').textContent = state.paused ? '녹음 일시정지' : state.active ? (state.mode === 'demo' ? '연속 점검 · 체험 중' : '연속 녹음 중') : '점검 시작 전';
+    $('stateLabel').textContent = state.paused ? '녹음 일시정지' : describing ? '사진 촬영됨 · 설명 녹음 중' : state.active ? (state.mode === 'demo' ? '다음 사진 촬영 대기' : '다음 사진 촬영 대기') : '점검 시작 전';
     $('pauseBtn').innerHTML = icon(state.paused ? 'play' : 'pause');
     $('pauseBtn').ariaLabel = state.paused ? '녹음 이어하기' : '녹음 일시정지';
     $('shutter').disabled = state.paused || state.busy || state.stopping;
-    $('finishBtn').disabled = state.stopping;
+    $('shutter').classList.toggle('review', describing);
+    $('shutter').innerHTML = `<span class="shutter-inner">${icon(describing ? 'check' : 'camera')}</span>`;
+    $('shutter').ariaLabel = describing ? '음성 설명 완료하고 기록 저장' : '사진 촬영';
+    $('shutterLabel').textContent = describing ? '녹음 완료 OK' : '사진 촬영';
+    $('finishBtn').disabled = state.stopping || describing;
     $('demoMode').disabled = state.active || state.busy;
     $('liveMode').disabled = state.active || state.busy;
     $('locationBtn').disabled = state.stopping;
@@ -822,15 +829,15 @@ function setMode(mode) {
     saveSetting('mode', mode);
     $('demoMode').classList.toggle('selected', mode === 'demo');
     $('liveMode').classList.toggle('selected', mode === 'live');
-    $('modeNote').innerHTML = mode === 'demo' ? '<b>화면 체험 중</b> · 음성은 예시 문장으로 표시됩니다.' : '<b>음성·카메라 실사용</b> · 자유롭게 말하고 문장이 보이면 촬영하세요.';
+    $('modeNote').innerHTML = mode === 'demo' ? '<b>화면 체험 중</b> · 촬영 후 예시 설명을 확인하고 OK를 누릅니다.' : '<b>음성·카메라 실사용</b> · 사진을 찍고 설명한 뒤 녹음 완료 OK를 누르세요.';
     $('sceneImage').classList.remove('hidden');
     $('liveVideo').classList.add('hidden');
     $('sampleBadge').textContent = mode === 'demo' ? '예시 이미지 · 실제 촬영 아님' : '대기 화면 · 시작 시 카메라 연결';
     $('sampleBadge').classList.remove('hidden');
-    $('startDescription').innerHTML = mode === 'demo' ? '체험에서는 카메라·마이크 권한 없이<br>연속 등록 흐름을 확인할 수 있어요.' : '시작 시 카메라·마이크 권한을 요청합니다.<br>인식 문장과 사진·원본 음성을 이 기기에 저장합니다.';
-    $('captionLabel').textContent = '사진과 설명을 한 번에';
-    $('captionText').innerHTML = '점검은 시작할 때 한 번만.<br>그다음은 촬영 버튼 하나.';
-    $('captionSub').textContent = mode === 'demo' ? '녹음 시작 · 종료 · 등록을 매번 누르지 않습니다.' : '말한 문장이 보이면 촬영하세요. 말하는 순서는 자유롭습니다.';
+    $('startDescription').innerHTML = mode === 'demo' ? '체험에서는 권한 없이 사진→설명→OK<br>등록 흐름을 확인할 수 있습니다.' : '시작 시 카메라·마이크 권한을 요청합니다.<br>사진을 찍은 뒤 해당 사진의 설명을 말하세요.';
+    $('captionLabel').textContent = '사진별 음성 기록';
+    $('captionText').innerHTML = '사진을 찍고 설명한 뒤<br>녹음 완료 OK로 저장합니다.';
+    $('captionSub').textContent = mode === 'demo' ? '사진 촬영과 녹음 완료 흐름을 확인합니다.' : '사진을 먼저 촬영하면 그 사진의 음성인식이 시작됩니다.';
     $('elapsed').textContent = '00:00';
     alertBox('');
     uiState();
@@ -896,15 +903,19 @@ async function startSession() {
         state.pausedMs = 0;
         state.pauseAt = 0;
         state.exampleIndex = 0;
+        state.draftPhoto = '';
+        state.draftCreatedAt = 0;
+        state.draftAudioOffsetMs = 0;
         if (state.recorder)
             state.recorder.start(1000);
         if (state.mode === 'demo')
             showNextExample();
         else {
-            $('captionLabel').textContent = speechState.supported ? '한국어 음성인식 연결 중' : '원본 녹음 중';
-            $('captionText').textContent = '지적 내용을 자유롭게 말해 주세요.';
-            $('captionSub').textContent = speechState.supported ? '문장이 보이면 촬영하세요. 동·호수는 문장 어디에 있어도 됩니다.' : '이 브라우저는 음성인식을 지원하지 않아 원본 녹음만 저장합니다.';
-            startSpeechRecognition();
+            stopSpeechRecognition(true);
+            speechState.manualPaused = false;
+            $('captionLabel').textContent = '다음 기록 준비';
+            $('captionText').textContent = '사진을 먼저 촬영해 주세요.';
+            $('captionSub').textContent = '촬영 직후 이 사진에 붙일 음성인식이 시작됩니다.';
             for (const track of stream.getTracks())
                 track.onended = () => { if (state.active && !state.stopping) {
                     alertBox('카메라 또는 마이크 연결이 끊겼습니다. 점검을 종료하고 확인하세요.');
@@ -913,7 +924,7 @@ async function startSession() {
         }
         state.timer = setInterval(() => { $('elapsed').textContent = fmtClock(elapsed()); }, 250);
         await acquireWake();
-        toast(state.mode === 'demo' ? `체험 시작 · ${state.location || '위치 미지정'}` : '연속 녹음 시작 · 지적 내용을 말하면서 촬영하세요.');
+        toast(state.mode === 'demo' ? `체험 시작 · ${state.location || '위치 미지정'}` : '카메라 준비 완료 · 사진을 먼저 촬영하세요.');
     }
     catch (e) {
         stream?.getTracks().forEach(t => t.stop());
@@ -965,8 +976,13 @@ function pauseSession(force = false) {
             state.recorder.resume();
         if (state.mode === 'demo')
             showNextExample();
-        else {
+        else if (state.draftPhoto) {
             resumeSpeechRecognition();
+        }
+        else {
+            $('captionLabel').textContent = '다음 기록 준비';
+            $('captionText').textContent = '사진을 먼저 촬영해 주세요.';
+            $('captionSub').textContent = '촬영하면 해당 사진의 설명 녹음이 시작됩니다.';
         }
         acquireWake();
     }
@@ -975,6 +991,10 @@ function pauseSession(force = false) {
 async function finishSession() {
     if (!state.active || state.stopping || state.busy)
         return;
+    if (state.draftPhoto) {
+        toast('촬영한 사진의 녹음 완료 OK를 먼저 눌러주세요.', true);
+        return;
+    }
     state.stopping = true;
     stopSpeechRecognition(false);
     uiState();
@@ -1002,6 +1022,7 @@ async function finishSession() {
         state.active = false;
         state.paused = false;
         state.stopping = false;
+        state.draftPhoto = '';
         clearInterval(state.timer);
         await state.wake?.release().catch(() => { });
         state.wake = null;
@@ -1022,39 +1043,66 @@ async function capture() {
         return;
     state.busy = true;
     uiState();
-    $('saveStatus').textContent = '이 기기에 저장 중…';
-    const photoTime = Date.now(), offset = Math.round(elapsed());
+    $('saveStatus').textContent = state.draftPhoto ? '사진과 설명 저장 중…' : '사진 촬영 중…';
     try {
-        let photo, text = '', transcriptRaw = '', transcriptionStatus = 'not_supported';
         const ex = examples[state.exampleIndex % examples.length];
-        if (state.mode === 'demo') {
-            photo = sceneData(ex.scene);
-            text = ex.text;
+        if (!state.draftPhoto) {
+            if (state.mode === 'demo')
+                state.draftPhoto = sceneData(ex.scene);
+            else {
+                const v = $('liveVideo');
+                if (!v.videoWidth)
+                    throw new Error('카메라 화면이 준비되지 않았습니다.');
+                const scale = Math.min(1, 1600 / v.videoWidth);
+                const canvas = document.createElement('canvas');
+                canvas.width = Math.round(v.videoWidth * scale);
+                canvas.height = Math.round(v.videoHeight * scale);
+                canvas.getContext('2d').drawImage(v, 0, 0, canvas.width, canvas.height);
+                state.draftPhoto = canvas.toDataURL('image/jpeg', .87);
+            }
+            state.draftCreatedAt = Date.now();
+            state.draftAudioOffsetMs = Math.round(elapsed());
+            $('sceneImage').src = state.draftPhoto;
+            $('sceneImage').classList.remove('hidden');
+            $('liveVideo').classList.add('hidden');
+            $('sampleBadge').textContent = '촬영 완료 · 이 사진의 설명 녹음 중';
+            $('sampleBadge').classList.remove('hidden');
+            $('flash').classList.remove('fire');
+            void $('flash').offsetWidth;
+            $('flash').classList.add('fire');
+            stopSpeechRecognition(true);
+            speechState.manualPaused = false;
+            if (state.mode === 'live')
+                startSpeechRecognition();
+            $('captionLabel').textContent = state.mode === 'demo' ? '체험용 설명' : speechState.supported ? '이 사진의 한국어 음성인식 중' : '이 사진의 원본 녹음 중';
+            $('captionText').textContent = state.mode === 'demo' ? ex.text : '이 사진의 하자 내용을 말해 주세요.';
+            $('captionSub').textContent = '설명이 끝나면 녹음 완료 OK를 누르세요.';
+            $('saveStatus').textContent = `${fmtTime(state.draftCreatedAt)} · 사진 촬영됨 · 설명 대기`;
+            toast('사진 촬영 완료 · 설명한 뒤 녹음 완료 OK를 누르세요.');
+            return;
         }
-        else {
+        let text = ex.text, transcriptRaw = '', transcriptionStatus = 'demo';
+        if (state.mode === 'live') {
             const speech = takeSpeechSnapshot();
             text = speech.text;
             transcriptRaw = speech.raw;
             transcriptionStatus = text ? 'browser' : speechState.supported ? 'pending' : 'not_supported';
-            const v = $('liveVideo');
-            if (!v.videoWidth)
-                throw new Error('카메라 화면이 준비되지 않았습니다.');
-            const scale = Math.min(1, 1600 / v.videoWidth);
-            const canvas = document.createElement('canvas');
-            canvas.width = Math.round(v.videoWidth * scale);
-            canvas.height = Math.round(v.videoHeight * scale);
-            canvas.getContext('2d').drawImage(v, 0, 0, canvas.width, canvas.height);
-            photo = canvas.toDataURL('image/jpeg', .87);
+            stopSpeechRecognition(true);
+            speechState.manualPaused = false;
         }
-        const r = { id: uid(), sessionId: state.session.id, number: state.records.filter(r => r.sessionId === state.session.id).length + 1, mode: state.mode, createdAt: photoTime, location: state.location, text, transcriptRaw, photo, photoFormat: state.mode === 'demo' ? 'svg' : 'jpg', audioOffsetMs: offset, transcriptionStatus: state.mode === 'demo' ? 'demo' : transcriptionStatus, cloudStatus: 'not_connected' };
+        const photoTime = state.draftCreatedAt, photo = state.draftPhoto, offset = state.draftAudioOffsetMs;
+        const r = { id: uid(), sessionId: state.session.id, number: state.records.filter(r => r.sessionId === state.session.id).length + 1, mode: state.mode, createdAt: photoTime, location: state.location, text, transcriptRaw, photo, photoFormat: state.mode === 'demo' ? 'svg' : 'jpg', audioOffsetMs: offset, transcriptionStatus, cloudStatus: 'not_connected' };
         await put('records', r);
         state.records.push(r);
-        if (state.mode === 'live' && !text)
-            markSpeechCapture(r.id);
-        $('flash').classList.remove('fire');
-        void $('flash').offsetWidth;
-        $('flash').classList.add('fire');
         $('saveStatus').textContent = `${fmtTime(photoTime)} · 사진 ${String(r.number).padStart(2, '0')} 저장됨`;
+        state.draftPhoto = '';
+        state.draftCreatedAt = 0;
+        state.draftAudioOffsetMs = 0;
+        $('sampleBadge').classList.add('hidden');
+        if (state.mode === 'live') {
+            $('sceneImage').classList.add('hidden');
+            $('liveVideo').classList.remove('hidden');
+        }
         if (!state.keep) {
             state.location = '';
             state[state.mode + 'Location'] = '';
@@ -1065,11 +1113,12 @@ async function capture() {
         if (state.mode === 'demo')
             showNextExample();
         else {
-            $('captionText').textContent = text || '저장됐습니다. 다음 지적 내용을 말해 주세요.';
-            $('captionSub').textContent = text ? '인식 문장과 사진을 함께 저장했습니다.' : '인식이 늦으면 촬영 직후 문장을 자동 연결합니다.';
+            $('captionLabel').textContent = '기록 저장 완료';
+            $('captionText').textContent = '다음 사진을 촬영해 주세요.';
+            $('captionSub').textContent = text ? '방금 사진과 인식 문장을 함께 저장했습니다.' : '음성 내용은 확인 필요 상태로 저장했습니다.';
         }
         renderRecords();
-        toast(state.mode === 'demo' ? `사진 ${String(r.number).padStart(2, '0')} · 예시 설명 자동 저장` : `사진 ${String(r.number).padStart(2, '0')} · 촬영 시각과 원본 음성 기록`);
+        toast(`사진 ${String(r.number).padStart(2, '0')} · 사진과 설명 저장 완료`);
     }
     catch (e) {
         $('saveStatus').textContent = '저장 실패 · 다시 촬영해 주세요';
@@ -1239,7 +1288,7 @@ async function exportRecords() {
 const SpeechRecognitionApi = window.SpeechRecognition || window.webkitSpeechRecognition;
 const KOREAN_DIGITS = { '영': '0', '공': '0', '일': '1', '이': '2', '삼': '3', '사': '4', '오': '5', '육': '6', '칠': '7', '팔': '8', '구': '9' };
 const KOREAN_UNITS = { '십': 10, '백': 100, '천': 1000 };
-const speechState = { supported: !!SpeechRecognitionApi, recognition: null, listening: false, disabled: false, manualPaused: false, finalText: '', interimText: '', restartTimer: null, lastCapture: null, lastError: '' };
+const speechState = { supported: !!SpeechRecognitionApi, recognition: null, listening: false, disabled: false, manualPaused: false, finalText: '', interimText: '', restartTimer: null, lastError: '' };
 
 function spokenNumberToDigits(value) {
     const text = String(value || '').replace(/\s+/g, '');
@@ -1298,52 +1347,36 @@ function speechPhrase() {
     return [speechState.finalText, speechState.interimText].filter(Boolean).join(' ').replace(/\s+/g, ' ').trim();
 }
 
+function shouldRecognizeSpeech() {
+    return state.mode === 'live' && !!state.draftPhoto;
+}
+
 function renderSpeechCaption() {
     if (!state.active || state.mode !== 'live' || state.paused)
         return;
+    if (!state.draftPhoto) {
+        $('captionLabel').textContent = '다음 기록 준비';
+        $('captionText').textContent = '사진을 먼저 촬영해 주세요.';
+        $('captionSub').textContent = '촬영 직후 해당 사진의 음성인식이 시작됩니다.';
+        return;
+    }
     const phrase = speechPhrase();
     const parsed = parseVoiceInput(phrase);
     $('captionLabel').textContent = speechState.listening ? '한국어 음성인식 중' : speechState.manualPaused ? '음성인식 일시 중지' : speechState.supported && !speechState.disabled ? '음성인식 다시 연결 중' : '원본 녹음 중';
     $('captionText').textContent = phrase || '지적 내용을 자유롭게 말해 주세요.';
     $('captionSub').textContent = parsed.location
-        ? `${parsed.location} 인식 · 문장이 보이면 촬영하세요.`
-        : speechState.listening ? '말한 문장이 보이면 촬영하세요. 순서는 자유롭습니다.' : '인식이 안 되어도 사진과 원본 음성은 저장됩니다.';
+        ? `${parsed.location} 인식 · 설명이 끝나면 녹음 완료 OK를 누르세요.`
+        : speechState.listening ? '설명이 끝나면 녹음 완료 OK를 누르세요. 순서는 자유롭습니다.' : '인식이 안 되어도 사진과 원본 음성은 저장됩니다.';
     $('speechBtn')?.classList.toggle('listening', speechState.listening);
     $('speechBtn')?.setAttribute('aria-label', speechState.listening ? '음성인식 일시 중지' : '음성인식 다시 시작');
 }
 
-async function attachLateSpeech(text) {
-    const link = speechState.lastCapture;
-    if (!link || Date.now() - link.at > 2500)
-        return false;
-    const record = state.records.find(item => item.id === link.id);
-    if (!record || record.text)
-        return false;
-    const parsed = parseVoiceInput(text);
-    if (!parsed.text)
-        return false;
-    if (parsed.location)
-        record.location = parsed.location;
-    record.text = parsed.text.slice(0, 4000);
-    record.transcriptRaw = parsed.raw.slice(0, 4000);
-    record.transcriptionStatus = 'browser';
-    record.updatedAt = Date.now();
-    await put('records', record);
-    renderRecords();
-    toast('촬영 직후 인식된 설명을 사진에 연결했습니다.');
-    speechState.lastCapture = null;
-    return true;
-}
-
 async function handleFinalSpeech(text) {
+    if (!state.draftPhoto)
+        return;
     const parsed = parseVoiceInput(text);
     applyVoiceLocation(parsed.location);
-    if (await attachLateSpeech(text)) {
-        speechState.finalText = '';
-        speechState.interimText = '';
-    }
-    else
-        speechState.finalText = [speechState.finalText, text].filter(Boolean).join(' ').trim();
+    speechState.finalText = [speechState.finalText, text].filter(Boolean).join(' ').trim();
     renderSpeechCaption();
 }
 
@@ -1386,14 +1419,14 @@ function makeSpeechRecognition() {
         speechState.listening = false;
         renderSpeechCaption();
         clearTimeout(speechState.restartTimer);
-        if (state.active && state.mode === 'live' && !state.paused && !state.stopping && !speechState.disabled && !speechState.manualPaused)
+        if (state.active && shouldRecognizeSpeech() && !state.paused && !state.stopping && !speechState.disabled && !speechState.manualPaused)
             speechState.restartTimer = setTimeout(() => startSpeechRecognition(), 350);
     };
     return recognition;
 }
 
 function startSpeechRecognition() {
-    if (!speechState.supported || speechState.disabled || speechState.manualPaused || speechState.listening || state.mode !== 'live') {
+    if (!speechState.supported || speechState.disabled || speechState.manualPaused || speechState.listening || !shouldRecognizeSpeech()) {
         renderSpeechCaption();
         return;
     }
@@ -1416,7 +1449,6 @@ function stopSpeechRecognition(clear = false) {
         speechState.manualPaused = true;
         speechState.finalText = '';
         speechState.interimText = '';
-        speechState.lastCapture = null;
     }
     try { recognition?.stop(); }
     catch { }
@@ -1440,11 +1472,6 @@ function takeSpeechSnapshot() {
     speechState.finalText = '';
     speechState.interimText = '';
     return parsed;
-}
-
-function markSpeechCapture(recordId) {
-    speechState.lastCapture = { id: recordId, at: Date.now() };
-    renderSpeechCaption();
 }
 
 </script>

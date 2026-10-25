@@ -6,8 +6,8 @@ const vm = require('node:vm');
 
 const source = fs.readFileSync(path.join(__dirname, '..', 'src', 'js', 'speech.js'), 'utf8');
 const context = { window: {}, state: {}, console, setTimeout, clearTimeout };
-vm.runInNewContext(source + '\n;globalThis.__speechTest = { spokenNumberToDigits, parseVoiceInput };', context);
-const { spokenNumberToDigits, parseVoiceInput } = context.__speechTest;
+vm.runInNewContext(source + '\n;globalThis.__speechTest = { spokenNumberToDigits, parseVoiceInput, shouldRecognizeSpeech };', context);
+const { spokenNumberToDigits, parseVoiceInput, shouldRecognizeSpeech } = context.__speechTest;
 
 assert.equal(spokenNumberToDigits('백일'), '101');
 assert.equal(spokenNumberToDigits('삼공이'), '302');
@@ -23,4 +23,11 @@ assert.deepEqual(
     { ...parseVoiceInput('101동에 302호 욕실 타일 단차 보수 요청') },
     { raw: '101동에 302호 욕실 타일 단차 보수 요청', location: '101동 302호', text: '욕실 타일 단차 보수 요청' }
 );
+context.state.mode = 'live';
+context.state.draftPhoto = '';
+assert.equal(shouldRecognizeSpeech(), false);
+context.state.draftPhoto = 'data:image/jpeg;base64,test';
+assert.equal(shouldRecognizeSpeech(), true);
+context.state.mode = 'demo';
+assert.equal(shouldRecognizeSpeech(), false);
 console.log('speech parser tests passed');

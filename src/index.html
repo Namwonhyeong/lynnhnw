@@ -24,7 +24,7 @@
  <section id="captureView">
   <div class="workspace">
    <div class="main-column">
-    <div class="section-intro"><div><div class="eyebrow">VOICE-FIRST INSPECTION</div><h1>말하면 적고, 찍으면 묶습니다.</h1><p id="modeNote" class="mode-note"><b>음성·카메라 실사용</b> · 자유롭게 말하고 문장이 보이면 촬영하세요.</p></div></div>
+    <div class="section-intro"><div><div class="eyebrow">PHOTO-FIRST INSPECTION</div><h1>찍고 말한 뒤, OK로 저장합니다.</h1><p id="modeNote" class="mode-note"><b>음성·카메라 실사용</b> · 사진을 찍고 설명한 뒤 녹음 완료 OK를 누르세요.</p></div></div>
     <div class="location-card">
      <div class="location-main"><div class="location-icon"><i data-icon="pin"></i></div><div><div class="location-label">현재 위치</div><div class="location-value" id="locationText">점검 시작 시 위치 설정</div></div></div>
      <div class="location-actions"><label class="keep-location"><span>다음 사진에도 유지</span><span class="switch"><input id="keepLocation" type="checkbox" checked aria-label="다음 사진에도 위치 유지"><span></span></span></label><button class="text-button" id="locationBtn">위치 변경</button></div>
@@ -36,13 +36,13 @@
       <div class="hud"><span class="state-badge" id="stateBadge"><span class="state-dot"></span><span id="stateLabel">점검 시작 전</span></span><span class="elapsed mono"><i data-icon="clock"></i><span id="elapsed">00:00</span></span></div>
       <div class="sample-badge" id="sampleBadge">대기 화면 · 시작 시 카메라 연결</div>
       <div class="viewfinder" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
-      <div class="live-caption"><div class="caption-kicker"><i data-icon="mic"></i><span id="captionLabel">사진과 설명을 한 번에</span><span class="wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span></div><p class="caption-text" id="captionText">점검은 시작할 때 한 번만.<br>그다음은 촬영 버튼 하나.</p><p class="caption-sub" id="captionSub">녹음 시작 · 종료 · 등록을 매번 누르지 않습니다.</p></div>
+      <div class="live-caption"><div class="caption-kicker"><i data-icon="mic"></i><span id="captionLabel">사진별 음성 기록</span><span class="wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span></div><p class="caption-text" id="captionText">사진을 찍고 설명한 뒤<br>녹음 완료 OK로 저장합니다.</p><p class="caption-sub" id="captionSub">사진마다 음성 구간을 명확하게 나눕니다.</p></div>
       <div class="flash" id="flash"></div>
      </div>
      <div class="controls">
-      <div class="start-area" id="startArea"><button class="primary" id="startBtn"><i data-icon="camera"></i>카메라·마이크 켜기</button><div class="start-description" id="startDescription">권한을 허용하면 실제 카메라와 한국어 음성인식이 시작됩니다.<br>말한 문장이 화면에 보이면 촬영하세요.</div></div>
+      <div class="start-area" id="startArea"><button class="primary" id="startBtn"><i data-icon="camera"></i>카메라·마이크 켜기</button><div class="start-description" id="startDescription">권한을 허용하고 사진을 먼저 촬영하세요.<br>촬영한 사진에 붙일 음성인식이 바로 시작됩니다.</div></div>
       <button class="last-shortcut hidden" id="lastShortcut" aria-label="방금 저장한 기록 보기"><span class="last-thumb" id="lastThumb"><i data-icon="image"></i></span><span><b id="sessionCount">0건</b><small>이번 점검</small></span></button>
-      <div class="shutter-wrap hidden" id="shutterWrap"><button id="shutter" class="shutter" aria-label="사진 촬영하고 자동 저장"><span class="shutter-inner"><i data-icon="camera"></i></span></button><span>말하면서 촬영</span></div>
+      <div class="shutter-wrap hidden" id="shutterWrap"><button id="shutter" class="shutter" aria-label="사진 촬영"><span class="shutter-inner"><i data-icon="camera"></i></span></button><span id="shutterLabel">사진 촬영</span></div>
       <div class="session-actions hidden" id="sessionActions"><button id="speechBtn" class="pause-btn speech-btn" aria-label="음성인식 다시 시작"><i data-icon="mic"></i></button><button id="pauseBtn" class="pause-btn" aria-label="녹음 일시정지"><i data-icon="pause"></i></button><button id="finishBtn" class="finish-btn">점검 종료</button></div>
      </div>
      <div class="camera-footer"><span class="save-status"><i data-icon="check"></i><span id="saveStatus">촬영하면 이 기기에 자동 저장</span></span><span id="cloudStatus">클라우드 미연결</span></div>
@@ -52,7 +52,7 @@
    <aside class="side">
     <div class="side-title"><h2>방금 등록</h2><span id="recentCounter">0건</span></div><div class="recent-list" id="recentList"></div>
     <button class="view-all" id="viewAll">전체 기록 보기<i data-icon="arrow"></i></button>
-    <div class="workflow-card"><h3>한 세대, 끊김 없는 기록</h3><div class="flow-step"><span class="step-no">1</span><div><strong>카메라·마이크 켜기</strong><p>브라우저 권한을 허용하면 실제 촬영과<br>한국어 음성인식이 함께 시작됩니다.</p></div></div><div class="flow-step active"><span class="step-no">2</span><div><strong>말한 문장을 확인하고 촬영</strong><p>“101동 302호 안방 창틀 코킹 누락”처럼<br>순서와 관계없이 자유롭게 말하세요.</p></div></div><div class="flow-step"><span class="step-no">3</span><div><strong>사진·문장 자동 저장</strong><p>동·호수와 지적 내용을 나눠 사진에 붙이고<br>내 등록과 사진 포함 엑셀에 반영합니다.</p></div></div></div>
+    <div class="workflow-card"><h3>사진별로 끊어 기록</h3><div class="flow-step"><span class="step-no">1</span><div><strong>사진 촬영</strong><p>하자 부위를 먼저 찍으면 화면에<br>해당 사진이 고정됩니다.</p></div></div><div class="flow-step active"><span class="step-no">2</span><div><strong>사진을 보며 설명</strong><p>“101동 302호 안방 창틀 코킹 누락”처럼<br>순서와 관계없이 자유롭게 말하세요.</p></div></div><div class="flow-step"><span class="step-no">3</span><div><strong>녹음 완료 OK</strong><p>OK를 누른 지점까지 한 건으로 저장하고<br>카메라가 다음 사진 촬영 상태로 돌아갑니다.</p></div></div></div>
     <div class="connection-note">현재 버전: 자유발화 한국어 음성인식 / 카메라·연속 녹음 / 사진 엑셀 / 집계<br>음성인식은 지원 브라우저와 네트워크가 필요하며 서버 공유는 연결 전입니다.</div>
    </aside>
   </div>

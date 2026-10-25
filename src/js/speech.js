@@ -4,7 +4,7 @@
 const SpeechRecognitionApi = window.SpeechRecognition || window.webkitSpeechRecognition;
 const KOREAN_DIGITS = { '영': '0', '공': '0', '일': '1', '이': '2', '삼': '3', '사': '4', '오': '5', '육': '6', '칠': '7', '팔': '8', '구': '9' };
 const KOREAN_UNITS = { '십': 10, '백': 100, '천': 1000 };
-const speechState = { supported: !!SpeechRecognitionApi, recognition: null, listening: false, disabled: false, manualPaused: false, finalText: '', interimText: '', restartTimer: null, lastCapture: null, lastError: '' };
+const speechState = { supported: !!SpeechRecognitionApi, recognition: null, listening: false, disabled: false, manualPaused: false, finalText: '', interimText: '', restartTimer: null, lastError: '' };
 
 function spokenNumberToDigits(value) {
     const text = String(value || '').replace(/\s+/g, '');
@@ -63,52 +63,36 @@ function speechPhrase() {
     return [speechState.finalText, speechState.interimText].filter(Boolean).join(' ').replace(/\s+/g, ' ').trim();
 }
 
+function shouldRecognizeSpeech() {
+    return state.mode === 'live' && !!state.draftPhoto;
+}
+
 function renderSpeechCaption() {
     if (!state.active || state.mode !== 'live' || state.paused)
         return;
+    if (!state.draftPhoto) {
+        $('captionLabel').textContent = '다음 기록 준비';
+        $('captionText').textContent = '사진을 먼저 촬영해 주세요.';
+        $('captionSub').textContent = '촬영 직후 해당 사진의 음성인식이 시작됩니다.';
+        return;
+    }
     const phrase = speechPhrase();
     const parsed = parseVoiceInput(phrase);
     $('captionLabel').textContent = speechState.listening ? '한국어 음성인식 중' : speechState.manualPaused ? '음성인식 일시 중지' : speechState.supported && !speechState.disabled ? '음성인식 다시 연결 중' : '원본 녹음 중';
     $('captionText').textContent = phrase || '지적 내용을 자유롭게 말해 주세요.';
     $('captionSub').textContent = parsed.location
-        ? `${parsed.location} 인식 · 문장이 보이면 촬영하세요.`
-        : speechState.listening ? '말한 문장이 보이면 촬영하세요. 순서는 자유롭습니다.' : '인식이 안 되어도 사진과 원본 음성은 저장됩니다.';
+        ? `${parsed.location} 인식 · 설명이 끝나면 녹음 완료 OK를 누르세요.`
+        : speechState.listening ? '설명이 끝나면 녹음 완료 OK를 누르세요. 순서는 자유롭습니다.' : '인식이 안 되어도 사진과 원본 음성은 저장됩니다.';
     $('speechBtn')?.classList.toggle('listening', speechState.listening);
     $('speechBtn')?.setAttribute('aria-label', speechState.listening ? '음성인식 일시 중지' : '음성인식 다시 시작');
 }
 
-async function attachLateSpeech(text) {
-    const link = speechState.lastCapture;
-    if (!link || Date.now() - link.at > 2500)
-        return false;
-    const record = state.records.find(item => item.id === link.id);
-    if (!record || record.text)
-        return false;
-    const parsed = parseVoiceInput(text);
-    if (!parsed.text)
-        return false;
-    if (parsed.location)
-        record.location = parsed.location;
-    record.text = parsed.text.slice(0, 4000);
-    record.transcriptRaw = parsed.raw.slice(0, 4000);
-    record.transcriptionStatus = 'browser';
-    record.updatedAt = Date.now();
-    await put('records', record);
-    renderRecords();
-    toast('촬영 직후 인식된 설명을 사진에 연결했습니다.');
-    speechState.lastCapture = null;
-    return true;
-}
-
 async function handleFinalSpeech(text) {
+    if (!state.draftPhoto)
+        return;
     const parsed = parseVoiceInput(text);
     applyVoiceLocation(parsed.location);
-    if (await attachLateSpeech(text)) {
-        speechState.finalText = '';
-        speechState.interimText = '';
-    }
-    else
-        speechState.finalText = [speechState.finalText, text].filter(Boolean).join(' ').trim();
+    speechState.finalText = [speechState.finalText, text].filter(Boolean).join(' ').trim();
     renderSpeechCaption();
 }
 
@@ -151,14 +135,14 @@ function makeSpeechRecognition() {
         speechState.listening = false;
         renderSpeechCaption();
         clearTimeout(speechState.restartTimer);
-        if (state.active && state.mode === 'live' && !state.paused && !state.stopping && !speechState.disabled && !speechState.manualPaused)
+        if (state.active && shouldRecognizeSpeech() && !state.paused && !state.stopping && !speechState.disabled && !speechState.manualPaused)
             speechState.restartTimer = setTimeout(() => startSpeechRecognition(), 350);
     };
     return recognition;
 }
 
 function startSpeechRecognition() {
-    if (!speechState.supported || speechState.disabled || speechState.manualPaused || speechState.listening || state.mode !== 'live') {
+    if (!speechState.supported || speechState.disabled || speechState.manualPaused || speechState.listening || !shouldRecognizeSpeech()) {
         renderSpeechCaption();
         return;
     }
@@ -181,7 +165,6 @@ function stopSpeechRecognition(clear = false) {
         speechState.manualPaused = true;
         speechState.finalText = '';
         speechState.interimText = '';
-        speechState.lastCapture = null;
     }
     try { recognition?.stop(); }
     catch { }
@@ -205,9 +188,4 @@ function takeSpeechSnapshot() {
     speechState.finalText = '';
     speechState.interimText = '';
     return parsed;
-}
-
-function markSpeechCapture(recordId) {
-    speechState.lastCapture = { id: recordId, at: Date.now() };
-    renderSpeechCaption();
 }
