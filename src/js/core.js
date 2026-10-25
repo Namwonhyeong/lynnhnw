@@ -39,7 +39,7 @@ function sceneData(index = 0) {
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="780" height="450" viewBox="0 0 780 450"><defs><linearGradient id="light" x2="1" y2="1"><stop stop-color="${p[0]}"/><stop offset="1" stop-color="${p[1]}"/></linearGradient><linearGradient id="floor" x2="0" y2="1"><stop stop-color="${p[2]}"/><stop offset="1" stop-color="#78908b"/></linearGradient></defs><rect width="780" height="450" fill="url(#light)"/><path d="M0 0h86v314L0 383" fill="#829896" opacity=".3"/><path d="M0 365 85 310h626l69 55v85H0" fill="url(#floor)"/><path d="M85 310h625M0 401h780M187 310 107 450M334 310 310 450M481 310 513 450M629 310 718 450" stroke="#ccdad0" opacity=".35" stroke-width="1.4"/>${detail}<path d="M0 361 85 306h60M632 306h78l70 55" stroke="#e1e4d5" stroke-width="8"/><path d="M0 0h780v450H0Z" fill="#173239" opacity=".06"/></svg>`;
     return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
 }
-const state = { mode: 'live', active: false, paused: false, session: null, records: [], sessions: [], db: null, location: '', keep: true, exampleIndex: 0, filter: 'all', stream: null, recorder: null, chunkSeq: 0, chunkChain: Promise.resolve(), timer: null, origin: 0, pauseAt: 0, pausedMs: 0, busy: false, stopping: false, detailId: null, audioURL: null, wake: null, saveFailures: 0, view: 'capture', demoLocation: '', liveLocation: '', draftPhoto: '', draftCreatedAt: 0, draftAudioOffsetMs: 0 };
+const state = { mode: 'live', buildingMode: 'apartment', active: false, paused: false, session: null, records: [], sessions: [], db: null, location: '', keep: true, exampleIndex: 0, filter: 'all', stream: null, recorder: null, chunkSeq: 0, chunkChain: Promise.resolve(), timer: null, origin: 0, pauseAt: 0, pausedMs: 0, busy: false, stopping: false, detailId: null, audioURL: null, wake: null, saveFailures: 0, view: 'capture', demoLocation: '', liveLocation: '', draftPhoto: '', draftCreatedAt: 0, draftAudioOffsetMs: 0 };
 function toast(msg, error = false) { $('toast').textContent = msg; $('toast').classList.toggle('error', error); $('toast').classList.add('visible'); clearTimeout(toast.t); toast.t = setTimeout(() => $('toast').classList.remove('visible'), 3200); }
 function alertBox(msg) { $('runtimeAlert').textContent = msg; $('runtimeAlert').classList.toggle('hidden', !msg); }
 function fmtClock(ms) { const s = Math.floor(Math.max(0, ms) / 1000); return `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`; }
@@ -56,6 +56,7 @@ function saveSetting(key, value) { try {
     localStorage.setItem('field-note-' + key, JSON.stringify(value));
 }
 catch { } }
+function locationSettingKey(mode = state.mode, buildingMode = state.buildingMode) { return `${mode}-${buildingMode}-location`; }
 function openDB() { return new Promise((resolve, reject) => { const req = indexedDB.open('field-note-prototype-v1', 1); req.onupgradeneeded = () => { const db = req.result; db.createObjectStore('records', { keyPath: 'id' }); db.createObjectStore('sessions', { keyPath: 'id' }); const chunks = db.createObjectStore('chunks', { keyPath: 'id' }); chunks.createIndex('sessionId', 'sessionId', { unique: false }); }; req.onsuccess = () => resolve(req.result); req.onerror = () => reject(req.error); req.onblocked = () => reject(new Error('저장소가 다른 창에서 사용 중입니다. 다른 창을 닫고 다시 열어주세요.')); }); }
 function transaction(store, mode, operation) { return new Promise((resolve, reject) => { if (!state.db)
     return reject(new Error('저장소를 사용할 수 없습니다.')); let tx; try {
@@ -119,14 +120,27 @@ function uiState() {
     $('finishBtn').disabled = state.stopping || describing;
     $('demoMode').disabled = state.active || state.busy;
     $('liveMode').disabled = state.active || state.busy;
+    $('apartmentMode').disabled = state.active || state.busy;
+    $('generalMode').disabled = state.active || state.busy;
     $('locationBtn').disabled = state.stopping;
+    locationRender();
+}
+function setBuildingMode(mode) {
+    if (state.active || state.busy || !['apartment', 'general'].includes(mode))
+        return;
+    state.buildingMode = mode;
+    state.location = readSetting(locationSettingKey(), mode === 'apartment' ? state[state.mode + 'Location'] : '');
+    saveSetting('buildingMode', mode);
+    $('apartmentMode').classList.toggle('selected', mode === 'apartment');
+    $('generalMode').classList.toggle('selected', mode === 'general');
+    $('buildingModeHelp').textContent = mode === 'apartment' ? '동·호수를 음성에서 인식합니다.' : '층과 실명을 음성에서 인식합니다.';
     locationRender();
 }
 function setMode(mode) {
     if (state.active || state.busy)
         return;
     state.mode = mode;
-    state.location = state[mode + 'Location'];
+    state.location = readSetting(locationSettingKey(mode), state.buildingMode === 'apartment' ? state[mode + 'Location'] || '' : '');
     saveSetting('mode', mode);
     $('demoMode').classList.toggle('selected', mode === 'demo');
     $('liveMode').classList.toggle('selected', mode === 'live');
@@ -174,7 +188,7 @@ async function startSession() {
             $('sceneImage').classList.add('hidden');
             $('sampleBadge').classList.add('hidden');
         }
-        const session = { id: uid(), mode: state.mode, createdAt: Date.now(), status: 'recording', mime: '', durationMs: 0, locationAtStart: state.location };
+        const session = { id: uid(), mode: state.mode, buildingMode: state.buildingMode, createdAt: Date.now(), status: 'recording', mime: '', durationMs: 0, locationAtStart: state.location };
         startingSession = session;
         if (state.mode === 'live') {
             const choices = ['audio/webm;codecs=opus', 'audio/mp4', 'audio/webm'];
@@ -190,9 +204,12 @@ async function startSession() {
             state.recorder.onerror = e => { alertBox('녹음 장치 오류입니다. 점검을 종료한 뒤 다시 시작하세요.'); pauseSession(true); console.error(e.error); };
         }
         if (state.mode === 'demo' && !state.location) {
-            state.location = '101동 1203호';
-            state.demoLocation = state.location;
-            saveSetting('demoLocation', state.location);
+            state.location = state.buildingMode === 'general' ? '3층 회의실' : '101동 1203호';
+            if (state.buildingMode === 'apartment') {
+                state.demoLocation = state.location;
+                saveSetting('demoLocation', state.location);
+            }
+            saveSetting(locationSettingKey(), state.location);
         }
         session.locationAtStart = state.location;
         await put('sessions', session);
@@ -392,7 +409,7 @@ async function capture() {
             speechState.manualPaused = false;
         }
         const photoTime = state.draftCreatedAt, photo = state.draftPhoto, offset = state.draftAudioOffsetMs;
-        const r = { id: uid(), sessionId: state.session.id, number: state.records.filter(r => r.sessionId === state.session.id).length + 1, mode: state.mode, createdAt: photoTime, location: state.location, text, transcriptRaw, photo, photoFormat: state.mode === 'demo' ? 'svg' : 'jpg', audioOffsetMs: offset, transcriptionStatus, cloudStatus: 'not_connected' };
+        const r = { id: uid(), sessionId: state.session.id, number: state.records.filter(r => r.sessionId === state.session.id).length + 1, mode: state.mode, buildingMode: state.buildingMode, createdAt: photoTime, location: state.location, text, transcriptRaw, photo, photoFormat: state.mode === 'demo' ? 'svg' : 'jpg', audioOffsetMs: offset, transcriptionStatus, cloudStatus: 'not_connected' };
         await put('records', r);
         state.records.push(r);
         $('saveStatus').textContent = `${fmtTime(photoTime)} · 사진 ${String(r.number).padStart(2, '0')} 저장됨`;
@@ -406,8 +423,11 @@ async function capture() {
         }
         if (!state.keep) {
             state.location = '';
-            state[state.mode + 'Location'] = '';
-            saveSetting(state.mode + 'Location', '');
+            if (state.buildingMode === 'apartment') {
+                state[state.mode + 'Location'] = '';
+                saveSetting(state.mode + 'Location', '');
+            }
+            saveSetting(locationSettingKey(), '');
             locationRender();
         }
         state.exampleIndex++;
@@ -432,8 +452,8 @@ async function capture() {
     }
 }
 function openLocation() { if (state.active && !state.paused)
-    pauseSession(true); $('locationInput').value = state.location; $('locationExample').classList.toggle('hidden', state.mode !== 'demo'); $('locationHelp').textContent = state.mode === 'demo' ? '체험에서는 아래 예시를 눌러 위치 변경 흐름을 확인합니다.' : '점검 중에는 문장 속 동·호수를 자동으로 찾습니다. 여기서는 인식 결과를 수동 보정할 수 있습니다.'; const next = state.location.includes('1204') ? '101동 1205호' : '101동 1204호'; $('locationExample').dataset.next = next; $('locationExampleText').textContent = `“위치 변경, ${next}”`; $('locationDialog').showModal(); }
-function applyLocation(value) { state.location = value.trim().replace(/\s+/g, ' ').slice(0, 80); state[state.mode + 'Location'] = state.location; saveSetting(state.mode + 'Location', state.location); locationRender(); $('locationDialog').close(); alertBox(''); toast(state.location ? `${state.location} · 다음 촬영부터 적용` : '위치가 초기화됐습니다.'); if (state.active && state.paused)
+    pauseSession(true); const general = state.buildingMode === 'general', next = general ? (state.location.includes('회의실') ? '지하 1층 기계실' : '3층 회의실') : (state.location.includes('1204') ? '101동 1205호' : '101동 1204호'); $('locationInput').value = state.location; $('locationInputLabel').textContent = general ? '현재 층·실명' : '현재 동·호수'; $('locationInput').placeholder = general ? '예: 지하 1층 기계실' : '예: 101동 1203호'; $('locationExample').classList.toggle('hidden', state.mode !== 'demo'); $('locationHelp').textContent = state.mode === 'demo' ? '체험에서는 아래 예시를 눌러 위치 변경 흐름을 확인합니다.' : general ? '점검 중에는 문장 속 층과 실명을 순서와 관계없이 찾습니다. 여기서는 결과를 수동 보정할 수 있습니다.' : '점검 중에는 문장 속 동·호수를 순서와 관계없이 찾습니다. 여기서는 결과를 수동 보정할 수 있습니다.'; $('locationExample').dataset.next = next; $('locationExampleText').textContent = `“위치 변경, ${next}”`; $('locationDialog').showModal(); }
+function applyLocation(value) { state.location = value.trim().replace(/\s+/g, ' ').slice(0, 80); if (state.buildingMode === 'apartment') { state[state.mode + 'Location'] = state.location; saveSetting(state.mode + 'Location', state.location); } saveSetting(locationSettingKey(), state.location); locationRender(); $('locationDialog').close(); alertBox(''); toast(state.location ? `${state.location} · 다음 촬영부터 적용` : '위치가 초기화됐습니다.'); if (state.active && state.paused)
     pauseSession(); }
 async function openDetailBase(id) {
     const r = state.records.find(r => r.id === id);

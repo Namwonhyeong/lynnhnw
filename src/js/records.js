@@ -23,6 +23,8 @@ function automaticClassification(r) {
         unit = unitMatch[0].replace(/\s*동\s*/, '동 ').replace(/\s*호/, '호');
     else if (unitVoice)
         unit = unitVoice[0].replace(/\s*동\s*/, '동 ').replace(/\s*호/, '호');
+    else if (r.buildingMode === 'general' && stored)
+        unit = stored;
     else if (/\d+\s*동|\d+\s*호/.test(stored))
         unit = stored;
     // Specialist room variants absorb generic 욕실 instead of counting twice.
@@ -54,7 +56,7 @@ function recordNote(r, { exported = false } = {}) { const c = classifyRecord(r);
     flags.push('체험 예시 · 실제 현장 아님'); if (!r.text)
     flags.push('음성 확인 필요'); if (!c.reviewed)
     flags.push('자동 분류 · 확인 전'); if (c.unit === '미지정')
-    flags.push('동호수 미지정'); return flags.join(' / '); }
+    flags.push('위치 정보 미지정'); return flags.join(' / '); }
 function setOptions(id, values, empty) { const el = $(id), old = el.value; el.innerHTML = `<option value="">${esc(empty)}</option>` + uniqueSorted(values).map(v => `<option value="${esc(v)}">${esc(v)}</option>`).join(''); if ([...el.options].some(x => x.value === old))
     el.value = old; }
 function modeMatches(r) { return state.filter === 'all' || state.filter === 'live' && r.mode === 'live' || state.filter === 'demo' && r.mode === 'demo' || state.filter === 'pending' && r.mode === 'live' && !r.text; }
@@ -71,7 +73,7 @@ function renderListV2() {
         if (!ids.has(id))
             state.selected.delete(id);
     const base = state.records.filter(modeMatches), classes = base.map(classifyRecord);
-    setOptions('filterUnit', classes.map(c => c.unit), '전체 동호수');
+    setOptions('filterUnit', classes.map(c => c.unit), '전체 위치 정보');
     setOptions('filterPosition', classes.map(c => c.position), '전체 위치');
     setOptions('filterTrade', classes.map(c => c.trade), '전체 공종');
     const filterCount = ['filterUnit', 'filterPosition', 'filterTrade', 'filterFrom', 'filterTo'].filter(id => $(id).value).length;
@@ -84,7 +86,7 @@ function renderListV2() {
     $('selectVisible').disabled = !rs.length;
     $('clearSelection').classList.toggle('hidden', !state.selected.size);
     $('excelBtn').disabled = !rs.length || state.exporting;
-    $('excelBtn').innerHTML = icon('sheet') + `사진 포함 엑셀${rs.length ? ' · ' + (n || rs.length) + '건' : ''}`;
+    $('excelBtn').innerHTML = icon('sheet') + `사진대지 엑셀${rs.length ? ' · ' + (n || rs.length) + '건' : ''}`;
     $('tableViewBtn').classList.toggle('active', state.listFormat === 'table');
     $('cardViewBtn').classList.toggle('active', state.listFormat === 'cards');
     $('calendarViewBtn').classList.toggle('active', state.listFormat === 'calendar');
@@ -95,7 +97,7 @@ function renderListV2() {
     $('recordGrid').innerHTML = rs.length ? rs.map(r => { const c = classifyRecord(r), picked = state.selected.has(r.id); return `<article class="grid-card ${picked ? 'selected-row' : ''}"><label class="card-pick"><input class="row-select" type="checkbox" data-select="${esc(r.id)}" aria-label="${esc(c.unit)} 기록 선택" ${picked ? 'checked' : ''}></label><button class="card-open" data-record="${esc(r.id)}"><div class="photo"><img loading="lazy" src="${esc(r.photo)}" alt="${r.mode === 'demo' ? '체험 예시' : '촬영'} 사진"><span class="photo-index">${r.mode === 'demo' ? '체험' : '촬영'}</span></div><div class="grid-body"><div class="grid-loc">${esc(c.unit)}</div><div class="card-classification">${classChip(c.position)}${classChip(c.trade)}</div><p class="grid-desc">${esc(recordDescription(r))}</p><div class="grid-bottom"><span>${dayKey(r.createdAt)} ${fmtTime(r.createdAt)}</span><span class="auto-note">${c.reviewed ? '분류 확인됨' : '자동 분류 · 확인 전'}</span></div></div></button></article>`; }).join('') : '<div class="data-empty">' + icon('image') + '<h3>조회되는 기록이 없습니다.</h3><p>현장 등록에서 촬영하거나<br>아래 예시 데이터로 엑셀·집계 기능을 체험하세요.</p></div>';
     renderCalendar(rs);
     const hiddenSelected = state.selected.size - n;
-    $('listFootnote').textContent = (hiddenSelected ? `현재 필터 밖 선택 ${hiddenSelected}건은 내보내기에서 제외됩니다. ` : '') + '엑셀: 날짜 / 동호수 / 위치 / 공종 / 내용 / 비고 / 해당사진';
+    $('listFootnote').textContent = (hiddenSelected ? `현재 필터 밖 선택 ${hiddenSelected}건은 내보내기에서 제외됩니다. ` : '') + '사진대지: 날짜 / 동호수·층실 / 세부 위치 / 공종 / 내용 / 비고 / 해당사진';
 }
 function classChip(text) { return `<span class="class-chip ${text === '미분류' || text === '미지정' ? 'unknown' : ''}">${esc(text)}</span>`; }
 function updateView(view) { state.view = view; for (const v of ['capture', 'list', 'analytics']) {
@@ -114,7 +116,7 @@ async function openDetail(id) {
     if (!r)
         return;
     const c = classifyRecord(r);
-    $('detailText').insertAdjacentHTML('afterend', `<div class="detail-fields"><h3>엑셀·집계용 분류</h3><p>자동 분류는 키워드 기반 초안입니다. 수정은 여기서만, 현장 촬영 때는 입력하지 않아도 됩니다.</p><div class="detail-fields-grid"><div><label for="detailUnit">동호수</label><input class="field" id="detailUnit" maxlength="80" value="${esc(c.unit === '미지정' ? '' : c.unit)}" placeholder="예: 101동 1203호"></div><div><label for="detailPosition">위치</label><input class="field" id="detailPosition" maxlength="80" list="positionOptions" value="${esc(c.position)}"></div><div><label for="detailTrade">공종</label><input class="field" id="detailTrade" maxlength="80" list="tradeOptions" value="${esc(c.trade)}"></div><div><label for="detailType">지적 유형 · 집계용</label><input class="field" id="detailType" maxlength="80" list="typeOptions" value="${esc(c.defectType)}"></div><div class="full"><label for="detailNote">비고</label><input class="field" id="detailNote" maxlength="1000" placeholder="필요한 추가 메모만" value="${esc(c.note)}"></div></div><button class="text-button" id="reclassify">수정한 내용으로 다시 자동 분류</button><datalist id="positionOptions">${POSITION_RULES.map(([n]) => `<option value="${esc(n)}">`).join('')}</datalist><datalist id="tradeOptions">${TRADE_RULES.map(([n]) => `<option value="${esc(n)}">`).join('')}</datalist><datalist id="typeOptions">${TYPE_RULES.map(([n]) => `<option value="${esc(n)}">`).join('')}</datalist></div>`);
+    $('detailText').insertAdjacentHTML('afterend', `<div class="detail-fields"><h3>엑셀·집계용 분류</h3><p>자동 분류는 키워드 기반 초안입니다. 수정은 여기서만, 현장 촬영 때는 입력하지 않아도 됩니다.</p><div class="detail-fields-grid"><div><label for="detailUnit">동호수 / 층·실명</label><input class="field" id="detailUnit" maxlength="80" value="${esc(c.unit === '미지정' ? '' : c.unit)}" placeholder="예: 101동 1203호 또는 3층 회의실"></div><div><label for="detailPosition">세부 위치</label><input class="field" id="detailPosition" maxlength="80" list="positionOptions" value="${esc(c.position)}"></div><div><label for="detailTrade">공종</label><input class="field" id="detailTrade" maxlength="80" list="tradeOptions" value="${esc(c.trade)}"></div><div><label for="detailType">지적 유형 · 집계용</label><input class="field" id="detailType" maxlength="80" list="typeOptions" value="${esc(c.defectType)}"></div><div class="full"><label for="detailNote">비고</label><input class="field" id="detailNote" maxlength="1000" placeholder="필요한 추가 메모만" value="${esc(c.note)}"></div></div><button class="text-button" id="reclassify">수정한 내용으로 다시 자동 분류</button><datalist id="positionOptions">${POSITION_RULES.map(([n]) => `<option value="${esc(n)}">`).join('')}</datalist><datalist id="tradeOptions">${TRADE_RULES.map(([n]) => `<option value="${esc(n)}">`).join('')}</datalist><datalist id="typeOptions">${TYPE_RULES.map(([n]) => `<option value="${esc(n)}">`).join('')}</datalist></div>`);
     $('reclassify').onclick = () => { const a = automaticClassification({ ...r, text: $('detailText').value }); $('detailPosition').value = a.position; $('detailTrade').value = a.trade; $('detailType').value = a.defectType; toast('내용의 키워드로 다시 분류했습니다. 확인 후 저장하세요.'); };
     $('detailSave').onclick = async () => { const next = { ...r, text: $('detailText').value.trim().slice(0, 4000), unitOverride: $('detailUnit').value.trim().slice(0, 80) || '미지정', positionOverride: $('detailPosition').value.trim().slice(0, 80) || '미분류', tradeOverride: $('detailTrade').value.trim().slice(0, 80) || '미분류', typeOverride: $('detailType').value.trim().slice(0, 80) || '미분류', note: $('detailNote').value.trim().slice(0, 1000), classificationReviewed: true, transcriptionStatus: r.mode === 'demo' ? 'demo' : 'manual', updatedAt: Date.now() }; try {
         await put('records', next);

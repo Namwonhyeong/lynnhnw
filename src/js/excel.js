@@ -61,7 +61,7 @@ function makeSummarySheet(rs, scope) {
         rows.push(rowXML(r, cells));
     }
     const unitStart = 11 + Math.max(ps.length, ts.length);
-    rows.push(rowXML(unitStart, textCell('A' + unitStart, '동호수', map.A7) + textCell('B' + unitStart, '등록 건수', map.A7) + textCell('C' + unitStart, '등록 내 비중', map.A7), 28));
+    rows.push(rowXML(unitStart, textCell('A' + unitStart, '동호수 / 층·실명', map.A7) + textCell('B' + unitStart, '등록 건수', map.A7) + textCell('C' + unitStart, '등록 내 비중', map.A7), 28));
     for (let i = 0; i < us.length; i++) {
         const r = unitStart + i + 1, u = us[i];
         rows.push(rowXML(r, textCell('A' + r, u.name, map.A8) + formulaCell('B' + r, `COUNTIF('등록목록'!$B$5:$B$${end},${literalCriterion('A' + r)})`, u.count, map.B8) + formulaCell('C' + r, `IFERROR(B${r}/$B$4,0)`, u.count / n, map.C8)));
@@ -82,10 +82,10 @@ async function makeExcel(rs, { scope = '조회 중인 기록' } = {}) {
         throw new Error('사진 포함 내보내기는 한 번에 1,000건까지입니다. 날짜·위치 필터로 나눠주세요.');
     const sorted = [...rs].sort((a, b) => a.createdAt - b.createdAt || a.id.localeCompare(b.id)), map = XLSX_TEMPLATE.styles['xl/worksheets/sheet1.xml'], parts = { ...XLSX_TEMPLATE.parts }, files = [], rows = [], anchors = [], relationships = [];
     const meta = `${scope} · ${sorted.length}건 · ${sourceLabel(sorted)} · 생성 ${dayKey(Date.now())} (한국시간) · 자동 분류는 확인 필요`;
-    rows.push(rowXML(1, textCell('A1', '현장노트 · 사진 등록목록', map.A1), 38));
+    rows.push(rowXML(1, textCell('A1', '현장노트 · 사진대지', map.A1), 38));
     rows.push(rowXML(2, textCell('A2', meta, map.A2), 34));
     rows.push(rowXML(3, '', 10));
-    rows.push(rowXML(4, ['날짜', '동호수', '위치', '공종', '내용', '비고', '해당사진'].map((v, i) => textCell('ABCDEFG'[i] + '4', v, map.A4)).join(''), 30));
+    rows.push(rowXML(4, ['날짜', '동호수 / 층·실명', '세부 위치', '공종', '내용', '비고', '해당사진'].map((v, i) => textCell('ABCDEFG'[i] + '4', v, map.A4)).join(''), 30));
     for (let i = 0; i < sorted.length; i++) {
         const record = sorted[i], c = classifyRecord(record), r = i + 5, alt = i % 2 ? 6 : 5, s = (col) => map[col + alt];
         showExportProgress(`사진 엑셀 준비 · ${i + 1} / ${sorted.length}건`);
@@ -117,8 +117,8 @@ async function exportExcel(fromAnalytics = false) { if (state.exporting)
     return; const selected = !fromAnalytics && visibleRecords().some(r => state.selected.has(r.id)); const scope = fromAnalytics ? '집계 화면 조회 범위' : selected ? '선택한 등록 기록' : '등록 목록 조회 범위'; state.exporting = true; $('excelBtn').disabled = true; $('analyticsExcel').disabled = true; try {
     const file = await makeExcel(rows, { scope });
     if (file) {
-        downloadBlob(file, `현장노트_${sourceLabel(rows).startsWith('체험') ? '체험_' : ''}사진목록_${dayKey(Date.now()).replaceAll('-', '')}_${rows.length}건.xlsx`);
-        toast(`사진 ${rows.length}장과 등록목록·집계 시트를 내보냈습니다.`);
+        downloadBlob(file, `현장노트_${sourceLabel(rows).startsWith('체험') ? '체험_' : ''}사진대지_${dayKey(Date.now()).replaceAll('-', '')}_${rows.length}건.xlsx`);
+        toast(`사진 ${rows.length}장의 사진대지와 집계 시트를 내보냈습니다.`);
     }
 }
 catch (e) {

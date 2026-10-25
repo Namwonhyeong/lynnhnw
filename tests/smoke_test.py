@@ -44,7 +44,7 @@ def validate_xlsx(path: Path, count: int) -> None:
         assert [s.attrib['name'] for s in workbook.findall('m:sheets/m:sheet', N)] == ['등록목록', '집계']
         sheet = ET.fromstring(z.read('xl/worksheets/sheet1.xml'))
         headers = [''.join(c.itertext()) for c in sheet.findall("m:sheetData/m:row[@r='4']/m:c", N)]
-        assert headers == ['날짜', '동호수', '위치', '공종', '내용', '비고', '해당사진'], headers
+        assert headers == ['날짜', '동호수 / 층·실명', '세부 위치', '공종', '내용', '비고', '해당사진'], headers
         rows = [r for r in sheet.findall('m:sheetData/m:row', N) if int(r.attrib['r']) >= 5]
         assert len(rows) == count, len(rows)
         assert len([n for n in z.namelist() if n.startswith('xl/media/photo')]) == count

@@ -23,6 +23,14 @@ assert.deepEqual(
     { ...parseVoiceInput('101동에 302호 욕실 타일 단차 보수 요청') },
     { raw: '101동에 302호 욕실 타일 단차 보수 요청', location: '101동 302호', text: '욕실 타일 단차 보수 요청' }
 );
+assert.deepEqual(
+    { ...parseVoiceInput('천장 누수고 여기는 삼층 회의실입니다', 'general') },
+    { raw: '천장 누수고 여기는 삼층 회의실입니다', location: '3층 회의실', text: '천장 누수고' }
+);
+assert.deepEqual(
+    { ...parseVoiceInput('기계실 배관 누수 지하 일층', 'general') },
+    { raw: '기계실 배관 누수 지하 일층', location: '지하 1층 기계실', text: '배관 누수' }
+);
 context.state.mode = 'live';
 context.state.draftPhoto = '';
 assert.equal(shouldRecognizeSpeech(), false);

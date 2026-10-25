@@ -69,6 +69,8 @@ $('listTab').onclick = () => updateView('list');
 $('viewAll').onclick = () => updateView('list');
 $('demoMode').onclick = () => setMode('demo');
 $('liveMode').onclick = () => setMode('live');
+$('apartmentMode').onclick = () => setBuildingMode('apartment');
+$('generalMode').onclick = () => setBuildingMode('general');
 $('startBtn').onclick = startSession;
 $('shutter').onclick = capture;
 $('pauseBtn').onclick = () => pauseSession();
@@ -116,6 +118,8 @@ window.addEventListener('pagehide', () => { stopSpeechRecognition(true); state.s
     state.demoLocation = readSetting('demoLocation', '');
     state.liveLocation = readSetting('liveLocation', '');
     state.keep = readSetting('keep', true);
+    state.buildingMode = readSetting('buildingMode', 'apartment');
+    setBuildingMode(state.buildingMode);
     setMode('live');
     renderRecords();
 }

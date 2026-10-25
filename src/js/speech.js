@@ -26,9 +26,23 @@ function spokenNumberToDigits(value) {
     return String(total + current);
 }
 
-function parseVoiceInput(value) {
+function parseVoiceInput(value, buildingMode = 'apartment') {
     const raw = String(value || '').replace(/\s+/g, ' ').trim();
     const number = '[0-9영공일이삼사오육칠팔구십백천]';
+    if (buildingMode === 'general') {
+        const basement = raw.match(/\bB\s*(\d{1,3})\s*층?\b/i);
+        const floorMatch = basement || raw.match(new RegExp(`(지하|지상)?\\s*(${number}{1,4})\\s*층`));
+        const floorNumber = floorMatch ? spokenNumberToDigits(basement ? floorMatch[1] : floorMatch[2]) : '';
+        const floor = floorNumber ? `${basement || floorMatch[1] === '지하' ? '지하 ' : ''}${floorNumber}층` : '';
+        const roomMatch = raw.match(/([가-힣A-Za-z0-9]{1,12}실|로비|복도|옥상|주차장|식당|창고|강당|점포)/);
+        const room = roomMatch?.[1] || '';
+        let text = raw;
+        if (floorMatch)
+            text = text.replace(floorMatch[0], ' ');
+        if (roomMatch)
+            text = text.replace(roomMatch[0], ' ');
+        return { raw, location: [floor, room].filter(Boolean).join(' '), text: cleanVoiceText(text) };
+    }
     const unitPattern = new RegExp(`(${number}{1,8})\\s*동\\s*(?:에|의|이고|에서|으로)?\\s*(${number}{1,8})\\s*호`);
     const match = raw.match(unitPattern);
     const building = match ? spokenNumberToDigits(match[1]) : '';
@@ -37,6 +51,11 @@ function parseVoiceInput(value) {
     let text = raw;
     if (match)
         text = text.replace(match[0], ' ');
+    text = cleanVoiceText(text);
+    return { raw, location, text };
+}
+
+function cleanVoiceText(text) {
     text = text
         .replace(/(?:위치|동호수|장소)\s*(?:를|가|는|은)?\s*(?:변경|바꿔|바꾸기|이동|설정)(?:해|해주세요|합니다|할게요)?/g, ' ')
         .replace(/(?:여기는|현재 위치는|위치는|장소는)\s*/g, ' ')
@@ -46,15 +65,18 @@ function parseVoiceInput(value) {
         .trim();
     if (/^(?:입니다|이에요|예요|이야|입니다요)$/.test(text))
         text = '';
-    return { raw, location, text };
+    return text;
 }
 
 function applyVoiceLocation(location) {
     if (!location || state.location === location)
         return;
     state.location = location;
-    state[state.mode + 'Location'] = location;
-    saveSetting(state.mode + 'Location', location);
+    if (state.buildingMode === 'apartment') {
+        state[state.mode + 'Location'] = location;
+        saveSetting(state.mode + 'Location', location);
+    }
+    saveSetting(locationSettingKey(), location);
     locationRender();
     toast(`${location} · 음성으로 위치 적용`);
 }
@@ -77,7 +99,7 @@ function renderSpeechCaption() {
         return;
     }
     const phrase = speechPhrase();
-    const parsed = parseVoiceInput(phrase);
+    const parsed = parseVoiceInput(phrase, state.buildingMode);
     $('captionLabel').textContent = speechState.listening ? '한국어 음성인식 중' : speechState.manualPaused ? '음성인식 일시 중지' : speechState.supported && !speechState.disabled ? '음성인식 다시 연결 중' : '원본 녹음 중';
     $('captionText').textContent = phrase || '지적 내용을 자유롭게 말해 주세요.';
     $('captionSub').textContent = parsed.location
@@ -90,7 +112,7 @@ function renderSpeechCaption() {
 async function handleFinalSpeech(text) {
     if (!state.draftPhoto)
         return;
-    const parsed = parseVoiceInput(text);
+    const parsed = parseVoiceInput(text, state.buildingMode);
     applyVoiceLocation(parsed.location);
     speechState.finalText = [speechState.finalText, text].filter(Boolean).join(' ').trim();
     renderSpeechCaption();
@@ -183,7 +205,7 @@ function toggleSpeechRecognition() {
 }
 
 function takeSpeechSnapshot() {
-    const parsed = parseVoiceInput(speechPhrase());
+    const parsed = parseVoiceInput(speechPhrase(), state.buildingMode);
     applyVoiceLocation(parsed.location);
     speechState.finalText = '';
     speechState.interimText = '';
