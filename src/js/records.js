@@ -86,7 +86,9 @@ function renderListV2() {
     $('selectVisible').disabled = !rs.length;
     $('clearSelection').classList.toggle('hidden', !state.selected.size);
     $('excelBtn').disabled = !rs.length || state.exporting;
-    $('excelBtn').innerHTML = icon('sheet') + `사진대지 엑셀${rs.length ? ' · ' + (n || rs.length) + '건' : ''}`;
+    $('templateExcelBtn').disabled = !rs.length || state.exporting;
+    $('excelBtn').innerHTML = icon('sheet') + `목록형 엑셀${rs.length ? ' · ' + (n || rs.length) + '건' : ''}`;
+    $('templateExcelBtn').innerHTML = icon('sheet') + `지정 양식 엑셀${rs.length ? ' · ' + (n || rs.length) + '건' : ''}`;
     $('tableViewBtn').classList.toggle('active', state.listFormat === 'table');
     $('cardViewBtn').classList.toggle('active', state.listFormat === 'cards');
     $('calendarViewBtn').classList.toggle('active', state.listFormat === 'calendar');

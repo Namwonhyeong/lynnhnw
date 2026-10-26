@@ -17,7 +17,7 @@ ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / 'tests/output/harness'
 OUT.mkdir(parents=True, exist_ok=True)
 REPORT = []
-SCRIPTS = ['core.js','speech.js','xlsx-template.js','records.js','analytics.js','excel.js','backup-import.js','main.js']
+SCRIPTS = ['core.js','speech.js','photo-template.js','xlsx-template.js','records.js','analytics.js','excel.js','backup-import.js','main.js']
 
 def record(name, detail=''):
     REPORT.append({'test': name, 'status': 'PASS', 'details': detail})

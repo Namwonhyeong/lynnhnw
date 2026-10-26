@@ -15,11 +15,11 @@ function formulaCell(ref, formula, cached, style = 4) { return `<c r="${ref}" s=
 function rowXML(r, cells, height = 24) { return `<row r="${r}" ht="${height}" customHeight="1">${cells}</row>`; }
 function excelDate(ms) { return (Date.parse(dayKey(ms) + 'T00:00:00Z') - Date.UTC(1899, 11, 30)) / 864e5; }
 function sheetXML(data, { lastRow, cols, merges = [], freeze = 4, filter = '', drawing = false, extra = '', landscape = true } = {}) { return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="${XML_NS}" xmlns:r="${REL_NS}"><sheetPr><pageSetUpPr fitToPage="1"/></sheetPr><dimension ref="A1:G${lastRow}"/><sheetViews><sheetView workbookViewId="0" showGridLines="0"><pane ySplit="${freeze}" topLeftCell="A${freeze + 1}" activePane="bottomLeft" state="frozen"/><selection pane="bottomLeft" activeCell="A${freeze + 1}" sqref="A${freeze + 1}"/></sheetView></sheetViews><sheetFormatPr defaultRowHeight="24"/><cols>${cols.map((w, i) => `<col min="${i + 1}" max="${i + 1}" width="${w}" customWidth="1"/>`).join('')}</cols><sheetData>${data}</sheetData>${filter ? `<autoFilter ref="${filter}"/>` : ''}${merges.length ? `<mergeCells count="${merges.length}">${merges.map(r => `<mergeCell ref="${r}"/>`).join('')}</mergeCells>` : ''}${extra}<printOptions horizontalCentered="1"/><pageMargins left="0.25" right="0.25" top="0.35" bottom="0.35" header="0.15" footer="0.15"/><pageSetup paperSize="9" orientation="${landscape ? 'landscape' : 'portrait'}" fitToWidth="1" fitToHeight="0"/><headerFooter><oddFooter>&amp;L현장노트 · 등록목록&amp;R&amp;P / &amp;N</oddFooter></headerFooter>${drawing ? '<drawing r:id="rIdImages"/>' : ''}</worksheet>`; }
-function imageForExcel(url) { return new Promise((resolve, reject) => { const img = new Image(), timer = setTimeout(() => reject(new Error('사진 변환 시간 초과')), 15000); img.onload = () => { clearTimeout(timer); try {
+function imageForExcel(url, { boxWidth = 250, boxHeight = 144, maxSide = 800 } = {}) { return new Promise((resolve, reject) => { const img = new Image(), timer = setTimeout(() => reject(new Error('사진 변환 시간 초과')), 15000); img.onload = () => { clearTimeout(timer); try {
     const w = img.naturalWidth, h = img.naturalHeight;
     if (!w || !h)
         throw new Error('사진 크기 확인 불가');
-    const scale = Math.min(1, 800 / w, 800 / h), canvas = document.createElement('canvas');
+    const scale = Math.min(1, maxSide / w, maxSide / h), canvas = document.createElement('canvas');
     canvas.width = Math.max(1, Math.round(w * scale));
     canvas.height = Math.max(1, Math.round(h * scale));
     const ctx = canvas.getContext('2d');
@@ -27,13 +27,64 @@ function imageForExcel(url) { return new Promise((resolve, reject) => { const im
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
     const bytes = dataURLBytes(canvas.toDataURL('image/jpeg', .83));
-    const fit = Math.min(250 / w, 144 / h);
+    const fit = Math.min(boxWidth / w, boxHeight / h);
     resolve({ bytes, width: Math.round(w * fit), height: Math.round(h * fit) });
 }
 catch (e) {
     reject(e);
 } }; img.onerror = () => { clearTimeout(timer); reject(new Error('사진을 읽지 못했습니다. 기록 상세에서 확인하세요.')); }; img.src = url; }); }
 function imageAnchor(index, row, image, description) { const x = Math.round((271 - image.width) / 2), y = Math.round((160 - image.height) / 2), emu = v => Math.round(v * 9525), mark = (tag, dx, dy) => `<xdr:${tag}><xdr:col>6</xdr:col><xdr:colOff>${emu(dx)}</xdr:colOff><xdr:row>${row - 1}</xdr:row><xdr:rowOff>${emu(dy)}</xdr:rowOff></xdr:${tag}>`; return `<xdr:twoCellAnchor editAs="twoCell">${mark('from', x, y)}${mark('to', x + image.width, y + image.height)}<xdr:pic><xdr:nvPicPr><xdr:cNvPr id="${index}" name="현장사진 ${index}" descr="${xml(description)}"/><xdr:cNvPicPr><a:picLocks noChangeAspect="1"/></xdr:cNvPicPr></xdr:nvPicPr><xdr:blipFill><a:blip r:embed="rId${index}"/><a:stretch><a:fillRect/></a:stretch></xdr:blipFill><xdr:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="${emu(image.width)}" cy="${emu(image.height)}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></xdr:spPr></xdr:pic><xdr:clientData/></xdr:twoCellAnchor>`; }
+function templateText(key) { return new TextDecoder().decode(Uint8Array.from(atob(PHOTO_LEDGER_TEMPLATE[key]), c => c.charCodeAt(0))); }
+function templateCell(sheet, ref, value) { const pattern = new RegExp(`<c r="${ref}"([^>]*)>.*?<\\/c>`); return sheet.replace(pattern, (_, attrs) => `<c r="${ref}"${attrs.replace(/\s+t="[^"]*"/g, '')} t="inlineStr"><is><t xml:space="preserve">${xml(value)}</t></is></c>`); }
+function templatePhotoAnchor(index, slot, image, description) { const boxWidth = 630, boxHeight = 365, emu = v => Math.round(v * 9525), x = Math.max(0, Math.round((boxWidth - image.width) / 2)), y = Math.max(0, Math.round((boxHeight - image.height) / 2)), row = slot ? 14 : 1; return `<xdr:oneCellAnchor><xdr:from><xdr:col>0</xdr:col><xdr:colOff>${emu(x)}</xdr:colOff><xdr:row>${row}</xdr:row><xdr:rowOff>${emu(y)}</xdr:rowOff></xdr:from><xdr:ext cx="${emu(image.width)}" cy="${emu(image.height)}"/><xdr:pic><xdr:nvPicPr><xdr:cNvPr id="${index}" name="현장사진 ${index}" descr="${xml(description)}"/><xdr:cNvPicPr><a:picLocks noChangeAspect="1"/></xdr:cNvPicPr></xdr:nvPicPr><xdr:blipFill><a:blip r:embed="rId${index}"/><a:stretch><a:fillRect/></a:stretch></xdr:blipFill><xdr:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="${emu(image.width)}" cy="${emu(image.height)}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></xdr:spPr></xdr:pic><xdr:clientData/></xdr:oneCellAnchor>`; }
+function templateSheet(records) {
+    let sheet = templateText('sheet').replace(/ tabSelected="1"/, '').replace(/ xr:uid="[^"]+"/, '').replace(/ r:id="rId1"/, '');
+    const cells = [['E13', 'P13', 'E14'], ['E26', 'P26', 'E27']];
+    for (let i = 0; i < 2; i++) {
+        const record = records[i], c = record ? classifyRecord(record) : null;
+        sheet = templateCell(sheet, cells[i][0], c?.unit || '');
+        sheet = templateCell(sheet, cells[i][1], record ? dayKey(record.createdAt) : '');
+        sheet = templateCell(sheet, cells[i][2], record?.text || (record ? '음성 내용 확인 필요' : ''));
+    }
+    return sheet.replace('</worksheet>', '<drawing r:id="rIdImages"/></worksheet>');
+}
+async function makeTemplateExcel(rs) {
+    if (!rs.length)
+        return null;
+    if (rs.length > 200)
+        throw new Error('지정 양식 내보내기는 한 번에 200건까지입니다. 날짜·위치 필터로 나눠주세요.');
+    const sorted = [...rs].sort((a, b) => a.createdAt - b.createdAt || a.id.localeCompare(b.id)), pageCount = Math.ceil(sorted.length / 2), files = [], sheetNames = [];
+    for (let page = 0; page < pageCount; page++) {
+        const records = sorted.slice(page * 2, page * 2 + 2), sheetNo = page + 3, sheetName = `${String(sheetNo).padStart(3, '0')}. 사진대지`, drawingNo = page + 1, anchors = [], relationships = [];
+        sheetNames.push(sheetName);
+        for (let slot = 0; slot < records.length; slot++) {
+            const record = records[slot], photoNo = page * 2 + slot + 1, c = classifyRecord(record);
+            showExportProgress(`지정 양식 준비 · ${photoNo} / ${sorted.length}건`);
+            const photo = await imageForExcel(record.photo, { boxWidth: 630, boxHeight: 365, maxSide: 1400 });
+            files.push({ name: `xl/media/photo${photoNo}.jpeg`, data: photo.bytes });
+            anchors.push(templatePhotoAnchor(slot + 1, slot, photo, `${c.unit} ${record.text || ''}`));
+            relationships.push(`<Relationship Id="rId${slot + 1}" Type="${REL_NS}/image" Target="../media/photo${photoNo}.jpeg"/>`);
+        }
+        files.push({ name: `xl/worksheets/sheet${sheetNo}.xml`, data: new TextEncoder().encode(templateSheet(records)) });
+        files.push({ name: `xl/worksheets/_rels/sheet${sheetNo}.xml.rels`, data: new TextEncoder().encode(`<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="${PKG_NS}"><Relationship Id="rIdImages" Type="${REL_NS}/drawing" Target="../drawings/drawing${drawingNo}.xml"/></Relationships>`) });
+        files.push({ name: `xl/drawings/drawing${drawingNo}.xml`, data: new TextEncoder().encode(`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><xdr:wsDr xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="${REL_NS}">${anchors.join('')}</xdr:wsDr>`) });
+        files.push({ name: `xl/drawings/_rels/drawing${drawingNo}.xml.rels`, data: new TextEncoder().encode(`<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="${PKG_NS}">${relationships.join('')}</Relationships>`) });
+        await new Promise(resolve => setTimeout(resolve, 0));
+    }
+    const sheets = sheetNames.map((name, i) => `<sheet name="${xml(name)}" sheetId="${i + 1}" r:id="rIdSheet${i + 1}"/>`).join(''), names = sheetNames.map((name, i) => `<definedName name="_xlnm.Print_Area" localSheetId="${i}">'${xml(name)}'!$A$1:$V$27</definedName>`).join(''), rels = sheetNames.map((_, i) => `<Relationship Id="rIdSheet${i + 1}" Type="${REL_NS}/worksheet" Target="worksheets/sheet${i + 3}.xml"/>`).join(''), overrides = sheetNames.map((_, i) => `<Override PartName="/xl/worksheets/sheet${i + 3}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/drawings/drawing${i + 1}.xml" ContentType="application/vnd.openxmlformats-officedocument.drawing+xml"/>`).join(''), enc = new TextEncoder();
+    const parts = {
+        '[Content_Types].xml': `<?xml version="1.0" encoding="UTF-8"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Default Extension="jpeg" ContentType="image/jpeg"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/theme/theme1.xml" ContentType="application/vnd.openxmlformats-officedocument.theme+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/><Override PartName="/xl/sharedStrings.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sharedStrings+xml"/>${overrides}</Types>`,
+        '_rels/.rels': `<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="${PKG_NS}"><Relationship Id="rId1" Type="${REL_NS}/officeDocument" Target="xl/workbook.xml"/></Relationships>`,
+        'xl/workbook.xml': `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="${XML_NS}" xmlns:r="${REL_NS}"><bookViews><workbookView/></bookViews><sheets>${sheets}</sheets><definedNames>${names}</definedNames><calcPr calcId="191029"/></workbook>`,
+        'xl/_rels/workbook.xml.rels': `<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="${PKG_NS}"><Relationship Id="rIdStyles" Type="${REL_NS}/styles" Target="styles.xml"/><Relationship Id="rIdTheme" Type="${REL_NS}/theme" Target="theme/theme1.xml"/><Relationship Id="rIdStrings" Type="${REL_NS}/sharedStrings" Target="sharedStrings.xml"/>${rels}</Relationships>`,
+        'xl/styles.xml': templateText('styles'),
+        'xl/theme/theme1.xml': templateText('theme'),
+        'xl/sharedStrings.xml': templateText('sharedStrings'),
+    };
+    for (const [name, content] of Object.entries(parts))
+        files.push({ name, data: enc.encode(content) });
+    return new Blob([zipBlob(files)], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+}
 function showExportProgress(msg) { let e = $('excelProgress'); if (!e) {
     e = document.createElement('div');
     e.id = 'excelProgress';
@@ -114,7 +165,7 @@ async function exportExcel(fromAnalytics = false) { if (state.exporting)
     toast('점검을 종료한 뒤 엑셀을 내보내세요.');
     return;
 } const rows = fromAnalytics ? analysisRecords() : selectedRecords(); if (!rows.length)
-    return; const selected = !fromAnalytics && visibleRecords().some(r => state.selected.has(r.id)); const scope = fromAnalytics ? '집계 화면 조회 범위' : selected ? '선택한 등록 기록' : '등록 목록 조회 범위'; state.exporting = true; $('excelBtn').disabled = true; $('analyticsExcel').disabled = true; try {
+    return; const selected = !fromAnalytics && visibleRecords().some(r => state.selected.has(r.id)); const scope = fromAnalytics ? '집계 화면 조회 범위' : selected ? '선택한 등록 기록' : '등록 목록 조회 범위'; state.exporting = true; $('excelBtn').disabled = true; $('templateExcelBtn').disabled = true; $('analyticsExcel').disabled = true; try {
     const file = await makeExcel(rows, { scope });
     if (file) {
         downloadBlob(file, `현장노트_${sourceLabel(rows).startsWith('체험') ? '체험_' : ''}사진대지_${dayKey(Date.now()).replaceAll('-', '')}_${rows.length}건.xlsx`);
@@ -132,3 +183,34 @@ finally {
     if (state.view === 'analytics')
         renderAnalytics();
 } }
+async function exportTemplateExcel() {
+    if (state.exporting)
+        return;
+    if (state.active) {
+        toast('점검을 종료한 뒤 엑셀을 내보내세요.');
+        return;
+    }
+    const rows = selectedRecords();
+    if (!rows.length)
+        return;
+    state.exporting = true;
+    $('excelBtn').disabled = true;
+    $('templateExcelBtn').disabled = true;
+    $('analyticsExcel').disabled = true;
+    try {
+        const file = await makeTemplateExcel(rows);
+        if (file) {
+            downloadBlob(file, `현장노트_${sourceLabel(rows).startsWith('체험') ? '체험_' : ''}지정양식_사진대지_${dayKey(Date.now()).replaceAll('-', '')}_${rows.length}건.xlsx`);
+            toast(`지정 양식 사진대지 ${Math.ceil(rows.length / 2)}장을 만들었습니다.`);
+        }
+    }
+    catch (e) {
+        console.error(e);
+        toast(`지정 양식 내보내기 실패: ${e.message}`, true);
+    }
+    finally {
+        state.exporting = false;
+        $('excelProgress')?.remove();
+        renderRecords();
+    }
+}

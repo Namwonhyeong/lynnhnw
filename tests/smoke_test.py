@@ -62,6 +62,22 @@ def download_excel(page, path: Path, expected_count: int) -> None:
     validate_xlsx(path, expected_count)
     page.wait_for_function('!state.exporting')
 
+def download_template_excel(page, path: Path, expected_count: int) -> None:
+    with page.expect_download(timeout=30000) as pending:
+        page.locator('#templateExcelBtn').click()
+    pending.value.save_as(path)
+    with zipfile.ZipFile(path) as z:
+        assert z.testzip() is None
+        workbook = ET.fromstring(z.read('xl/workbook.xml'))
+        names = [s.attrib['name'] for s in workbook.findall('m:sheets/m:sheet', N)]
+        assert names == [f'{3 + i:03d}. 사진대지' for i in range((expected_count + 1) // 2)], names
+        assert len([n for n in z.namelist() if n.startswith('xl/media/photo')]) == expected_count
+        sheet = ET.fromstring(z.read('xl/worksheets/sheet1.xml'))
+        assert sheet.find("m:sheetData/m:row/m:c[@r='E13']", N) is not None
+        assert sheet.find("m:sheetData/m:row/m:c[@r='P13']", N) is not None
+        assert sheet.find("m:sheetData/m:row/m:c[@r='E14']", N) is not None
+    page.wait_for_function('!state.exporting')
+
 def run() -> None:
     server = ThreadingHTTPServer(('127.0.0.1', 0), functools.partial(QuietHandler, directory=str(ROOT)))
     server_thread = threading.Thread(target=server.serve_forever, daemon=True)
@@ -113,6 +129,8 @@ def run() -> None:
             page.locator('#recordTableBody [data-select]').first.check()
             download_excel(page, OUT / 'selected-one.xlsx', 1)
             passed('필터와 선택 항목 엑셀', '욕실 12건 중 선택 1건만 내보내기')
+            download_template_excel(page, OUT / 'selected-one-template.xlsx', 1)
+            passed('지정 사진대지 양식 엑셀', '선택 1건, 사진·위치·일자·내용 및 시트명 확인')
             page.locator('#clearSelection').click()
             page.locator('#resetFilters').click()
 

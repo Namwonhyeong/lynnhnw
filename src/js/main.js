@@ -8,6 +8,7 @@ function wireV2() {
     $('filterToggle').onclick = () => { const open = $('listFilterBlock').classList.toggle('open'); $('filterToggle').setAttribute('aria-expanded', String(open)); };
     $('analyticsTab').onclick = () => updateView('analytics');
     $('excelBtn').onclick = () => exportExcel(false);
+    $('templateExcelBtn').onclick = exportTemplateExcel;
     $('analyticsExcel').onclick = () => exportExcel(true);
     for (const id of ['filterUnit', 'filterPosition', 'filterTrade', 'filterFrom', 'filterTo'])
         $(id).onchange = renderRecords;
