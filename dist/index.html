@@ -365,6 +365,7 @@ select{font:inherit;color:var(--ink)}
 .toolbar-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .excel-btn{background:var(--green)}
 .excel-btn:hover{background:#125f54}
+.toolbar-actions>.excel-btn{flex:0 0 174px}
 .list-heading h1{margin-top:0}
 .list-heading p{max-width:640px}
 .list-heading{gap:20px}
@@ -678,7 +679,7 @@ select{font:inherit;color:var(--ink)}
   </div>
  </section>
  <section id="listView" class="hidden">
-  <div class="list-heading"><div><div class="eyebrow">RECORDS → EXCEL</div><h1>내가 남긴 기록 <span id="listCount" class="muted">0</span></h1><p>현장에서는 계속 촬영하세요. 위치·공종 정리와 사진대지는 여기서.<br>선택 기록이 있으면 선택 항목만, 없으면 조회 중인 기록을 내보냅니다.</p></div><div class="toolbar-actions"><button class="subtle-btn" id="importBtn"><i data-icon="upload"></i>기록 가져오기</button><button class="secondary" id="exportBtn"><i data-icon="download"></i>기록 백업</button><button class="secondary template-excel-btn" id="templateExcelBtn"><i data-icon="sheet"></i>지정 양식 엑셀</button><button class="primary excel-btn" id="excelBtn"><i data-icon="sheet"></i>목록형 엑셀</button></div></div>
+  <div class="list-heading"><div><div class="eyebrow">RECORDS → EXCEL</div><h1>내가 남긴 기록 <span id="listCount" class="muted">0</span></h1><p>현장에서는 계속 촬영하세요. 위치·공종 정리와 사진대지는 여기서.<br>선택 기록이 있으면 선택 항목만, 없으면 조회 중인 기록을 내보냅니다.</p></div><div class="toolbar-actions"><button class="subtle-btn" id="importBtn"><i data-icon="upload"></i>기록 가져오기</button><button class="secondary" id="exportBtn"><i data-icon="download"></i>기록 백업</button><button class="primary excel-btn" id="templateExcelBtn"><i data-icon="sheet"></i>사진대지 내보내기</button><button class="primary excel-btn" id="excelBtn"><i data-icon="sheet"></i>하자목록 내보내기</button></div></div>
   <div class="list-tools"><div class="filters"><button class="filter selected" data-filter="all">전체</button><button class="filter" data-filter="live">실제 기록</button><button class="filter" data-filter="pending">음성 확인 필요</button><button class="filter" data-filter="demo">체험 기록</button></div><div class="search-wrap"><i data-icon="search"></i><input class="search-input" id="search" placeholder="위치 · 공종 · 업체명 · 내용 검색" aria-label="기록 검색"></div></div>
   <button class="subtle-btn filter-toggle" id="filterToggle" aria-expanded="false" aria-controls="listFilterBlock">위치·공종·날짜 필터 <span id="filterBadge"></span></button>
   <div class="list-filter-block" id="listFilterBlock">
@@ -1646,8 +1647,8 @@ function renderListV2() {
     $('clearSelection').classList.toggle('hidden', !state.selected.size);
     $('excelBtn').disabled = !rs.length || state.exporting;
     $('templateExcelBtn').disabled = !rs.length || state.exporting;
-    $('excelBtn').innerHTML = icon('sheet') + `목록형 엑셀${rs.length ? ' · ' + (n || rs.length) + '건' : ''}`;
-    $('templateExcelBtn').innerHTML = icon('sheet') + `지정 양식 엑셀${rs.length ? ' · ' + (n || rs.length) + '건' : ''}`;
+    $('excelBtn').innerHTML = icon('sheet') + `하자목록 내보내기${rs.length ? ' · ' + (n || rs.length) + '건' : ''}`;
+    $('templateExcelBtn').innerHTML = icon('sheet') + `사진대지 내보내기${rs.length ? ' · ' + (n || rs.length) + '건' : ''}`;
     $('tableViewBtn').classList.toggle('active', state.listFormat === 'table');
     $('cardViewBtn').classList.toggle('active', state.listFormat === 'cards');
     $('calendarViewBtn').classList.toggle('active', state.listFormat === 'calendar');

@@ -354,6 +354,7 @@ select{font:inherit;color:var(--ink)}
 .toolbar-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .excel-btn{background:var(--green)}
 .excel-btn:hover{background:#125f54}
+.toolbar-actions>.excel-btn{flex:0 0 174px}
 .list-heading h1{margin-top:0}
 .list-heading p{max-width:640px}
 .list-heading{gap:20px}
