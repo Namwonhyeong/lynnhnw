@@ -95,7 +95,11 @@ $('search').oninput = renderRecords;
 document.querySelectorAll('[data-filter]').forEach(b => b.onclick = () => { state.filter = b.dataset.filter; document.querySelectorAll('[data-filter]').forEach(x => x.classList.toggle('selected', x === b)); renderRecords(); });
 $('exportBtn').onclick = exportRecords;
 wireV2();
-if ('serviceWorker' in navigator)
+if (window.AndroidBridge) {
+    document.querySelector('.local-label').textContent = '앱 내부 저장 · 내보내기 시 Drive/OneDrive 선택';
+    $('cloudStatus').textContent = '기기 저장';
+}
+if (!window.AndroidBridge && 'serviceWorker' in navigator)
     window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => { }));
 window.addEventListener('beforeunload', e => { if (state.active && state.mode === 'live') {
     e.preventDefault();

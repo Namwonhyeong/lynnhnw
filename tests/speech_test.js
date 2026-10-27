@@ -38,4 +38,16 @@ context.state.draftPhoto = 'data:image/jpeg;base64,test';
 assert.equal(shouldRecognizeSpeech(), true);
 context.state.mode = 'demo';
 assert.equal(shouldRecognizeSpeech(), false);
+
+let nativeStarted = 0, nativeStopped = 0, nativeResult = '';
+const nativeContext = { window: { AndroidBridge: { startSpeech: () => nativeStarted++, stopSpeech: () => nativeStopped++ } }, state: {}, console, setTimeout, clearTimeout };
+vm.runInNewContext(source + '\n;globalThis.__nativeSpeechTest = SpeechRecognitionApi;', nativeContext);
+const nativeRecognition = new nativeContext.__nativeSpeechTest();
+nativeRecognition.onresult = event => { nativeResult = event.results[0][0].transcript; };
+nativeRecognition.start();
+nativeContext.window.__nativeSpeechResult('101동 302호 창틀 코킹 누락', false);
+nativeRecognition.stop();
+assert.equal(nativeStarted, 1);
+assert.equal(nativeStopped, 1);
+assert.equal(nativeResult, '101동 302호 창틀 코킹 누락');
 console.log('speech parser tests passed');

@@ -180,7 +180,7 @@ async function startSession() {
                 throw new Error('카메라·마이크 사용에는 HTTPS 또는 localhost가 필요합니다. 현재 환경에서는 화면 체험을 이용하세요.');
             if (!window.MediaRecorder)
                 throw new Error('이 브라우저는 녹음을 지원하지 않습니다. 다른 브라우저에서 테스트하세요.');
-            stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' }, width: { ideal: 1920 }, height: { ideal: 1080 } }, audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } });
+            stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' }, width: { ideal: 1920 }, height: { ideal: 1080 } }, audio: window.AndroidBridge ? false : { echoCancellation: true, noiseSuppression: true, autoGainControl: true } });
             state.stream = stream;
             $('liveVideo').srcObject = stream;
             await $('liveVideo').play();
@@ -193,15 +193,17 @@ async function startSession() {
         if (state.mode === 'live') {
             const choices = ['audio/webm;codecs=opus', 'audio/mp4', 'audio/webm'];
             const mime = choices.find(m => MediaRecorder.isTypeSupported(m));
-            state.recorder = new MediaRecorder(new MediaStream(stream.getAudioTracks()), mime ? { mimeType: mime } : {});
-            session.mime = state.recorder.mimeType;
+            state.recorder = stream.getAudioTracks().length ? new MediaRecorder(new MediaStream(stream.getAudioTracks()), mime ? { mimeType: mime } : {}) : null;
+            session.mime = state.recorder?.mimeType || '';
             state.chunkSeq = 0;
             state.chunkChain = Promise.resolve();
             state.saveFailures = 0;
-            state.recorder.ondataavailable = e => { if (!e.data.size)
+            if (state.recorder)
+                state.recorder.ondataavailable = e => { if (!e.data.size)
                 return; const chunk = { id: `${session.id}:${state.chunkSeq}`, sessionId: session.id, seq: state.chunkSeq++, blob: e.data, receivedAt: Date.now() }; state.chunkChain = state.chunkChain.then(() => put('chunks', chunk)).catch(err => { state.saveFailures++; alertBox('녹음 저장 오류가 발생했습니다. 점검을 중단하고 기존 기록을 백업하세요.'); if (state.active && !state.paused)
                 pauseSession(true); console.error(err); }); };
-            state.recorder.onerror = e => { alertBox('녹음 장치 오류입니다. 점검을 종료한 뒤 다시 시작하세요.'); pauseSession(true); console.error(e.error); };
+            if (state.recorder)
+                state.recorder.onerror = e => { alertBox('녹음 장치 오류입니다. 점검을 종료한 뒤 다시 시작하세요.'); pauseSession(true); console.error(e.error); };
         }
         if (state.mode === 'demo' && !state.location) {
             state.location = state.buildingMode === 'general' ? '3층 회의실' : '101동 1203호';
@@ -404,7 +406,7 @@ async function capture() {
             const speech = takeSpeechSnapshot();
             text = speech.text;
             transcriptRaw = speech.raw;
-            transcriptionStatus = text ? 'browser' : speechState.supported ? 'pending' : 'not_supported';
+            transcriptionStatus = text ? window.AndroidBridge ? 'native' : 'browser' : speechState.supported ? 'pending' : 'not_supported';
             stopSpeechRecognition(true);
             speechState.manualPaused = false;
         }
@@ -519,7 +521,19 @@ async function openDetailBase(id) {
             $('audioArea').innerHTML = '<p class="small-note">음성 원본을 불러오지 못했습니다.</p>';
     }
 }
-function downloadBlob(blob, name) { const u = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = u; a.download = name; document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(u), 15000); }
+function downloadBlob(blob, name) {
+    if (window.AndroidBridge) {
+        blob.arrayBuffer().then(buffer => {
+            const bytes = new Uint8Array(buffer), chunkSize = 24576;
+            window.AndroidBridge.beginSave(name, blob.type || 'application/octet-stream', bytes.length);
+            for (let i = 0; i < bytes.length; i += chunkSize)
+                window.AndroidBridge.appendSaveChunk(btoa(String.fromCharCode(...bytes.subarray(i, i + chunkSize))));
+            window.AndroidBridge.finishSave();
+        }).catch(() => toast('파일을 준비하지 못했습니다.', true));
+        return;
+    }
+    const u = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = u; a.download = name; document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(u), 15000);
+}
 function dataURLBytes(url) { const idx = url.indexOf(','); const hdr = url.slice(0, idx), data = url.slice(idx + 1); if (hdr.includes(';base64'))
     return Uint8Array.from(atob(data), c => c.charCodeAt(0)); return new TextEncoder().encode(decodeURIComponent(data)); }
 function downloadDataURL(url, name) { downloadBlob(new Blob([dataURLBytes(url)], { type: url.slice(5, url.indexOf(';')) }), name); }

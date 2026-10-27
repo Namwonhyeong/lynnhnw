@@ -1,7 +1,22 @@
 /* Browser speech recognition and free-form Korean field-note parsing. */
 'use strict';
 
-const SpeechRecognitionApi = window.SpeechRecognition || window.webkitSpeechRecognition;
+let nativeSpeechInstance = null;
+class NativeSpeechRecognition {
+    start() { nativeSpeechInstance = this; window.AndroidBridge.startSpeech(); }
+    stop() { window.AndroidBridge.stopSpeech(); }
+}
+window.__nativeSpeechStart = () => nativeSpeechInstance?.onstart?.();
+window.__nativeSpeechResult = (text, isFinal) => {
+    if (!nativeSpeechInstance || !text)
+        return;
+    const result = [{ transcript: text }];
+    result.isFinal = !!isFinal;
+    nativeSpeechInstance.onresult?.({ resultIndex: 0, results: [result] });
+};
+window.__nativeSpeechError = error => nativeSpeechInstance?.onerror?.({ error });
+window.__nativeSpeechEnd = () => { const instance = nativeSpeechInstance; nativeSpeechInstance = null; instance?.onend?.(); };
+const SpeechRecognitionApi = window.AndroidBridge ? NativeSpeechRecognition : window.SpeechRecognition || window.webkitSpeechRecognition;
 const KOREAN_DIGITS = { '영': '0', '공': '0', '일': '1', '이': '2', '삼': '3', '사': '4', '오': '5', '육': '6', '칠': '7', '팔': '8', '구': '9' };
 const KOREAN_UNITS = { '십': 10, '백': 100, '천': 1000 };
 const speechState = { supported: !!SpeechRecognitionApi, recognition: null, listening: false, disabled: false, manualPaused: false, finalText: '', interimText: '', restartTimer: null, lastError: '' };
