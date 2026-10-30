@@ -11,7 +11,7 @@ import re
 import shutil
 import traceback
 from playwright.sync_api import sync_playwright
-from smoke_test import validate_xlsx
+from smoke_test import seed_live_records, validate_xlsx
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / 'tests/output/harness'
@@ -63,20 +63,15 @@ def main():
             mount(page)
             assert page.evaluate('state.records.length')==0
             record('분리 소스 화면 초기화','로컬 HTML 렌더링 + 메모리 테스트 저장소; 네이티브 저장 검증 아님')
-            page.locator('#listTab').click();page.locator('#seedListBtn').click()
-            page.wait_for_function('state.records.length === 36')
-            page.locator('#seedListBtn').click();page.wait_for_timeout(80)
-            assert page.evaluate('state.records.length')==36
-            record('체험 36건 생성·중복 방지')
+            page.locator('#listTab').click();seed_live_records(page)
+            assert page.evaluate('actualRecords().length')==36
+            record('실제 형식 테스트 기록 36건 준비')
             page.locator('#analyticsTab').click()
             assert page.evaluate('analysisRecords().length')==36
             assert page.evaluate('countBy(analysisRecords(),r=>classifyRecord(r).position)[0]')=={'name':'욕실','count':12}
             assert '8건' in page.locator('#ruleInsights').inner_text()
             page.screenshot(path=str(OUT/'analytics-desktop.png'),full_page=True)
-            page.locator('#analyticsLive').click()
-            assert page.evaluate('analysisRecords().length')==0
-            assert page.locator('#analysisEmpty').is_visible()
-            record('집계·규칙 요약·실제/체험 분리','욕실 12건; 반복 단차 8건; 실제 기록 0건 분리')
+            record('집계·규칙 요약·실제 기록 전용','욕실 12건; 반복 단차 8건')
             page.locator('#listTab').click()
             export(page,'all-36.xlsx',36)
             record('사진 포함 엑셀 36건','7열 순서, 2시트, 36개 이미지, XML·캐시·수식 구조')
@@ -118,16 +113,16 @@ def main():
             page2.locator('#shutter').click();page2.wait_for_function('!state.draftPhoto && state.records.length===39 && !state.busy')
             assert page2.evaluate('state.records.slice(-3).map(r=>r.location)')==['101동 1203호','101동 1203호','101동 1204호']
             page2.locator('#finishBtn').click();page2.wait_for_function('!state.active && !state.stopping')
-            record('체험 사진→설명→OK·위치 유지·변경','사진별 OK로 3건 생성, 이전 기록 위치 불변')
+            record('사진→설명→OK·위치 유지·변경','사진별 OK로 3건 생성, 이전 기록 위치 불변')
             page2.set_viewport_size({'width':390,'height':844})
-            page2.locator('#analyticsTab').click();page2.locator('#analyticsDemo').click()
+            page2.locator('#analyticsTab').click()
             page2.screenshot(path=str(OUT/'analytics-mobile.png'),full_page=True)
             assert not page2.evaluate('document.documentElement.scrollWidth > innerWidth+1')
             record('모바일 390px 화면 렌더링','문서 가로 넘침 없음')
             page3=context.new_page();page3.on('pageerror',lambda e:errors.append(str(e)))
             mount(page3,use_dist=True)
-            page3.locator('#listTab').click();page3.locator('#seedListBtn').click();page3.wait_for_function('state.records.length===36')
-            record('단일 HTML 빌드 산출물 UI','동일 테스트 저장소 어댑터로 화면·예시 생성 확인')
+            page3.locator('#listTab').click();seed_live_records(page3)
+            record('단일 HTML 빌드 산출물 UI','동일 테스트 저장소 어댑터로 실제 형식 기록 렌더링 확인')
             assert not errors,errors
             record('시험 중 처리되지 않은 JS 오류 없음')
             browser.close()

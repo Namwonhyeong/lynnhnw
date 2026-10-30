@@ -31,13 +31,10 @@ assert.deepEqual(
     { ...parseVoiceInput('기계실 배관 누수 지하 일층', 'general') },
     { raw: '기계실 배관 누수 지하 일층', location: '지하 1층 기계실', text: '배관 누수' }
 );
-context.state.mode = 'live';
 context.state.draftPhoto = '';
 assert.equal(shouldRecognizeSpeech(), false);
 context.state.draftPhoto = 'data:image/jpeg;base64,test';
 assert.equal(shouldRecognizeSpeech(), true);
-context.state.mode = 'demo';
-assert.equal(shouldRecognizeSpeech(), false);
 
 let nativeStarted = 0, nativeStopped = 0, nativeResult = '';
 const nativeContext = { window: { AndroidBridge: { startSpeech: () => nativeStarted++, stopSpeech: () => nativeStopped++ } }, state: {}, console, setTimeout, clearTimeout };

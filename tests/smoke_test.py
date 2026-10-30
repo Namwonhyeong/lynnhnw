@@ -34,6 +34,15 @@ def ready(page):
     page.wait_for_function("typeof state !== 'undefined' && state.db !== null", timeout=15000)
     page.wait_for_function("document.getElementById('startBtn') !== null")
 
+def seed_live_records(page) -> None:
+    page.evaluate("""async () => {
+        const specs = [['욕실','바닥 타일 단차, ○○타일 확인.',2,8],['욕실','벽 타일 들뜸, ○○타일 보수.',2,4],['거실','창호 하부 코킹 누락, ○○창호 보수.',0,5],['거실','벽지 들뜸, ○○도배 보수.',1,3],['주방','걸레받이 미시공, ○○가구 확인.',3,4],['주방','싱크대 문짝 찍힘, ○○가구 보수.',3,2],['안방','문선 찍힘, ○○내장 보수.',1,3],['안방','벽지 들뜸, ○○도배 보수.',1,2],['현관','몰딩 이음부 틈새, ○○내장 보수.',0,3],['작은방','콘센트 미설치, ○○전기 확인.',1,2]];
+        const units=['101동 1203호','101동 1204호','101동 1303호','102동 803호','102동 804호','102동 903호'], now=Date.now(), sid='test-live-v1'; let i=0;
+        for (const [pos,desc,scene,n] of specs) for(let k=0;k<n;k++){ i++; const r={id:`test-live-${i}`,sessionId:sid,number:i,mode:'live',buildingMode:'apartment',createdAt:now-((i*3+k)%7)*864e5-i*6e4,location:units[(i-1)%units.length],text:pos+' '+desc,photo:sceneData(scene),photoFormat:'svg',audioOffsetMs:0,transcriptionStatus:'manual',cloudStatus:'not_connected',note:''}; await put('records',r); state.records.push(r); }
+        const s={id:sid,mode:'live',status:'finished',startedAt:now,endedAt:now,mime:''}; await put('sessions',s); state.sessions.push(s); renderRecords();
+    }""")
+    page.wait_for_function('actualRecords().length === 36')
+
 def validate_xlsx(path: Path, count: int) -> None:
     with zipfile.ZipFile(path) as z:
         assert z.testzip() is None
@@ -103,11 +112,8 @@ def run() -> None:
             passed('분리 소스 초기 로드', '실제 브라우저 IndexedDB, 테스트 저장소 어댑터 없음')
 
             page.locator('#listTab').click()
-            page.locator('#seedListBtn').click()
-            page.wait_for_function('state.records.length === 36')
-            page.locator('#seedListBtn').click()
-            page.wait_for_function('state.records.length === 36')
-            passed('체험 36건 생성 및 재실행 중복 방지')
+            seed_live_records(page)
+            passed('실제 형식 테스트 기록 36건 준비')
 
             page.locator('#analyticsTab').click()
             assert page.evaluate('analysisRecords().length') == 36
@@ -116,10 +122,7 @@ def run() -> None:
             assert '8건' in page.locator('#ruleInsights').inner_text()
             page.screenshot(path=str(OUT / 'analytics-desktop.png'), full_page=True)
             passed('집계 및 규칙 요약', '욕실 12건; 욕실·타일·단차 반복 8건')
-            page.locator('#analyticsLive').click()
-            assert page.evaluate('analysisRecords().length') == 0
-            assert page.locator('#analysisEmpty').is_visible()
-            passed('실제/체험 집계 분리', '실제 기록 0건일 때 통계 임의 생성 없음')
+            passed('실제 기록 전용 집계', '체험 전환 UI 없이 촬영 기록만 집계')
 
             page.locator('#listTab').click()
             download_excel(page, OUT / 'all-36.xlsx', 36)
@@ -221,7 +224,6 @@ def run() -> None:
 
             page2.set_viewport_size({'width': 390, 'height': 844})
             page2.locator('#analyticsTab').click()
-            page2.locator('#analyticsDemo').click()
             page2.screenshot(path=str(OUT / 'analytics-mobile.png'), full_page=True)
             overflow = page2.evaluate('document.documentElement.scrollWidth > window.innerWidth + 1')
             assert not overflow
@@ -233,9 +235,8 @@ def run() -> None:
             page3.goto(base + '/dist/index.html')
             ready(page3)
             page3.locator('#listTab').click()
-            page3.locator('#seedListBtn').click()
-            page3.wait_for_function('state.records.length === 36')
-            passed('빌드된 단일 HTML 실행', '별도 CSS/JS 파일 요청 없이 예시 36건 생성')
+            seed_live_records(page3)
+            passed('빌드된 단일 HTML 실행', '별도 CSS/JS 파일 요청 없이 실제 형식 기록 36건 렌더링')
             assert not errors, errors
             assert not network, network
             passed('처리되지 않은 JS 오류·외부 API 요청 없음', '점검한 프런트엔드 경로 기준')

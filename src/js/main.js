@@ -38,13 +38,10 @@ function wireV2() {
     $('calendarNext').onclick = () => { state.calendarMonth = new Date(state.calendarMonth.getFullYear(), state.calendarMonth.getMonth() + 1, 1); renderListV2(); };
     $('calendarToday').onclick = () => { const now = new Date(); state.calendarMonth = new Date(now.getFullYear(), now.getMonth(), 1); renderListV2(); };
     $('calendarGrid').onclick = e => { const b = e.target.closest('[data-record]'); if (b) openDetail(b.dataset.record); };
-    $('analyticsLive').onclick = () => { state.analyticsMode = 'live'; $('analysisUnit').value = ''; renderAnalytics(); };
-    $('analyticsDemo').onclick = () => { state.analyticsMode = 'demo'; $('analysisUnit').value = ''; renderAnalytics(); };
     for (const id of ['analysisUnit', 'analysisFrom', 'analysisTo'])
         $(id).onchange = renderAnalytics;
     $('analysisReset').onclick = () => { for (const id of ['analysisUnit', 'analysisFrom', 'analysisTo'])
         $(id).value = ''; renderAnalytics(); };
-    $('seedListBtn').onclick = () => seedExamples('list');
     $('importBtn').onclick = () => { if (state.active) {
         toast('점검 종료 후 가져오세요.');
         return;
@@ -68,8 +65,6 @@ $('detailDialog').addEventListener('close', () => { const a = $('detailAudio'); 
 $('captureTab').onclick = () => updateView('capture');
 $('listTab').onclick = () => updateView('list');
 $('viewAll').onclick = () => updateView('list');
-$('demoMode').onclick = () => setMode('demo');
-$('liveMode').onclick = () => setMode('live');
 $('apartmentMode').onclick = () => setBuildingMode('apartment');
 $('generalMode').onclick = () => setBuildingMode('general');
 $('startBtn').onclick = startSession;
@@ -78,7 +73,6 @@ $('pauseBtn').onclick = () => pauseSession();
 $('speechBtn').onclick = toggleSpeechRecognition;
 $('finishBtn').onclick = finishSession;
 $('locationBtn').onclick = openLocation;
-$('locationExample').onclick = () => applyLocation($('locationExample').dataset.next);
 $('locationApply').onclick = () => applyLocation($('locationInput').value);
 $('locationInput').onkeydown = e => { if (e.key === 'Enter')
     applyLocation(e.target.value); };
@@ -101,11 +95,11 @@ if (window.AndroidBridge) {
 }
 if (!window.AndroidBridge && 'serviceWorker' in navigator)
     window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => { }));
-window.addEventListener('beforeunload', e => { if (state.active && state.mode === 'live') {
+window.addEventListener('beforeunload', e => { if (state.active) {
     e.preventDefault();
     e.returnValue = '';
 } });
-document.addEventListener('visibilitychange', () => { if (document.hidden && state.active && !state.paused && state.mode === 'live') {
+document.addEventListener('visibilitychange', () => { if (document.hidden && state.active && !state.paused) {
     pauseSession(true);
     alertBox('다른 앱·탭으로 이동해 녹음을 일시정지했습니다. 화면을 켠 상태에서 이어하기를 눌러주세요.');
 } });
@@ -120,12 +114,12 @@ window.addEventListener('pagehide', () => { stopSpeechRecognition(true); state.s
             await put('sessions', s);
         }
     }
-    state.demoLocation = readSetting('demoLocation', '');
     state.liveLocation = readSetting('liveLocation', '');
     state.keep = readSetting('keep', true);
     state.buildingMode = readSetting('buildingMode', 'apartment');
     setBuildingMode(state.buildingMode);
-    setMode('live');
+    state.location = readSetting(locationSettingKey(), state.buildingMode === 'apartment' ? state.liveLocation : '');
+    uiState();
     renderRecords();
 }
 catch (e) {

@@ -88,8 +88,8 @@ function applyVoiceLocation(location) {
         return;
     state.location = location;
     if (state.buildingMode === 'apartment') {
-        state[state.mode + 'Location'] = location;
-        saveSetting(state.mode + 'Location', location);
+        state.liveLocation = location;
+        saveSetting('liveLocation', location);
     }
     saveSetting(locationSettingKey(), location);
     locationRender();
@@ -101,11 +101,11 @@ function speechPhrase() {
 }
 
 function shouldRecognizeSpeech() {
-    return state.mode === 'live' && !!state.draftPhoto;
+    return !!state.draftPhoto;
 }
 
 function renderSpeechCaption() {
-    if (!state.active || state.mode !== 'live' || state.paused)
+    if (!state.active || state.paused)
         return;
     if (!state.draftPhoto) {
         $('captionLabel').textContent = '다음 기록 준비';

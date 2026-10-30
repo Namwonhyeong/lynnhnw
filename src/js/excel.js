@@ -93,14 +93,14 @@ function showExportProgress(msg) { let e = $('excelProgress'); if (!e) {
     e.setAttribute('aria-live', 'polite');
     document.body.appendChild(e);
 } e.textContent = msg; }
-function sourceLabel(rs) { const demo = rs.filter(r => r.mode === 'demo').length; return demo === rs.length ? '체험 예시 · 실제 현장 아님' : demo ? '실제·체험 혼합 (비고의 체험 표시 확인)' : '실제 촬영 기록'; }
+function sourceLabel() { return '실제 촬영 기록'; }
 function literalCriterion(ref) { return `SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(${ref},"~","~~"),"*","~*"),"?","~?")`; }
 function makeSummarySheet(rs, scope) {
     const map = XLSX_TEMPLATE.styles['xl/worksheets/sheet2.xml'], end = rs.length + 4, n = rs.length;
     const ps = countBy(rs, r => classifyRecord(r).position), ts = countBy(rs, r => classifyRecord(r).trade), us = countBy(rs, r => classifyRecord(r).unit), rows = [];
     rows.push(rowXML(1, textCell('A1', '현장노트 · 등록 데이터 집계', map.A1), 38));
     rows.push(rowXML(2, textCell('A2', `${scope} · ${sourceLabel(rs)} · 등록 건수이며 발생률·AI 예측 아님`, map.A2), 35));
-    rows.push(rowXML(4, textCell('A4', '등록 건수', map.A4) + formulaCell('B4', `COUNTA('등록목록'!$A$5:$A$${end})`, n, map.B4) + textCell('E4', '실제 / 체험', map.A4) + numCell('F4', rs.filter(r => r.mode === 'live').length, map.B4) + numCell('G4', rs.filter(r => r.mode === 'demo').length, map.B4), 30));
+    rows.push(rowXML(4, textCell('A4', '등록 건수', map.A4) + formulaCell('B4', `COUNTA('등록목록'!$A$5:$A$${end})`, n, map.B4) + textCell('E4', '실제 촬영', map.A4) + numCell('F4', n, map.B4), 30));
     rows.push(rowXML(7, ['위치', '등록 건수', '등록 내 비중'].map((v, i) => textCell('ABC'[i] + '7', v, map.A7)).join('') + ['공종', '등록 건수', '등록 내 비중'].map((v, i) => textCell('EFG'[i] + '7', v, map.A7)).join(''), 28));
     for (let i = 0; i < Math.max(ps.length, ts.length); i++) {
         const r = i + 8, p = ps[i], t = ts[i];
@@ -168,7 +168,7 @@ async function exportExcel(fromAnalytics = false) { if (state.exporting)
     return; const selected = !fromAnalytics && visibleRecords().some(r => state.selected.has(r.id)); const scope = fromAnalytics ? '집계 화면 조회 범위' : selected ? '선택한 등록 기록' : '등록 목록 조회 범위'; state.exporting = true; $('excelBtn').disabled = true; $('templateExcelBtn').disabled = true; $('analyticsExcel').disabled = true; try {
     const file = await makeExcel(rows, { scope });
     if (file) {
-        downloadBlob(file, `현장노트_${sourceLabel(rows).startsWith('체험') ? '체험_' : ''}사진대지_${dayKey(Date.now()).replaceAll('-', '')}_${rows.length}건.xlsx`);
+        downloadBlob(file, `현장노트_사진대지_${dayKey(Date.now()).replaceAll('-', '')}_${rows.length}건.xlsx`);
         toast(`사진 ${rows.length}장의 사진대지와 집계 시트를 내보냈습니다.`);
     }
 }
@@ -200,7 +200,7 @@ async function exportTemplateExcel() {
     try {
         const file = await makeTemplateExcel(rows);
         if (file) {
-            downloadBlob(file, `현장노트_${sourceLabel(rows).startsWith('체험') ? '체험_' : ''}지정양식_사진대지_${dayKey(Date.now()).replaceAll('-', '')}_${rows.length}건.xlsx`);
+            downloadBlob(file, `현장노트_지정양식_사진대지_${dayKey(Date.now()).replaceAll('-', '')}_${rows.length}건.xlsx`);
             toast(`지정 양식 사진대지 ${Math.ceil(rows.length / 2)}장을 만들었습니다.`);
         }
     }

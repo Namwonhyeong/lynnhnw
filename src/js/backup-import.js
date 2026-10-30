@@ -62,6 +62,8 @@ async function importBackup(file) {
                 throw new Error('기록의 ID 또는 날짜가 올바르지 않습니다.');
             if (existing.has(r.id) || newIds.has(r.id))
                 continue;
+            if (r.mode === 'demo')
+                continue;
             let photo = r.photo;
             if (files && r.photoFile) {
                 const bytes = files.get(r.photoFile);
@@ -73,8 +75,8 @@ async function importBackup(file) {
             if (!validLocalImage(photo))
                 throw new Error('사진 데이터가 없거나 잘못되었습니다. JSON 목록만 있으면 원래 ZIP을 선택하세요.');
             const importedStatus = ['browser', 'manual', 'pending', 'not_supported'].includes(r.transcriptionStatus) ? r.transcriptionStatus : r.text ? 'manual' : 'pending';
-            const safe = { id: r.id, sessionId: r.sessionId.slice(0, 200), number: Number.isInteger(r.number) ? r.number : added.length + 1, mode: r.mode, buildingMode: r.buildingMode === 'general' ? 'general' : 'apartment', createdAt: r.createdAt, location: String(r.location || '').slice(0, 80), text: String(r.text || '').slice(0, 4000), transcriptRaw: String(r.transcriptRaw || '').slice(0, 4000), photo, photoFormat: /image\/svg/.test(photo) ? 'svg' : /image\/png/.test(photo) ? 'png' : /image\/webp/.test(photo) ? 'webp' : 'jpg', audioOffsetMs: Number.isFinite(r.audioOffsetMs) ? Math.max(0, r.audioOffsetMs) : 0, transcriptionStatus: r.mode === 'demo' ? 'demo' : importedStatus, cloudStatus: 'not_connected', classificationReviewed: !!r.classificationReviewed };
-            for (const k of ['unitOverride', 'positionOverride', 'tradeOverride', 'typeOverride', 'demoSource'])
+            const safe = { id: r.id, sessionId: r.sessionId.slice(0, 200), number: Number.isInteger(r.number) ? r.number : added.length + 1, mode: 'live', buildingMode: r.buildingMode === 'general' ? 'general' : 'apartment', createdAt: r.createdAt, location: String(r.location || '').slice(0, 80), text: String(r.text || '').slice(0, 4000), transcriptRaw: String(r.transcriptRaw || '').slice(0, 4000), photo, photoFormat: /image\/svg/.test(photo) ? 'svg' : /image\/png/.test(photo) ? 'png' : /image\/webp/.test(photo) ? 'webp' : 'jpg', audioOffsetMs: Number.isFinite(r.audioOffsetMs) ? Math.max(0, r.audioOffsetMs) : 0, transcriptionStatus: importedStatus, cloudStatus: 'not_connected', classificationReviewed: !!r.classificationReviewed };
+            for (const k of ['unitOverride', 'positionOverride', 'tradeOverride', 'typeOverride'])
                 if (typeof r[k] === 'string')
                     safe[k] = r[k].slice(0, 80);
             safe.note = String(r.note || '').slice(0, 1000);
@@ -83,10 +85,10 @@ async function importBackup(file) {
         }
         const addedS = [], chunks = [];
         for (const s of sessionsIn) {
-            if (typeof s.id !== 'string' || !/^[A-Za-z0-9_.:-]{1,200}$/.test(s.id) || sids.has(s.id) || !['demo', 'live'].includes(s.mode))
+            if (typeof s.id !== 'string' || !/^[A-Za-z0-9_.:-]{1,200}$/.test(s.id) || sids.has(s.id) || s.mode !== 'live')
                 continue;
-            const ns = { id: s.id.slice(0, 200), mode: s.mode, status: 'finished', startedAt: Number(s.startedAt) || Date.now(), endedAt: Number(s.endedAt) || Date.now(), mime: String(s.mime || '').includes('mp4') || /\.m4a$/i.test(s.audioFile || '') ? 'audio/mp4' : 'audio/webm' };
-            if (files && typeof s.audioFile === 'string' && files.has(s.audioFile) && s.mode === 'live') {
+            const ns = { id: s.id.slice(0, 200), mode: 'live', status: 'finished', startedAt: Number(s.startedAt) || Date.now(), endedAt: Number(s.endedAt) || Date.now(), mime: String(s.mime || '').includes('mp4') || /\.m4a$/i.test(s.audioFile || '') ? 'audio/mp4' : 'audio/webm' };
+            if (files && typeof s.audioFile === 'string' && files.has(s.audioFile)) {
                 const audio = files.get(s.audioFile);
                 chunks.push({ id: `${ns.id}:import-0`, sessionId: ns.id, seq: 0, blob: new Blob([audio], { type: ns.mime }) });
             }
@@ -95,7 +97,7 @@ async function importBackup(file) {
         }
         for (const r of added)
             if (!sids.has(r.sessionId)) {
-                addedS.push({ id: r.sessionId, mode: r.mode, status: 'finished', startedAt: r.createdAt });
+                addedS.push({ id: r.sessionId, mode: 'live', status: 'finished', startedAt: r.createdAt });
                 sids.add(r.sessionId);
             }
         if (!added.length && !addedS.length) {

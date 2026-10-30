@@ -638,7 +638,6 @@ select{font:inherit;color:var(--ink)}
 <main class="app">
  <div class="topbar">
   <nav class="tabs" aria-label="주 메뉴"><button class="tab active" id="captureTab"><i data-icon="camera"></i>현장 등록</button><button class="tab" id="listTab"><i data-icon="grid"></i>내 등록 <span class="count-pill" id="totalCount">0</span></button><button class="tab" id="analyticsTab"><i data-icon="chart"></i>집계·분석</button></nav>
-  <div class="mode-switch" aria-label="기록 모드 선택"><button id="liveMode" class="selected">실제 촬영·음성인식</button><button id="demoMode">화면 체험</button></div>
  </div>
  <div id="runtimeAlert" class="runtime-alert hidden" role="alert"></div>
  <section id="captureView">
@@ -652,7 +651,7 @@ select{font:inherit;color:var(--ink)}
     </div>
     <div class="camera-shell">
      <div class="camera-stage" id="cameraStage">
-      <img class="demo-scene" id="sceneImage" alt="체험용 시공 부위 예시 이미지">
+      <img class="demo-scene" id="sceneImage" alt="카메라 촬영 대기 화면">
       <video id="liveVideo" autoplay playsinline muted class="hidden" aria-label="카메라 화면"></video>
       <div class="hud"><span class="state-badge" id="stateBadge"><span class="state-dot"></span><span id="stateLabel">점검 시작 전</span></span><span class="elapsed mono"><i data-icon="clock"></i><span id="elapsed">00:00</span></span></div>
       <div class="sample-badge" id="sampleBadge">대기 화면 · 시작 시 카메라 연결</div>
@@ -680,7 +679,7 @@ select{font:inherit;color:var(--ink)}
  </section>
  <section id="listView" class="hidden">
   <div class="list-heading"><div><div class="eyebrow">RECORDS → EXCEL</div><h1>내가 남긴 기록 <span id="listCount" class="muted">0</span></h1><p>현장에서는 계속 촬영하세요. 위치·공종 정리와 사진대지는 여기서.<br>선택 기록이 있으면 선택 항목만, 없으면 조회 중인 기록을 내보냅니다.</p></div><div class="toolbar-actions"><button class="subtle-btn" id="importBtn"><i data-icon="upload"></i>기록 가져오기</button><button class="secondary" id="exportBtn"><i data-icon="download"></i>기록 백업</button><button class="primary excel-btn" id="templateExcelBtn"><i data-icon="sheet"></i>사진대지 내보내기</button><button class="primary excel-btn" id="excelBtn"><i data-icon="sheet"></i>하자목록 내보내기</button></div></div>
-  <div class="list-tools"><div class="filters"><button class="filter selected" data-filter="all">전체</button><button class="filter" data-filter="live">실제 기록</button><button class="filter" data-filter="pending">음성 확인 필요</button><button class="filter" data-filter="demo">체험 기록</button></div><div class="search-wrap"><i data-icon="search"></i><input class="search-input" id="search" placeholder="위치 · 공종 · 업체명 · 내용 검색" aria-label="기록 검색"></div></div>
+  <div class="list-tools"><div class="filters"><button class="filter selected" data-filter="all">전체</button><button class="filter" data-filter="pending">음성 확인 필요</button></div><div class="search-wrap"><i data-icon="search"></i><input class="search-input" id="search" placeholder="위치 · 공종 · 업체명 · 내용 검색" aria-label="기록 검색"></div></div>
   <button class="subtle-btn filter-toggle" id="filterToggle" aria-expanded="false" aria-controls="listFilterBlock">위치·공종·날짜 필터 <span id="filterBadge"></span></button>
   <div class="list-filter-block" id="listFilterBlock">
   <div class="data-filters"><div class="filter-field"><label for="filterUnit">위치 정보</label><select id="filterUnit"><option value="">전체 위치 정보</option></select></div><div class="filter-field"><label for="filterPosition">세부 위치</label><select id="filterPosition"><option value="">전체 세부 위치</option></select></div><div class="filter-field"><label for="filterTrade">공종</label><select id="filterTrade"><option value="">전체 공종</option></select></div><div class="filter-field"><label for="filterFrom">시작일</label><input type="date" id="filterFrom"></div><div class="filter-field"><label for="filterTo">종료일</label><input type="date" id="filterTo"></div><button class="text-button" id="resetFilters">초기화</button></div>
@@ -690,10 +689,10 @@ select{font:inherit;color:var(--ink)}
   <div id="recordTableWrap" class="table-shell"><table class="records-table"><thead><tr><th class="row-selection"></th><th>날짜</th><th>동호수 / 층·실명</th><th>세부 위치</th><th>공종</th><th>내용</th><th>비고</th><th>해당사진</th></tr></thead><tbody id="recordTableBody"></tbody></table></div>
   <div class="record-grid cards-v2 hidden" id="recordGrid"></div>
   <div class="calendar-shell hidden" id="calendarView"><div class="calendar-head"><button class="calendar-nav" id="calendarPrev" aria-label="이전 달">‹</button><h2 id="calendarTitle"></h2><button class="calendar-nav" id="calendarNext" aria-label="다음 달">›</button><button class="text-button" id="calendarToday">오늘</button></div><div class="calendar-week"><span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span></div><div class="calendar-grid" id="calendarGrid"></div></div>
-  <div class="after-list"><span id="listFootnote">사진대지 순서: 날짜 / 동호수·층실 / 세부 위치 / 공종 / 내용 / 비고 / 해당사진</span><button class="text-button" id="seedListBtn">예시 36건으로 기능 체험</button></div>
+  <div class="after-list"><span id="listFootnote">사진대지 순서: 날짜 / 동호수·층실 / 세부 위치 / 공종 / 내용 / 비고 / 해당사진</span></div>
  </section>
  <section id="analyticsView" class="hidden">
-  <div class="analysis-heading"><div><div class="eyebrow">QUALITY INSIGHTS / DRAFT 02</div><h1>기록을 모으면, 점검할 곳이 보입니다.</h1><p>어디에 지적이 모이는지 확인하고, 다음 점검의 우선순위를 잡으세요.</p></div><div class="source-switch" aria-label="집계 데이터 구분"><button id="analyticsLive" class="active">내 실제 기록</button><button id="analyticsDemo">체험 기록</button></div></div>
+  <div class="analysis-heading"><div><div class="eyebrow">QUALITY INSIGHTS / DRAFT 02</div><h1>기록을 모으면, 점검할 곳이 보입니다.</h1><p>어디에 지적이 모이는지 확인하고, 다음 점검의 우선순위를 잡으세요.</p></div></div>
   <div class="analysis-banner" id="analysisBanner"></div>
   <div class="data-filters"><div class="filter-field"><label for="analysisUnit">동호수</label><select id="analysisUnit"><option value="">전체 동호수</option></select></div><div class="filter-field"><label for="analysisFrom">시작일</label><input id="analysisFrom" type="date"></div><div class="filter-field"><label for="analysisTo">종료일</label><input id="analysisTo" type="date"></div><button class="text-button" id="analysisReset">초기화</button></div>
   <div id="analysisEmpty" class="data-empty hidden"></div>
@@ -710,13 +709,13 @@ select{font:inherit;color:var(--ink)}
    <div class="analysis-caveat"><i data-icon="info"></i><span><b>많이 등록됐다는 것과 발생률이 높다는 것은 다릅니다.</b> 현재는 지적 등록 건수만 집계합니다. 점검한 전체 세대·부위 수, 정상 사례, 중복·재점검 여부가 없으므로 하자율이나 업체 품질순위로 해석하지 마세요.</span></div>
   </div>
   <div class="ai-panel"><div class="ai-panel-head"><div><h2>AI 분석으로 이어지는 다음 단계</h2><p>현재 확인 가능한 사실과 미래 예측을 분리합니다.</p></div><span class="planned-tag">예측 모델 미연결</span></div><div class="ai-cols"><div class="ai-current"><div class="step-label">NOW · 등록 데이터 요약</div><h3>다음 점검에서 먼저 확인할 항목</h3><div id="ruleInsights"></div><p class="ai-disclaimer">동일 위치·공종·유형 3건 이상을 보여주는 규칙 기반 요약입니다. AI 추론 또는 실제 하자 발생 가능성 예측이 아닙니다.</p></div><div class="ai-future"><div class="step-label">NEXT · AI 예측 화면 시안</div><h3>“어떤 하자가 다시 생길 가능성이 클까?”</h3><div class="ai-example"><span class="example-label">아래 문구는 화면 예시 · 실제 분석 결과 아님</span><strong>동일 조건의 욕실 타일 단차<br>하자 발생 가능성 높음</strong><p>연관 시공 조건 / 과거 반복 사례 / 우선 점검 부위를 함께 설명하는 형태로 구현 예정입니다.</p><p><b>현재 예측 확률: 산출하지 않음</b></p></div><p class="ai-data-needs"><b>예측 전에 필요한 데이터</b><br>점검 대상 수와 정상 사례 · 공정 단계와 시공일<br>동일 하자 연결 및 조치 결과 · 향후 발생 여부<br>데이터 축적 후 현장별 검증을 거쳐 적용합니다.</p></div></div></div>
-  <div class="analysis-actions"><p>실제·체험 기록은 따로 집계합니다. 서버와 AI로 사진이나 내용을 전송하지 않습니다.</p><button class="secondary" id="analyticsExcel"><i data-icon="sheet"></i>이 범위 사진 엑셀로 받기</button></div>
+  <div class="analysis-actions"><p>기록은 이 기기에 저장되며 서버와 AI로 사진이나 내용을 전송하지 않습니다.</p><button class="secondary" id="analyticsExcel"><i data-icon="sheet"></i>이 범위 사진 엑셀로 받기</button></div>
  </section>
  <footer class="page-foot"><b>FIELD NOTE / VOICE BETA</b><span>한국어 음성인식 · 사진·녹음은 현재 브라우저에 저장</span></footer>
 </main>
 <input type="file" id="importInput" accept=".zip,.json" hidden>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
-<dialog class="dialog" id="locationDialog"><div class="dialog-head"><h2>위치 변경</h2><button class="close-btn" data-close="locationDialog" aria-label="닫기"><i data-icon="close"></i></button></div><div class="dialog-body"><p id="locationHelp">점검 중에는 위치와 내용을 순서 없이 말해도 인식합니다. 여기서는 결과를 수동 보정할 수 있습니다.</p><label class="field-label" id="locationInputLabel" for="locationInput">현재 동·호수</label><input id="locationInput" class="field" maxlength="80" placeholder="예: 101동 1203호"><button class="voice-example" id="locationExample"><i data-icon="mic"></i><span><span id="locationExampleText">“위치 변경, 101동 1204호”</span><small>체험 모드에서 예시 위치를 적용합니다.</small></span></button><p class="small-note">변경 이후 사진에만 적용됩니다. 이전 기록의 위치는 바뀌지 않습니다.</p><div class="dialog-actions"><button class="primary" id="locationApply">위치 적용</button></div></div></dialog>
+<dialog class="dialog" id="locationDialog"><div class="dialog-head"><h2>위치 변경</h2><button class="close-btn" data-close="locationDialog" aria-label="닫기"><i data-icon="close"></i></button></div><div class="dialog-body"><p id="locationHelp">점검 중에는 위치와 내용을 순서 없이 말해도 인식합니다. 여기서는 결과를 수동 보정할 수 있습니다.</p><label class="field-label" id="locationInputLabel" for="locationInput">현재 동·호수</label><input id="locationInput" class="field" maxlength="80" placeholder="예: 101동 1203호"><p class="small-note">변경 이후 사진에만 적용됩니다. 이전 기록의 위치는 바뀌지 않습니다.</p><div class="dialog-actions"><button class="primary" id="locationApply">위치 적용</button></div></div></dialog>
 <dialog class="dialog" id="infoDialog"><div class="dialog-head"><h2>현장노트 Voice 안내</h2><button class="close-btn" data-close="infoDialog" aria-label="닫기"><i data-icon="close"></i></button></div><div class="dialog-body"><div class="info-box warn">사진·인식 문장·원본 녹음은 이 브라우저에 저장됩니다. 브라우저 데이터 삭제 전에 기록 백업을 받으세요. 브라우저 음성인식 과정에서는 음성이 브라우저 제공자의 서버로 전송될 수 있습니다.</div><h3>자유발화 음성인식</h3><p>문장 순서를 정하지 않아도 됩니다. “안방 창틀 코킹 누락이고 101동 302호입니다”처럼 말하면 동·호수와 지적 내용을 나눠 저장합니다. 화면에 인식 문장이 보인 뒤 촬영하는 흐름이 가장 안정적입니다.</p><h3>카메라·연속 녹음</h3><p>카메라·마이크를 허용하면 실제 촬영과 연속 녹음이 됩니다. 음성인식이 중단되거나 오프라인이어도 사진과 원본 음성은 계속 기기에 저장됩니다. 점검 종료 후 상세 화면에서 원본 녹음을 들을 수 있습니다.</p><h3>현재 범위</h3><p>사진 포함 엑셀, 위치·공종별 집계, 반복 지적 요약을 사용할 수 있습니다. 사용자 로그인, 여러 기기 공유, CLOVA 전용 건설 용어 모델과 AI 하자 예측은 아직 연결되지 않았습니다.</p><div class="info-box">카메라·마이크 사용은 HTTPS가 필요합니다. Chrome 또는 Edge 최신 버전을 권장하며, 실제 현장 소음에서는 인식 내용을 확인하세요.</div><p class="small-note">기록 백업에는 사진, 목록 JSON, 연속 녹음 원본이 포함됩니다. 타인의 불필요한 대화는 녹음하지 않도록 일시정지를 이용하세요.</p></div></dialog>
 <dialog class="dialog" id="detailDialog"><div class="dialog-head"><h2>등록 기록</h2><button class="close-btn" data-close="detailDialog" aria-label="닫기"><i data-icon="close"></i></button></div><div class="dialog-body" id="detailBody"></div></dialog>
 <script>
@@ -733,15 +732,7 @@ function icon(name) { return `<svg class="icon" viewBox="0 0 24 24" aria-hidden=
 function hydrateIcons(root = document) { root.querySelectorAll('[data-icon]').forEach(el => { el.outerHTML = icon(el.dataset.icon); }); }
 function esc(v = '') { return String(v).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
 function uid() { return globalThis.crypto?.randomUUID?.() || `id-${Date.now()}-${Math.random().toString(16).slice(2)}`; }
-const examples = [
-    { text: '거실 창호 하부 코킹 누락, ○○창호 보수.', part: '거실 · 창호', scene: 0 },
-    { text: '안방 문선 찍힘, ○○내장 보수.', part: '안방 · 문선', scene: 1 },
-    { text: '욕실 바닥 타일 단차, ○○타일 확인.', part: '욕실 · 타일', scene: 2 },
-    { text: '주방 걸레받이 미시공, ○○가구 확인.', part: '주방 · 걸레받이', scene: 3 },
-    { text: '작은방 벽지 들뜸, ○○도배 보수.', part: '작은방 · 벽지', scene: 1 },
-    { text: '현관 몰딩 이음부 틈새, ○○내장 보수.', part: '현관 · 몰딩', scene: 0 }
-];
-// Deliberately illustrative demo frames, not photographs of a real site.
+// Camera-ready placeholder shown before the real camera stream starts.
 function sceneData(index = 0) {
     const palettes = [['#b7c4c4', '#ced6d1', '#788e90'], ['#c4beb4', '#dbd4c5', '#8f887c'], ['#a9c1c3', '#cfdbd7', '#778e8b'], ['#bfcbc5', '#dce1d5', '#8e9e8f']];
     const p = palettes[index % 4];
@@ -761,7 +752,7 @@ function sceneData(index = 0) {
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="780" height="450" viewBox="0 0 780 450"><defs><linearGradient id="light" x2="1" y2="1"><stop stop-color="${p[0]}"/><stop offset="1" stop-color="${p[1]}"/></linearGradient><linearGradient id="floor" x2="0" y2="1"><stop stop-color="${p[2]}"/><stop offset="1" stop-color="#78908b"/></linearGradient></defs><rect width="780" height="450" fill="url(#light)"/><path d="M0 0h86v314L0 383" fill="#829896" opacity=".3"/><path d="M0 365 85 310h626l69 55v85H0" fill="url(#floor)"/><path d="M85 310h625M0 401h780M187 310 107 450M334 310 310 450M481 310 513 450M629 310 718 450" stroke="#ccdad0" opacity=".35" stroke-width="1.4"/>${detail}<path d="M0 361 85 306h60M632 306h78l70 55" stroke="#e1e4d5" stroke-width="8"/><path d="M0 0h780v450H0Z" fill="#173239" opacity=".06"/></svg>`;
     return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
 }
-const state = { mode: 'live', buildingMode: 'apartment', active: false, paused: false, session: null, records: [], sessions: [], db: null, location: '', keep: true, exampleIndex: 0, filter: 'all', stream: null, recorder: null, chunkSeq: 0, chunkChain: Promise.resolve(), timer: null, origin: 0, pauseAt: 0, pausedMs: 0, busy: false, stopping: false, detailId: null, audioURL: null, wake: null, saveFailures: 0, view: 'capture', demoLocation: '', liveLocation: '', draftPhoto: '', draftCreatedAt: 0, draftAudioOffsetMs: 0 };
+const state = { buildingMode: 'apartment', active: false, paused: false, session: null, records: [], sessions: [], db: null, location: '', keep: true, filter: 'all', stream: null, recorder: null, chunkSeq: 0, chunkChain: Promise.resolve(), timer: null, origin: 0, pauseAt: 0, pausedMs: 0, busy: false, stopping: false, detailId: null, audioURL: null, wake: null, saveFailures: 0, view: 'capture', liveLocation: '', draftPhoto: '', draftCreatedAt: 0, draftAudioOffsetMs: 0 };
 function toast(msg, error = false) { $('toast').textContent = msg; $('toast').classList.toggle('error', error); $('toast').classList.add('visible'); clearTimeout(toast.t); toast.t = setTimeout(() => $('toast').classList.remove('visible'), 3200); }
 function alertBox(msg) { $('runtimeAlert').textContent = msg; $('runtimeAlert').classList.toggle('hidden', !msg); }
 function fmtClock(ms) { const s = Math.floor(Math.max(0, ms) / 1000); return `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`; }
@@ -778,7 +769,7 @@ function saveSetting(key, value) { try {
     localStorage.setItem('field-note-' + key, JSON.stringify(value));
 }
 catch { } }
-function locationSettingKey(mode = state.mode, buildingMode = state.buildingMode) { return `${mode}-${buildingMode}-location`; }
+function locationSettingKey(buildingMode = state.buildingMode) { return `live-${buildingMode}-location`; }
 function openDB() { return new Promise((resolve, reject) => { const req = indexedDB.open('field-note-prototype-v1', 1); req.onupgradeneeded = () => { const db = req.result; db.createObjectStore('records', { keyPath: 'id' }); db.createObjectStore('sessions', { keyPath: 'id' }); const chunks = db.createObjectStore('chunks', { keyPath: 'id' }); chunks.createIndex('sessionId', 'sessionId', { unique: false }); }; req.onsuccess = () => resolve(req.result); req.onerror = () => reject(req.error); req.onblocked = () => reject(new Error('저장소가 다른 창에서 사용 중입니다. 다른 창을 닫고 다시 열어주세요.')); }); }
 function transaction(store, mode, operation) { return new Promise((resolve, reject) => { if (!state.db)
     return reject(new Error('저장소를 사용할 수 없습니다.')); let tx; try {
@@ -799,10 +790,11 @@ const del = (store, id) => transaction(store, 'readwrite', s => s.delete(id));
 async function getChunks(sessionId) { return transaction('chunks', 'readonly', s => s.index('sessionId').getAll(sessionId)); }
 async function sessionBlob(id) { const chunks = await getChunks(id); chunks.sort((a, b) => a.seq - b.seq); const session = state.sessions.find(s => s.id === id); return new Blob(chunks.map(c => c.blob), { type: session?.mime || chunks[0]?.blob?.type || 'audio/webm' }); }
 function locationRender() { $('locationText').textContent = state.location || (state.active ? '위치 미지정' : '점검 시작 시 위치 설정'); $('keepLocation').checked = state.keep; }
-function tagMarkup(r) { return `<span class="tag saved">이 기기 저장</span>${r.mode === 'demo' ? '<span class="tag">예시 문장</span>' : r.transcriptionStatus === 'browser' ? '<span class="tag">음성 인식</span>' : r.text ? '<span class="tag">직접 수정</span>' : '<span class="tag pending">음성 확인 필요</span>'}`; }
+function actualRecords() { return state.records.filter(r => r.mode !== 'demo'); }
+function tagMarkup(r) { return `<span class="tag saved">이 기기 저장</span>${r.transcriptionStatus === 'browser' ? '<span class="tag">음성 인식</span>' : r.text ? '<span class="tag">직접 수정</span>' : '<span class="tag pending">음성 확인 필요</span>'}`; }
 function recordDescription(r) { return r.text || '음성 원본 기록 · 내용 확인 필요'; }
 function renderRecordsCore() {
-    const rs = [...state.records].sort((a, b) => b.createdAt - a.createdAt);
+    const rs = actualRecords().sort((a, b) => b.createdAt - a.createdAt);
     $('totalCount').textContent = rs.length;
     $('listCount').textContent = rs.length;
     $('recentCounter').textContent = `${rs.length}건`;
@@ -811,16 +803,15 @@ function renderRecordsCore() {
     $('sessionCount').textContent = `${current.length}건`;
     $('lastThumb').innerHTML = current.length ? `<img src="${current[0].photo}" alt="최근 등록 사진">` : icon('image');
     const query = $('search').value.trim().toLowerCase();
-    const filtered = rs.filter(r => (state.filter === 'all' || state.filter === 'demo' && r.mode === 'demo' || state.filter === 'pending' && r.mode === 'live' && !r.text) && `${r.location} ${r.text}`.toLowerCase().includes(query));
-    $('recordGrid').innerHTML = filtered.length ? filtered.map(r => `<button class="grid-card" data-record="${r.id}"><div class="photo"><img src="${r.photo}" alt="${esc(r.location || '위치 미지정')} 사진"><span class="photo-index">${r.mode === 'demo' ? '체험' : '촬영'} ${String(r.number).padStart(2, '0')}</span></div><div class="grid-body"><div class="grid-loc">${esc(r.location || '위치 미지정')}</div><p class="grid-desc">${esc(recordDescription(r))}</p><div class="grid-bottom"><span>${tagMarkup(r)}</span><span>${fmtDate(r.createdAt)} ${fmtTime(r.createdAt)}</span></div></div></button>`).join('') : `<div class="empty-list">${icon('image')}<h3>${query || state.filter !== 'all' ? '해당하는 기록이 없습니다.' : '아직 등록한 기록이 없습니다.'}</h3><p>현장 등록에서 점검을 시작하고 촬영해보세요.<br>사진과 위치가 자동으로 목록에 남습니다.</p></div>`;
+    const filtered = rs.filter(r => (state.filter === 'all' || state.filter === 'pending' && !r.text) && `${r.location} ${r.text}`.toLowerCase().includes(query));
+    $('recordGrid').innerHTML = filtered.length ? filtered.map(r => `<button class="grid-card" data-record="${r.id}"><div class="photo"><img src="${r.photo}" alt="${esc(r.location || '위치 미지정')} 사진"><span class="photo-index">촬영 ${String(r.number).padStart(2, '0')}</span></div><div class="grid-body"><div class="grid-loc">${esc(r.location || '위치 미지정')}</div><p class="grid-desc">${esc(recordDescription(r))}</p><div class="grid-bottom"><span>${tagMarkup(r)}</span><span>${fmtDate(r.createdAt)} ${fmtTime(r.createdAt)}</span></div></div></button>`).join('') : `<div class="empty-list">${icon('image')}<h3>${query || state.filter !== 'all' ? '해당하는 기록이 없습니다.' : '아직 등록한 기록이 없습니다.'}</h3><p>현장 등록에서 점검을 시작하고 촬영해보세요.<br>사진과 위치가 자동으로 목록에 남습니다.</p></div>`;
     $('exportBtn').disabled = !rs.length;
 }
 function updateViewLegacy(view) { state.view = view; $('captureView').classList.toggle('hidden', view !== 'capture'); $('listView').classList.toggle('hidden', view !== 'list'); $('captureTab').classList.toggle('active', view === 'capture'); $('listTab').classList.toggle('active', view === 'list'); if (view === 'list' && state.active && !state.paused) {
     pauseSession(true);
     toast('목록을 보는 동안 녹음을 일시정지합니다.');
 } }
-function setScene() { const ex = examples[state.exampleIndex % examples.length]; $('sceneImage').src = sceneData(ex.scene); }
-function showNextExample() { setScene(); $('captionLabel').textContent = '다음 기록 준비 · 체험'; $('captionText').textContent = '사진을 먼저 촬영해 주세요.'; $('captionSub').textContent = '촬영 후 예시 설명을 확인하고 녹음 완료 OK를 누릅니다.'; }
+function setScene() { $('sceneImage').src = sceneData(0); }
 function uiState() {
     const describing = !!state.draftPhoto;
     document.body.classList.toggle('session-on', state.active);
@@ -831,7 +822,7 @@ function uiState() {
     $('cameraStage').classList.toggle('paused', state.paused);
     $('stateBadge').classList.toggle('recording', state.active && !state.paused);
     $('stateBadge').classList.toggle('paused', state.paused);
-    $('stateLabel').textContent = state.paused ? '녹음 일시정지' : describing ? '사진 촬영됨 · 설명 녹음 중' : state.active ? (state.mode === 'demo' ? '다음 사진 촬영 대기' : '다음 사진 촬영 대기') : '점검 시작 전';
+    $('stateLabel').textContent = state.paused ? '녹음 일시정지' : describing ? '사진 촬영됨 · 설명 녹음 중' : state.active ? '다음 사진 촬영 대기' : '점검 시작 전';
     $('pauseBtn').innerHTML = icon(state.paused ? 'play' : 'pause');
     $('pauseBtn').ariaLabel = state.paused ? '녹음 이어하기' : '녹음 일시정지';
     $('shutter').disabled = state.paused || state.busy || state.stopping;
@@ -840,8 +831,6 @@ function uiState() {
     $('shutter').ariaLabel = describing ? '음성 설명 완료하고 기록 저장' : '사진 촬영';
     $('shutterLabel').textContent = describing ? '녹음 완료 OK' : '사진 촬영';
     $('finishBtn').disabled = state.stopping || describing;
-    $('demoMode').disabled = state.active || state.busy;
-    $('liveMode').disabled = state.active || state.busy;
     $('apartmentMode').disabled = state.active || state.busy;
     $('generalMode').disabled = state.active || state.busy;
     $('locationBtn').disabled = state.stopping;
@@ -851,33 +840,12 @@ function setBuildingMode(mode) {
     if (state.active || state.busy || !['apartment', 'general'].includes(mode))
         return;
     state.buildingMode = mode;
-    state.location = readSetting(locationSettingKey(), mode === 'apartment' ? state[state.mode + 'Location'] : '');
+    state.location = readSetting(locationSettingKey(), mode === 'apartment' ? state.liveLocation : '');
     saveSetting('buildingMode', mode);
     $('apartmentMode').classList.toggle('selected', mode === 'apartment');
     $('generalMode').classList.toggle('selected', mode === 'general');
     $('buildingModeHelp').textContent = mode === 'apartment' ? '동·호수를 음성에서 인식합니다.' : '층과 실명을 음성에서 인식합니다.';
     locationRender();
-}
-function setMode(mode) {
-    if (state.active || state.busy)
-        return;
-    state.mode = mode;
-    state.location = readSetting(locationSettingKey(mode), state.buildingMode === 'apartment' ? state[mode + 'Location'] || '' : '');
-    saveSetting('mode', mode);
-    $('demoMode').classList.toggle('selected', mode === 'demo');
-    $('liveMode').classList.toggle('selected', mode === 'live');
-    $('modeNote').innerHTML = mode === 'demo' ? '<b>화면 체험 중</b> · 촬영 후 예시 설명을 확인하고 OK를 누릅니다.' : '<b>음성·카메라 실사용</b> · 사진을 찍고 설명한 뒤 녹음 완료 OK를 누르세요.';
-    $('sceneImage').classList.remove('hidden');
-    $('liveVideo').classList.add('hidden');
-    $('sampleBadge').textContent = mode === 'demo' ? '예시 이미지 · 실제 촬영 아님' : '대기 화면 · 시작 시 카메라 연결';
-    $('sampleBadge').classList.remove('hidden');
-    $('startDescription').innerHTML = mode === 'demo' ? '체험에서는 권한 없이 사진→설명→OK<br>등록 흐름을 확인할 수 있습니다.' : '시작 시 카메라·마이크 권한을 요청합니다.<br>사진을 찍은 뒤 해당 사진의 설명을 말하세요.';
-    $('captionLabel').textContent = '사진별 음성 기록';
-    $('captionText').innerHTML = '사진을 찍고 설명한 뒤<br>녹음 완료 OK로 저장합니다.';
-    $('captionSub').textContent = mode === 'demo' ? '사진 촬영과 녹음 완료 흐름을 확인합니다.' : '사진을 먼저 촬영하면 그 사진의 음성인식이 시작됩니다.';
-    $('elapsed').textContent = '00:00';
-    alertBox('');
-    uiState();
 }
 async function acquireWake() { try {
     state.wake = await navigator.wakeLock?.request('screen');
@@ -896,23 +864,21 @@ async function startSession() {
     alertBox('');
     let stream = null, startingSession = null;
     try {
-        if (state.mode === 'live') {
-            speechState.manualPaused = false;
-            if (!window.isSecureContext || !navigator.mediaDevices?.getUserMedia)
-                throw new Error('카메라·마이크 사용에는 HTTPS 또는 localhost가 필요합니다. 현재 환경에서는 화면 체험을 이용하세요.');
-            if (!window.MediaRecorder)
-                throw new Error('이 브라우저는 녹음을 지원하지 않습니다. 다른 브라우저에서 테스트하세요.');
-            stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' }, width: { ideal: 1920 }, height: { ideal: 1080 } }, audio: window.AndroidBridge ? false : { echoCancellation: true, noiseSuppression: true, autoGainControl: true } });
-            state.stream = stream;
-            $('liveVideo').srcObject = stream;
-            await $('liveVideo').play();
-            $('liveVideo').classList.remove('hidden');
-            $('sceneImage').classList.add('hidden');
-            $('sampleBadge').classList.add('hidden');
-        }
-        const session = { id: uid(), mode: state.mode, buildingMode: state.buildingMode, createdAt: Date.now(), status: 'recording', mime: '', durationMs: 0, locationAtStart: state.location };
+        speechState.manualPaused = false;
+        if (!window.isSecureContext || !navigator.mediaDevices?.getUserMedia)
+            throw new Error('카메라·마이크 사용에는 HTTPS 또는 localhost가 필요합니다.');
+        if (!window.MediaRecorder)
+            throw new Error('이 브라우저는 녹음을 지원하지 않습니다. 다른 브라우저에서 실행하세요.');
+        stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' }, width: { ideal: 1920 }, height: { ideal: 1080 } }, audio: window.AndroidBridge ? false : { echoCancellation: true, noiseSuppression: true, autoGainControl: true } });
+        state.stream = stream;
+        $('liveVideo').srcObject = stream;
+        await $('liveVideo').play();
+        $('liveVideo').classList.remove('hidden');
+        $('sceneImage').classList.add('hidden');
+        $('sampleBadge').classList.add('hidden');
+        const session = { id: uid(), mode: 'live', buildingMode: state.buildingMode, createdAt: Date.now(), status: 'recording', mime: '', durationMs: 0, locationAtStart: state.location };
         startingSession = session;
-        if (state.mode === 'live') {
+        {
             const choices = ['audio/webm;codecs=opus', 'audio/mp4', 'audio/webm'];
             const mime = choices.find(m => MediaRecorder.isTypeSupported(m));
             state.recorder = stream.getAudioTracks().length ? new MediaRecorder(new MediaStream(stream.getAudioTracks()), mime ? { mimeType: mime } : {}) : null;
@@ -927,14 +893,6 @@ async function startSession() {
             if (state.recorder)
                 state.recorder.onerror = e => { alertBox('녹음 장치 오류입니다. 점검을 종료한 뒤 다시 시작하세요.'); pauseSession(true); console.error(e.error); };
         }
-        if (state.mode === 'demo' && !state.location) {
-            state.location = state.buildingMode === 'general' ? '3층 회의실' : '101동 1203호';
-            if (state.buildingMode === 'apartment') {
-                state.demoLocation = state.location;
-                saveSetting('demoLocation', state.location);
-            }
-            saveSetting(locationSettingKey(), state.location);
-        }
         session.locationAtStart = state.location;
         await put('sessions', session);
         state.sessions.push(session);
@@ -944,29 +902,24 @@ async function startSession() {
         state.origin = performance.now();
         state.pausedMs = 0;
         state.pauseAt = 0;
-        state.exampleIndex = 0;
         state.draftPhoto = '';
         state.draftCreatedAt = 0;
         state.draftAudioOffsetMs = 0;
         if (state.recorder)
             state.recorder.start(1000);
-        if (state.mode === 'demo')
-            showNextExample();
-        else {
-            stopSpeechRecognition(true);
-            speechState.manualPaused = false;
-            $('captionLabel').textContent = '다음 기록 준비';
-            $('captionText').textContent = '사진을 먼저 촬영해 주세요.';
-            $('captionSub').textContent = '촬영 직후 이 사진에 붙일 음성인식이 시작됩니다.';
-            for (const track of stream.getTracks())
-                track.onended = () => { if (state.active && !state.stopping) {
-                    alertBox('카메라 또는 마이크 연결이 끊겼습니다. 점검을 종료하고 확인하세요.');
-                    pauseSession(true);
-                } };
-        }
+        stopSpeechRecognition(true);
+        speechState.manualPaused = false;
+        $('captionLabel').textContent = '다음 기록 준비';
+        $('captionText').textContent = '사진을 먼저 촬영해 주세요.';
+        $('captionSub').textContent = '촬영 직후 이 사진에 붙일 음성인식이 시작됩니다.';
+        for (const track of stream.getTracks())
+            track.onended = () => { if (state.active && !state.stopping) {
+                alertBox('카메라 또는 마이크 연결이 끊겼습니다. 점검을 종료하고 확인하세요.');
+                pauseSession(true);
+            } };
         state.timer = setInterval(() => { $('elapsed').textContent = fmtClock(elapsed()); }, 250);
         await acquireWake();
-        toast(state.mode === 'demo' ? `체험 시작 · ${state.location || '위치 미지정'}` : '카메라 준비 완료 · 사진을 먼저 촬영하세요.');
+        toast('카메라 준비 완료 · 사진을 먼저 촬영하세요.');
     }
     catch (e) {
         stream?.getTracks().forEach(t => t.stop());
@@ -980,7 +933,7 @@ async function startSession() {
             if (state.session?.id === startingSession.id)
                 state.session = null;
         }
-        const errors = { NotAllowedError: '카메라·마이크 권한이 허용되지 않았습니다. 브라우저 권한을 확인하거나 화면 체험을 이용하세요.', NotFoundError: '사용할 카메라 또는 마이크를 찾지 못했습니다. 화면 체험으로 흐름을 확인하세요.', NotReadableError: '카메라나 마이크를 다른 앱에서 사용 중일 수 있습니다. 장치를 확인하세요.' };
+        const errors = { NotAllowedError: '카메라·마이크 권한이 허용되지 않았습니다. 브라우저 권한을 확인하세요.', NotFoundError: '사용할 카메라 또는 마이크를 찾지 못했습니다. 장치 연결을 확인하세요.', NotReadableError: '카메라나 마이크를 다른 앱에서 사용 중일 수 있습니다. 장치를 확인하세요.' };
         alertBox(errors[e.name] || e.message);
         toast('점검을 시작하지 못했습니다.', true);
         setScene();
@@ -1016,9 +969,7 @@ function pauseSession(force = false) {
         state.stream?.getAudioTracks().forEach(t => t.enabled = true);
         if (state.recorder?.state === 'paused')
             state.recorder.resume();
-        if (state.mode === 'demo')
-            showNextExample();
-        else if (state.draftPhoto) {
+        if (state.draftPhoto) {
             resumeSpeechRecognition();
         }
         else {
@@ -1087,21 +1038,16 @@ async function capture() {
     uiState();
     $('saveStatus').textContent = state.draftPhoto ? '사진과 설명 저장 중…' : '사진 촬영 중…';
     try {
-        const ex = examples[state.exampleIndex % examples.length];
         if (!state.draftPhoto) {
-            if (state.mode === 'demo')
-                state.draftPhoto = sceneData(ex.scene);
-            else {
-                const v = $('liveVideo');
-                if (!v.videoWidth)
-                    throw new Error('카메라 화면이 준비되지 않았습니다.');
-                const scale = Math.min(1, 1600 / v.videoWidth);
-                const canvas = document.createElement('canvas');
-                canvas.width = Math.round(v.videoWidth * scale);
-                canvas.height = Math.round(v.videoHeight * scale);
-                canvas.getContext('2d').drawImage(v, 0, 0, canvas.width, canvas.height);
-                state.draftPhoto = canvas.toDataURL('image/jpeg', .87);
-            }
+            const v = $('liveVideo');
+            if (!v.videoWidth)
+                throw new Error('카메라 화면이 준비되지 않았습니다.');
+            const scale = Math.min(1, 1600 / v.videoWidth);
+            const canvas = document.createElement('canvas');
+            canvas.width = Math.round(v.videoWidth * scale);
+            canvas.height = Math.round(v.videoHeight * scale);
+            canvas.getContext('2d').drawImage(v, 0, 0, canvas.width, canvas.height);
+            state.draftPhoto = canvas.toDataURL('image/jpeg', .87);
             state.draftCreatedAt = Date.now();
             state.draftAudioOffsetMs = Math.round(elapsed());
             $('sceneImage').src = state.draftPhoto;
@@ -1114,26 +1060,21 @@ async function capture() {
             $('flash').classList.add('fire');
             stopSpeechRecognition(true);
             speechState.manualPaused = false;
-            if (state.mode === 'live')
-                startSpeechRecognition();
-            $('captionLabel').textContent = state.mode === 'demo' ? '체험용 설명' : speechState.supported ? '이 사진의 한국어 음성인식 중' : '이 사진의 원본 녹음 중';
-            $('captionText').textContent = state.mode === 'demo' ? ex.text : '이 사진의 하자 내용을 말해 주세요.';
+            startSpeechRecognition();
+            $('captionLabel').textContent = speechState.supported ? '이 사진의 한국어 음성인식 중' : '이 사진의 원본 녹음 중';
+            $('captionText').textContent = '이 사진의 하자 내용을 말해 주세요.';
             $('captionSub').textContent = '설명이 끝나면 녹음 완료 OK를 누르세요.';
             $('saveStatus').textContent = `${fmtTime(state.draftCreatedAt)} · 사진 촬영됨 · 설명 대기`;
             toast('사진 촬영 완료 · 설명한 뒤 녹음 완료 OK를 누르세요.');
             return;
         }
-        let text = ex.text, transcriptRaw = '', transcriptionStatus = 'demo';
-        if (state.mode === 'live') {
-            const speech = takeSpeechSnapshot();
-            text = speech.text;
-            transcriptRaw = speech.raw;
-            transcriptionStatus = text ? window.AndroidBridge ? 'native' : 'browser' : speechState.supported ? 'pending' : 'not_supported';
-            stopSpeechRecognition(true);
-            speechState.manualPaused = false;
-        }
+        const speech = takeSpeechSnapshot();
+        const text = speech.text, transcriptRaw = speech.raw;
+        const transcriptionStatus = text ? window.AndroidBridge ? 'native' : 'browser' : speechState.supported ? 'pending' : 'not_supported';
+        stopSpeechRecognition(true);
+        speechState.manualPaused = false;
         const photoTime = state.draftCreatedAt, photo = state.draftPhoto, offset = state.draftAudioOffsetMs;
-        const r = { id: uid(), sessionId: state.session.id, number: state.records.filter(r => r.sessionId === state.session.id).length + 1, mode: state.mode, buildingMode: state.buildingMode, createdAt: photoTime, location: state.location, text, transcriptRaw, photo, photoFormat: state.mode === 'demo' ? 'svg' : 'jpg', audioOffsetMs: offset, transcriptionStatus, cloudStatus: 'not_connected' };
+        const r = { id: uid(), sessionId: state.session.id, number: actualRecords().filter(r => r.sessionId === state.session.id).length + 1, mode: 'live', buildingMode: state.buildingMode, createdAt: photoTime, location: state.location, text, transcriptRaw, photo, photoFormat: 'jpg', audioOffsetMs: offset, transcriptionStatus, cloudStatus: 'not_connected' };
         await put('records', r);
         state.records.push(r);
         $('saveStatus').textContent = `${fmtTime(photoTime)} · 사진 ${String(r.number).padStart(2, '0')} 저장됨`;
@@ -1141,27 +1082,20 @@ async function capture() {
         state.draftCreatedAt = 0;
         state.draftAudioOffsetMs = 0;
         $('sampleBadge').classList.add('hidden');
-        if (state.mode === 'live') {
-            $('sceneImage').classList.add('hidden');
-            $('liveVideo').classList.remove('hidden');
-        }
+        $('sceneImage').classList.add('hidden');
+        $('liveVideo').classList.remove('hidden');
         if (!state.keep) {
             state.location = '';
             if (state.buildingMode === 'apartment') {
-                state[state.mode + 'Location'] = '';
-                saveSetting(state.mode + 'Location', '');
+                state.liveLocation = '';
+                saveSetting('liveLocation', '');
             }
             saveSetting(locationSettingKey(), '');
             locationRender();
         }
-        state.exampleIndex++;
-        if (state.mode === 'demo')
-            showNextExample();
-        else {
-            $('captionLabel').textContent = '기록 저장 완료';
-            $('captionText').textContent = '다음 사진을 촬영해 주세요.';
-            $('captionSub').textContent = text ? '방금 사진과 인식 문장을 함께 저장했습니다.' : '음성 내용은 확인 필요 상태로 저장했습니다.';
-        }
+        $('captionLabel').textContent = '기록 저장 완료';
+        $('captionText').textContent = '다음 사진을 촬영해 주세요.';
+        $('captionSub').textContent = text ? '방금 사진과 인식 문장을 함께 저장했습니다.' : '음성 내용은 확인 필요 상태로 저장했습니다.';
         renderRecords();
         toast(`사진 ${String(r.number).padStart(2, '0')} · 사진과 설명 저장 완료`);
     }
@@ -1176,8 +1110,8 @@ async function capture() {
     }
 }
 function openLocation() { if (state.active && !state.paused)
-    pauseSession(true); const general = state.buildingMode === 'general', next = general ? (state.location.includes('회의실') ? '지하 1층 기계실' : '3층 회의실') : (state.location.includes('1204') ? '101동 1205호' : '101동 1204호'); $('locationInput').value = state.location; $('locationInputLabel').textContent = general ? '현재 층·실명' : '현재 동·호수'; $('locationInput').placeholder = general ? '예: 지하 1층 기계실' : '예: 101동 1203호'; $('locationExample').classList.toggle('hidden', state.mode !== 'demo'); $('locationHelp').textContent = state.mode === 'demo' ? '체험에서는 아래 예시를 눌러 위치 변경 흐름을 확인합니다.' : general ? '점검 중에는 문장 속 층과 실명을 순서와 관계없이 찾습니다. 여기서는 결과를 수동 보정할 수 있습니다.' : '점검 중에는 문장 속 동·호수를 순서와 관계없이 찾습니다. 여기서는 결과를 수동 보정할 수 있습니다.'; $('locationExample').dataset.next = next; $('locationExampleText').textContent = `“위치 변경, ${next}”`; $('locationDialog').showModal(); }
-function applyLocation(value) { state.location = value.trim().replace(/\s+/g, ' ').slice(0, 80); if (state.buildingMode === 'apartment') { state[state.mode + 'Location'] = state.location; saveSetting(state.mode + 'Location', state.location); } saveSetting(locationSettingKey(), state.location); locationRender(); $('locationDialog').close(); alertBox(''); toast(state.location ? `${state.location} · 다음 촬영부터 적용` : '위치가 초기화됐습니다.'); if (state.active && state.paused)
+    pauseSession(true); const general = state.buildingMode === 'general'; $('locationInput').value = state.location; $('locationInputLabel').textContent = general ? '현재 층·실명' : '현재 동·호수'; $('locationInput').placeholder = general ? '예: 지하 1층 기계실' : '예: 101동 1203호'; $('locationHelp').textContent = general ? '점검 중에는 문장 속 층과 실명을 순서와 관계없이 찾습니다. 여기서는 결과를 수동 보정할 수 있습니다.' : '점검 중에는 문장 속 동·호수를 순서와 관계없이 찾습니다. 여기서는 결과를 수동 보정할 수 있습니다.'; $('locationDialog').showModal(); }
+function applyLocation(value) { state.location = value.trim().replace(/\s+/g, ' ').slice(0, 80); if (state.buildingMode === 'apartment') { state.liveLocation = state.location; saveSetting('liveLocation', state.location); } saveSetting(locationSettingKey(), state.location); locationRender(); $('locationDialog').close(); alertBox(''); toast(state.location ? `${state.location} · 다음 촬영부터 적용` : '위치가 초기화됐습니다.'); if (state.active && state.paused)
     pauseSession(); }
 async function openDetailBase(id) {
     const r = state.records.find(r => r.id === id);
@@ -1192,7 +1126,7 @@ async function openDetailBase(id) {
     }
     $('detailBody').innerHTML = `<img class="detail-image" src="${r.photo}" alt="촬영 사진"><div class="detail-meta"><span class="detail-location">${esc(r.location || '위치 미지정')}</span><span>${fmtDate(r.createdAt)} ${fmtTime(r.createdAt)}</span></div><div class="record-tags" style="margin-bottom:17px">${tagMarkup(r)}</div><label class="field-label" for="detailText">지적 내용 · 담당 업체를 함께 기록</label><textarea id="detailText" class="field" placeholder="음성 인식 내용을 확인하거나 필요한 부분만 수정하세요.">${esc(r.text)}</textarea><div id="audioArea"></div><div class="detail-bottom"><button class="secondary" id="photoDownload">${icon('download')}사진 저장</button><button class="primary" id="detailSave">수정 저장</button></div><div class="detail-bottom"><button class="danger-link" id="deleteRecord">이 기록 삭제</button></div><p class="small-note">현재 기록은 이 브라우저에만 저장됩니다. 브라우저 음성인식은 네트워크를 사용할 수 있습니다.</p>`;
     $('detailDialog').showModal();
-    $('detailSave').onclick = async () => { r.text = $('detailText').value.trim().slice(0, 4000); r.transcriptionStatus = r.mode === 'demo' ? 'demo' : 'manual'; r.updatedAt = Date.now(); try {
+    $('detailSave').onclick = async () => { r.text = $('detailText').value.trim().slice(0, 4000); r.transcriptionStatus = 'manual'; r.updatedAt = Date.now(); try {
         await put('records', r);
         renderRecords();
         $('detailDialog').close();
@@ -1213,10 +1147,6 @@ async function openDetailBase(id) {
     catch {
         toast('삭제하지 못했습니다.', true);
     } };
-    if (r.mode === 'demo') {
-        $('audioArea').innerHTML = '<p class="small-note">화면 체험 기록입니다. 실제 음성 원본은 없습니다.</p>';
-        return;
-    }
     if (state.active && state.session?.id === r.sessionId) {
         $('audioArea').innerHTML = '<div class="info-box" style="margin-top:14px">녹음은 점검 종료 후 재생할 수 있습니다. 이 사진의 촬영 시점은 ' + fmtClock(r.audioOffsetMs) + '입니다.</div>';
         return;
@@ -1291,7 +1221,8 @@ function zipBlob(files) { const parts = [], directory = []; let offset = 0; cons
     offset += lh.length + data.length;
 } const len = directory.reduce((n, a) => n + a.length, 0), end = new Uint8Array(22), e = new DataView(end.buffer); e.setUint32(0, 0x06054b50, true); e.setUint16(8, files.length, true); e.setUint16(10, files.length, true); e.setUint32(12, len, true); e.setUint32(16, offset, true); return new Blob([...parts, ...directory, end], { type: 'application/zip' }); }
 async function exportRecords() {
-    if (!state.records.length)
+    const records = actualRecords();
+    if (!records.length)
         return;
     if (state.active) {
         toast('점검을 종료한 뒤 백업하세요. 녹음 원본을 함께 보관합니다.');
@@ -1301,18 +1232,14 @@ async function exportRecords() {
     $('exportBtn').innerHTML = icon('download') + '백업 만드는 중';
     try {
         const files = [], metadata = [], enc = new TextEncoder();
-        for (const r of state.records) {
+        for (const r of records) {
             const file = `photos/${r.id}.${r.photoFormat}`;
             files.push({ name: file, data: dataURLBytes(r.photo) });
             const { photo, ...rest } = r;
             metadata.push({ ...rest, photoFile: file });
         }
-        const sessions = [];
-        for (const s of state.sessions) {
-            if (s.mode === 'demo') {
-                sessions.push({ ...s, audioFile: null });
-                continue;
-            }
+        const sessionIds = new Set(records.map(r => r.sessionId)), sessions = [];
+        for (const s of state.sessions.filter(s => sessionIds.has(s.id))) {
             const b = await sessionBlob(s.id);
             if (b.size) {
                 const name = `audio/${s.id}.${(s.mime || '').includes('mp4') ? 'm4a' : 'webm'}`;
@@ -1323,7 +1250,7 @@ async function exportRecords() {
                 sessions.push({ ...s, audioFile: null });
         }
         files.push({ name: 'records.json', data: enc.encode(JSON.stringify({ schemaVersion: 2, exportedAt: new Date().toISOString(), storage: 'local-browser-only', records: metadata, sessions }, null, 2)) });
-        files.push({ name: '읽어주세요.txt', data: enc.encode('현장노트 Voice 백업\n\nphotos: 촬영 사진 또는 체험 예시 이미지\naudio: 점검별 연속 녹음 원본\nrecords.json: 위치, 음성 인식 지적 내용, 사진 파일명, 점검 ID와 음성 내 촬영 시점(audioOffsetMs)\n\n체험 기록은 실제 음성인식 결과가 아닙니다. 실제 기록의 음성 인식 문장은 브라우저 결과이므로 원본 녹음과 함께 확인하세요.\n이 ZIP은 현장노트 Voice의 기록 가져오기로 복원할 수 있습니다. 같은 ID의 기록은 덮어쓰지 않습니다.\n') });
+        files.push({ name: '읽어주세요.txt', data: enc.encode('현장노트 Voice 백업\n\nphotos: 촬영 사진\naudio: 점검별 연속 녹음 원본\nrecords.json: 위치, 음성 인식 지적 내용, 사진 파일명, 점검 ID와 음성 내 촬영 시점(audioOffsetMs)\n\n음성 인식 문장은 브라우저 결과이므로 원본 녹음과 함께 확인하세요.\n이 ZIP은 현장노트 Voice의 기록 가져오기로 복원할 수 있습니다. 같은 ID의 기록은 덮어쓰지 않습니다.\n') });
         downloadBlob(zipBlob(files), `현장노트_백업_${new Date().toISOString().slice(0, 10)}.zip`);
         toast('사진·목록·녹음 원본 백업을 만들었습니다.');
     }
@@ -1429,8 +1356,8 @@ function applyVoiceLocation(location) {
         return;
     state.location = location;
     if (state.buildingMode === 'apartment') {
-        state[state.mode + 'Location'] = location;
-        saveSetting(state.mode + 'Location', location);
+        state.liveLocation = location;
+        saveSetting('liveLocation', location);
     }
     saveSetting(locationSettingKey(), location);
     locationRender();
@@ -1442,11 +1369,11 @@ function speechPhrase() {
 }
 
 function shouldRecognizeSpeech() {
-    return state.mode === 'live' && !!state.draftPhoto;
+    return !!state.draftPhoto;
 }
 
 function renderSpeechCaption() {
-    if (!state.active || state.mode !== 'live' || state.paused)
+    if (!state.active || state.paused)
         return;
     if (!state.draftPhoto) {
         $('captionLabel').textContent = '다음 기록 준비';
@@ -1597,7 +1524,7 @@ const XLSX_TEMPLATE = { "parts": { "xl/workbook.xml": "<?xml version=\"1.0\" enc
    Excel styles/template generated with artifact_tool; variable rows and image parts
    are serialized locally as OOXML, using the existing offline ZIP writer. */
 Object.assign(icons, { chart: '<path d="M4 3v18h17M8 16v-5M13 16V7M18 16V4"/>', sheet: '<path d="M14 2H5v20h14V7Z M14 2v5h5M8 11h8M8 15h8M8 19h8M11 11v8"/>', upload: '<path d="M12 16V3m-5 5 5-5 5 5M4 16v5h16v-5"/>' });
-Object.assign(state, { selected: new Set(), listFormat: matchMedia('(max-width:600px)').matches ? 'cards' : 'table', calendarMonth: new Date(new Date().getFullYear(), new Date().getMonth(), 1), analyticsMode: 'live', exporting: false, importing: false });
+Object.assign(state, { selected: new Set(), listFormat: matchMedia('(max-width:600px)').matches ? 'cards' : 'table', calendarMonth: new Date(new Date().getFullYear(), new Date().getMonth(), 1), exporting: false, importing: false });
 const POSITION_RULES = [['공용욕실', /공용\s*욕실|거실\s*욕실/], ['안방욕실', /안방\s*욕실|부부\s*욕실/], ['욕실', /욕실|화장실/], ['거실', /거실/], ['안방', /안방/], ['작은방', /작은\s*방/], ['침실', /침실/], ['주방', /주방|부엌/], ['현관', /현관/], ['발코니', /발코니|베란다/], ['다용도실', /다용도실|세탁실/], ['드레스룸', /드레스\s*룸/], ['복도', /복도/], ['계단실', /계단실/], ['지하주차장', /지하\s*주차장/]];
 const TRADE_RULES = [['타일', /타일|줄눈|메지/], ['도배', /도배|벽지/], ['창호', /창호|창틀|창짝|방충망|유리/], ['내장', /문선|몰딩|내장|걸레받이|문틀|문짝/], ['가구', /가구|싱크대|붙박이|수납장|주방\s*걸레받이/], ['방수', /방수/], ['도장', /도장|도색|페인트|퍼티/], ['전기', /전기|콘센트|스위치|조명|배선/], ['설비', /설비|배관|수전|배수|환기구|위생도기/], ['골조', /골조|철근|거푸집|알폼|갱폼|콘크리트|동바리/], ['실란트', /코킹|실리콘|실란트/]];
 const TYPE_RULES = [['단차', /단차/], ['들뜸', /들뜸|들뜬/], ['누락·미시공', /누락|미시공|미설치|미충진|미충전/], ['찍힘·파손', /찍힘|파손|깨짐|찍힌/], ['균열', /균열|크랙/], ['틈새', /틈새|벌어짐|이격/], ['누수', /누수|물이\s*샘/], ['오염', /오염|얼룩/], ['수직·수평', /수직|수평/], ['작동 불량', /작동\s*불량|개폐\s*불량|고장/]];
@@ -1641,14 +1568,13 @@ function automaticClassification(r) {
 }
 function classifyRecord(r) { const a = automaticClassification(r); return { ...a, unit: r.unitOverride || a.unit, position: r.positionOverride || a.position, trade: r.tradeOverride || a.trade, defectType: r.typeOverride || a.defectType, note: r.note || '', reviewed: !!r.classificationReviewed }; }
 function recordNote(r, { exported = false } = {}) { const c = classifyRecord(r); const flags = []; if (c.note)
-    flags.push(c.note); if (r.mode === 'demo')
-    flags.push('체험 예시 · 실제 현장 아님'); if (!r.text)
+    flags.push(c.note); if (!r.text)
     flags.push('음성 확인 필요'); if (!c.reviewed)
     flags.push('자동 분류 · 확인 전'); if (c.unit === '미지정')
     flags.push('위치 정보 미지정'); return flags.join(' / '); }
 function setOptions(id, values, empty) { const el = $(id), old = el.value; el.innerHTML = `<option value="">${esc(empty)}</option>` + uniqueSorted(values).map(v => `<option value="${esc(v)}">${esc(v)}</option>`).join(''); if ([...el.options].some(x => x.value === old))
     el.value = old; }
-function modeMatches(r) { return state.filter === 'all' || state.filter === 'live' && r.mode === 'live' || state.filter === 'demo' && r.mode === 'demo' || state.filter === 'pending' && r.mode === 'live' && !r.text; }
+function modeMatches(r) { return r.mode !== 'demo' && (state.filter === 'all' || state.filter === 'pending' && !r.text); }
 function visibleRecords() { const query = $('search').value.trim().toLowerCase(), u = $('filterUnit').value, p = $('filterPosition').value, t = $('filterTrade').value, from = $('filterFrom').value, to = $('filterTo').value; return [...state.records].filter(r => { if (!modeMatches(r))
     return false; const c = classifyRecord(r), day = dayKey(r.createdAt); return (!u || c.unit === u) && (!p || c.position === p) && (!t || c.trade === t) && (!from || day >= from) && (!to || day <= to) && `${c.unit} ${c.position} ${c.trade} ${c.note} ${r.text || ''}`.toLowerCase().includes(query); }).sort((a, b) => b.createdAt - a.createdAt || a.id.localeCompare(b.id)); }
 function selectedRecords() { const rs = visibleRecords(), selected = rs.filter(r => state.selected.has(r.id)); return selected.length ? selected : rs; }
@@ -1657,11 +1583,11 @@ function renderCalendar(rs) { const month = state.calendarMonth, year = month.ge
 function renderRecords() { renderRecordsCore(); renderListV2(); if (state.view === 'analytics')
     renderAnalytics(); }
 function renderListV2() {
-    const ids = new Set(state.records.map(r => r.id));
+    const ids = new Set(actualRecords().map(r => r.id));
     for (const id of state.selected)
         if (!ids.has(id))
             state.selected.delete(id);
-    const base = state.records.filter(modeMatches), classes = base.map(classifyRecord);
+    const base = actualRecords().filter(modeMatches), classes = base.map(classifyRecord);
     setOptions('filterUnit', classes.map(c => c.unit), '전체 위치 정보');
     setOptions('filterPosition', classes.map(c => c.position), '전체 위치');
     setOptions('filterTrade', classes.map(c => c.trade), '전체 공종');
@@ -1684,8 +1610,8 @@ function renderListV2() {
     $('recordTableWrap').classList.toggle('hidden', state.listFormat !== 'table');
     $('recordGrid').classList.toggle('hidden', state.listFormat !== 'cards');
     $('calendarView').classList.toggle('hidden', state.listFormat !== 'calendar');
-    $('recordTableBody').innerHTML = rs.length ? rs.map(r => { const c = classifyRecord(r), picked = state.selected.has(r.id); return `<tr class="${picked ? 'selected-row' : ''}"><td><input class="row-select" type="checkbox" data-select="${esc(r.id)}" aria-label="${esc(c.unit + ' ' + (r.text || '사진'))} 선택" ${picked ? 'checked' : ''}></td><td class="date-col">${dayKey(r.createdAt)}<br>${fmtTime(r.createdAt)}<br>${r.mode === 'demo' ? '<span class="tag">체험</span>' : ''}</td><td class="unit-col"><button class="cell-link" data-record="${esc(r.id)}">${esc(c.unit)}</button></td><td class="position-col">${classChip(c.position)}</td><td class="trade-col">${classChip(c.trade)}${!c.reviewed ? '<span class="auto-note">자동 분류</span>' : ''}</td><td class="content-col"><button class="cell-link" data-record="${esc(r.id)}">${esc(recordDescription(r))}</button></td><td class="note-col">${esc(recordNote(r) || '—')}</td><td><button class="table-photo" data-record="${esc(r.id)}" aria-label="${esc(c.unit)} 사진 및 분류 수정"><img loading="lazy" src="${esc(r.photo)}" alt="${r.mode === 'demo' ? '체험용 예시' : '촬영'} 사진"></button></td></tr>`; }).join('') : '<tr><td colspan="8"><div class="analytics-empty-inline">조회되는 기록이 없습니다. 필터를 바꾸거나 현장 등록에서 촬영하세요.</div></td></tr>';
-    $('recordGrid').innerHTML = rs.length ? rs.map(r => { const c = classifyRecord(r), picked = state.selected.has(r.id); return `<article class="grid-card ${picked ? 'selected-row' : ''}"><label class="card-pick"><input class="row-select" type="checkbox" data-select="${esc(r.id)}" aria-label="${esc(c.unit)} 기록 선택" ${picked ? 'checked' : ''}></label><button class="card-open" data-record="${esc(r.id)}"><div class="photo"><img loading="lazy" src="${esc(r.photo)}" alt="${r.mode === 'demo' ? '체험 예시' : '촬영'} 사진"><span class="photo-index">${r.mode === 'demo' ? '체험' : '촬영'}</span></div><div class="grid-body"><div class="grid-loc">${esc(c.unit)}</div><div class="card-classification">${classChip(c.position)}${classChip(c.trade)}</div><p class="grid-desc">${esc(recordDescription(r))}</p><div class="grid-bottom"><span>${dayKey(r.createdAt)} ${fmtTime(r.createdAt)}</span><span class="auto-note">${c.reviewed ? '분류 확인됨' : '자동 분류 · 확인 전'}</span></div></div></button></article>`; }).join('') : '<div class="data-empty">' + icon('image') + '<h3>조회되는 기록이 없습니다.</h3><p>현장 등록에서 촬영하거나<br>아래 예시 데이터로 엑셀·집계 기능을 체험하세요.</p></div>';
+    $('recordTableBody').innerHTML = rs.length ? rs.map(r => { const c = classifyRecord(r), picked = state.selected.has(r.id); return `<tr class="${picked ? 'selected-row' : ''}"><td><input class="row-select" type="checkbox" data-select="${esc(r.id)}" aria-label="${esc(c.unit + ' ' + (r.text || '사진'))} 선택" ${picked ? 'checked' : ''}></td><td class="date-col">${dayKey(r.createdAt)}<br>${fmtTime(r.createdAt)}</td><td class="unit-col"><button class="cell-link" data-record="${esc(r.id)}">${esc(c.unit)}</button></td><td class="position-col">${classChip(c.position)}</td><td class="trade-col">${classChip(c.trade)}${!c.reviewed ? '<span class="auto-note">자동 분류</span>' : ''}</td><td class="content-col"><button class="cell-link" data-record="${esc(r.id)}">${esc(recordDescription(r))}</button></td><td class="note-col">${esc(recordNote(r) || '—')}</td><td><button class="table-photo" data-record="${esc(r.id)}" aria-label="${esc(c.unit)} 사진 및 분류 수정"><img loading="lazy" src="${esc(r.photo)}" alt="촬영 사진"></button></td></tr>`; }).join('') : '<tr><td colspan="8"><div class="analytics-empty-inline">조회되는 기록이 없습니다. 필터를 바꾸거나 현장 등록에서 촬영하세요.</div></td></tr>';
+    $('recordGrid').innerHTML = rs.length ? rs.map(r => { const c = classifyRecord(r), picked = state.selected.has(r.id); return `<article class="grid-card ${picked ? 'selected-row' : ''}"><label class="card-pick"><input class="row-select" type="checkbox" data-select="${esc(r.id)}" aria-label="${esc(c.unit)} 기록 선택" ${picked ? 'checked' : ''}></label><button class="card-open" data-record="${esc(r.id)}"><div class="photo"><img loading="lazy" src="${esc(r.photo)}" alt="촬영 사진"><span class="photo-index">촬영</span></div><div class="grid-body"><div class="grid-loc">${esc(c.unit)}</div><div class="card-classification">${classChip(c.position)}${classChip(c.trade)}</div><p class="grid-desc">${esc(recordDescription(r))}</p><div class="grid-bottom"><span>${dayKey(r.createdAt)} ${fmtTime(r.createdAt)}</span><span class="auto-note">${c.reviewed ? '분류 확인됨' : '자동 분류 · 확인 전'}</span></div></div></button></article>`; }).join('') : '<div class="data-empty">' + icon('image') + '<h3>조회되는 기록이 없습니다.</h3><p>현장 등록에서 촬영하면<br>사진과 음성 인식 내용이 여기에 쌓입니다.</p></div>';
     renderCalendar(rs);
     const hiddenSelected = state.selected.size - n;
     $('listFootnote').textContent = (hiddenSelected ? `현재 필터 밖 선택 ${hiddenSelected}건은 내보내기에서 제외됩니다. ` : '') + '사진대지: 날짜 / 동호수·층실 / 세부 위치 / 공종 / 내용 / 비고 / 해당사진';
@@ -1709,7 +1635,7 @@ async function openDetail(id) {
     const c = classifyRecord(r);
     $('detailText').insertAdjacentHTML('afterend', `<div class="detail-fields"><h3>엑셀·집계용 분류</h3><p>자동 분류는 키워드 기반 초안입니다. 수정은 여기서만, 현장 촬영 때는 입력하지 않아도 됩니다.</p><div class="detail-fields-grid"><div><label for="detailUnit">동호수 / 층·실명</label><input class="field" id="detailUnit" maxlength="80" value="${esc(c.unit === '미지정' ? '' : c.unit)}" placeholder="예: 101동 1203호 또는 3층 회의실"></div><div><label for="detailPosition">세부 위치</label><input class="field" id="detailPosition" maxlength="80" list="positionOptions" value="${esc(c.position)}"></div><div><label for="detailTrade">공종</label><input class="field" id="detailTrade" maxlength="80" list="tradeOptions" value="${esc(c.trade)}"></div><div><label for="detailType">지적 유형 · 집계용</label><input class="field" id="detailType" maxlength="80" list="typeOptions" value="${esc(c.defectType)}"></div><div class="full"><label for="detailNote">비고</label><input class="field" id="detailNote" maxlength="1000" placeholder="필요한 추가 메모만" value="${esc(c.note)}"></div></div><button class="text-button" id="reclassify">수정한 내용으로 다시 자동 분류</button><datalist id="positionOptions">${POSITION_RULES.map(([n]) => `<option value="${esc(n)}">`).join('')}</datalist><datalist id="tradeOptions">${TRADE_RULES.map(([n]) => `<option value="${esc(n)}">`).join('')}</datalist><datalist id="typeOptions">${TYPE_RULES.map(([n]) => `<option value="${esc(n)}">`).join('')}</datalist></div>`);
     $('reclassify').onclick = () => { const a = automaticClassification({ ...r, text: $('detailText').value }); $('detailPosition').value = a.position; $('detailTrade').value = a.trade; $('detailType').value = a.defectType; toast('내용의 키워드로 다시 분류했습니다. 확인 후 저장하세요.'); };
-    $('detailSave').onclick = async () => { const next = { ...r, text: $('detailText').value.trim().slice(0, 4000), unitOverride: $('detailUnit').value.trim().slice(0, 80) || '미지정', positionOverride: $('detailPosition').value.trim().slice(0, 80) || '미분류', tradeOverride: $('detailTrade').value.trim().slice(0, 80) || '미분류', typeOverride: $('detailType').value.trim().slice(0, 80) || '미분류', note: $('detailNote').value.trim().slice(0, 1000), classificationReviewed: true, transcriptionStatus: r.mode === 'demo' ? 'demo' : 'manual', updatedAt: Date.now() }; try {
+    $('detailSave').onclick = async () => { const next = { ...r, text: $('detailText').value.trim().slice(0, 4000), unitOverride: $('detailUnit').value.trim().slice(0, 80) || '미지정', positionOverride: $('detailPosition').value.trim().slice(0, 80) || '미분류', tradeOverride: $('detailTrade').value.trim().slice(0, 80) || '미분류', typeOverride: $('detailType').value.trim().slice(0, 80) || '미분류', note: $('detailNote').value.trim().slice(0, 1000), classificationReviewed: true, transcriptionStatus: 'manual', updatedAt: Date.now() }; try {
         await put('records', next);
         state.records = state.records.map(x => x.id === id ? next : x);
         renderRecords();
@@ -1725,7 +1651,7 @@ async function openDetail(id) {
 </script>
 <script>
 /* 현장노트 v2 · 개발 인수인계
- * 실제/체험 분리 집계, 반복 지적 요약, 체험 데이터 36건
+ * 실제 촬영 기록 집계와 반복 지적 요약
  * 원본 HTML의 인라인 스크립트 202–245행에서 분리했습니다.
  * classic script: 전역 이름과 로드 순서에 의존합니다. ESM 전환 시 별도 리팩터링이 필요합니다.
  */
@@ -1734,28 +1660,24 @@ function countBy(rs, getter) { const m = new Map(); for (const r of rs) {
     const k = getter(r) || '미분류';
     m.set(k, (m.get(k) || 0) + 1);
 } return [...m].map(([name, count]) => ({ name, count })).sort((a, b) => b.count - a.count || a.name.localeCompare(b.name, 'ko', { numeric: true })); }
-function modeAnalyticsRecords() { return state.records.filter(r => r.mode === state.analyticsMode); }
-function analysisRecords() { const u = $('analysisUnit').value, from = $('analysisFrom').value, to = $('analysisTo').value; return modeAnalyticsRecords().filter(r => { const day = dayKey(r.createdAt); return (!u || classifyRecord(r).unit === u) && (!from || day >= from) && (!to || day <= to); }); }
+function modeAnalyticsRecords() { return actualRecords(); }
+function analysisRecords() { const u = $('analysisUnit').value, from = $('analysisFrom').value, to = $('analysisTo').value; return actualRecords().filter(r => { const day = dayKey(r.createdAt); return (!u || classifyRecord(r).unit === u) && (!from || day >= from) && (!to || day <= to); }); }
 function renderBars(id, arr, total, maxItems = 6) { const max = arr[0]?.count || 1; $(id).innerHTML = arr.length ? arr.slice(0, maxItems).map((v, i) => `<div class="bar-row"><div class="bar-label" title="${esc(v.name)}"><small>${String(i + 1).padStart(2, '0')}</small>${esc(v.name)}</div><div class="bar-track"><div class="bar-fill" style="width:${Math.max(0, v.count / max * 100)}%"></div></div><div class="bar-num">${v.count}<small>${total ? Math.round(v.count / total * 100) : 0}%</small></div></div>`).join('') : '<div class="analytics-empty-inline">분류 가능한 기록이 없습니다.</div>'; }
 function renderAnalytics() {
     const base = modeAnalyticsRecords();
     setOptions('analysisUnit', base.map(r => classifyRecord(r).unit), '전체 동호수');
-    const rs = analysisRecords(), n = rs.length, demo = state.analyticsMode === 'demo';
-    $('analyticsLive').classList.toggle('active', !demo);
-    $('analyticsDemo').classList.toggle('active', demo);
-    $('analysisBanner').classList.toggle('is-demo', demo);
-    $('analysisBanner').innerHTML = `<span><b>${demo ? '체험 기록만 집계' : '실제 촬영 기록만 집계'}</b> · 조회 ${n}건 / ${demo ? '체험' : '실제'} 전체 ${base.length}건${demo ? ' · 예시 문장과 예시 이미지, 실제 현장 자료 아님' : ' · 체험 자료 제외'}</span><button class="text-button" id="seedAnalysisBtn">예시 36건으로 기능 체험</button>`;
-    $('seedAnalysisBtn').onclick = () => seedExamples('analytics');
+    const rs = analysisRecords(), n = rs.length;
+    $('analysisBanner').classList.remove('is-demo');
+    $('analysisBanner').innerHTML = `<span><b>실제 촬영 기록 집계</b> · 조회 ${n}건 / 전체 ${base.length}건</span>`;
     $('analysisEmpty').classList.toggle('hidden', n > 0);
     $('analysisContent').classList.toggle('hidden', !n);
     $('analyticsExcel').disabled = !n || state.exporting;
     if (!n) {
-        $('analysisEmpty').innerHTML = icon('chart') + `<h3>${base.length ? '이 조건에 맞는 기록이 없습니다.' : demo ? '체험 기록이 아직 없습니다.' : '실제 등록 데이터가 아직 없습니다.'}</h3><p>${base.length ? '동호수 또는 날짜 필터를 바꿔보세요.' : '현재는 집계할 데이터가 없어 통계와 발생 가능성을 계산하지 않습니다.<br>예시 데이터로 엑셀·집계 화면을 먼저 확인할 수 있습니다.'}</p><button class="secondary" id="seedEmptyBtn">예시 36건으로 둘러보기</button>`;
-        $('seedEmptyBtn').onclick = () => seedExamples('analytics');
+        $('analysisEmpty').innerHTML = icon('chart') + `<h3>${base.length ? '이 조건에 맞는 기록이 없습니다.' : '등록 데이터가 아직 없습니다.'}</h3><p>${base.length ? '동호수 또는 날짜 필터를 바꿔보세요.' : '현장 등록에서 실제 사진을 촬영하면 통계가 자동으로 집계됩니다.'}</p>`;
     }
     const positions = countBy(rs, r => classifyRecord(r).position), trades = countBy(rs, r => classifyRecord(r).trade), types = countBy(rs, r => classifyRecord(r).defectType), units = countBy(rs, r => classifyRecord(r).unit);
     const knownPosition = positions.filter(x => x.name !== '미분류'), tops = knownPosition.length ? knownPosition.filter(x => x.count === knownPosition[0].count) : [], top = tops[0], unitCount = units.filter(x => x.name !== '미지정').length, unknown = rs.filter(r => { const c = classifyRecord(r); return c.position === '미분류' || c.trade === '미분류' || c.unit === '미지정'; }).length, unreviewed = rs.filter(r => !classifyRecord(r).reviewed).length;
-    $('kpiGrid').innerHTML = `<div class="kpi"><div class="kpi-label">${icon('grid')}등록된 지적</div><div class="kpi-value">${n}<small>건</small></div><div class="kpi-sub">조회 범위 · ${demo ? '체험' : '실제'} 기록만</div></div><div class="kpi"><div class="kpi-label">${icon('pin')}기록이 있는 동호수</div><div class="kpi-value">${unitCount}<small>개</small></div><div class="kpi-sub">전체 점검 세대 수와 다릅니다.</div></div><div class="kpi featured"><div class="kpi-label">등록 최다 위치${tops.length > 1 ? ' · 공동' : ''}</div><div class="kpi-value">${top ? esc(top.name) + (tops.length > 1 ? ` 외 ${tops.length - 1}곳` : '') : '분류 전'}</div><div class="kpi-sub">${top ? `${top.count}건 · 조회 기록의 ${Math.round(top.count / n * 100)}%` : '위치 분류 후 표시'}</div></div><div class="kpi"><div class="kpi-label">${icon('info')}미분류·위치 미지정</div><div class="kpi-value">${unknown}<small>건</small></div><div class="kpi-sub">자동 분류 확인 전 ${unreviewed}건</div></div>`;
+    $('kpiGrid').innerHTML = `<div class="kpi"><div class="kpi-label">${icon('grid')}등록된 지적</div><div class="kpi-value">${n}<small>건</small></div><div class="kpi-sub">조회 범위 · 실제 촬영 기록</div></div><div class="kpi"><div class="kpi-label">${icon('pin')}기록이 있는 동호수</div><div class="kpi-value">${unitCount}<small>개</small></div><div class="kpi-sub">전체 점검 세대 수와 다릅니다.</div></div><div class="kpi featured"><div class="kpi-label">등록 최다 위치${tops.length > 1 ? ' · 공동' : ''}</div><div class="kpi-value">${top ? esc(top.name) + (tops.length > 1 ? ` 외 ${tops.length - 1}곳` : '') : '분류 전'}</div><div class="kpi-sub">${top ? `${top.count}건 · 조회 기록의 ${Math.round(top.count / n * 100)}%` : '위치 분류 후 표시'}</div></div><div class="kpi"><div class="kpi-label">${icon('info')}미분류·위치 미지정</div><div class="kpi-value">${unknown}<small>건</small></div><div class="kpi-sub">자동 분류 확인 전 ${unreviewed}건</div></div>`;
     renderBars('positionBars', positions, n);
     renderBars('tradeBars', trades, n);
     renderBars('typeBars', types, n);
@@ -1792,60 +1714,7 @@ function renderInsights(rs) {
             group.units.add(c.unit);
     }
     const groups = [...m.values()].filter(g => g.count >= 3).sort((a, b) => b.count - a.count || a.position.localeCompare(b.position, 'ko')).slice(0, 3);
-    $('ruleInsights').innerHTML = groups.length ? groups.map(g => `<div class="insight-item"><b>${esc(g.position)} · ${esc(g.trade)} · ${esc(g.defectType)}</b><p>조회 기록에서 같은 조합이 <b style="display:inline;font-size:inherit">${g.count}건</b> 등록됐습니다.${g.units.size ? ' 기록이 있는 동호수는 ' + g.units.size + '개입니다.' : ''} 다음 동일 공정 점검에서 우선 확인할 후보입니다.</p><span>${state.analyticsMode === 'demo' ? '체험 데이터' : '등록 데이터'} 근거 · 규칙 기반</span></div>`).join('') : `<div class="insight-item"><b>반복 요약을 만들 근거가 부족합니다.</b><p>같은 위치·공종·유형으로 분류된 기록이 3건 이상 쌓이면 반복 조합을 보여줍니다. 데이터가 없을 때 위험도나 예측 결과를 만들지 않습니다.</p></div>`;
-}
-function makeDemoRows() {
-    const specs = [
-        ['욕실', '바닥 타일 단차, ○○타일 확인.', 2, 8], ['욕실', '벽 타일 들뜸, ○○타일 보수.', 2, 4],
-        ['거실', '창호 하부 코킹 누락, ○○창호 보수.', 0, 5], ['거실', '벽지 들뜸, ○○도배 보수.', 1, 3],
-        ['주방', '걸레받이 미시공, ○○가구 확인.', 3, 4], ['주방', '싱크대 문짝 찍힘, ○○가구 보수.', 3, 2],
-        ['안방', '문선 찍힘, ○○내장 보수.', 1, 3], ['안방', '벽지 들뜸, ○○도배 보수.', 1, 2],
-        ['현관', '몰딩 이음부 틈새, ○○내장 보수.', 0, 3], ['작은방', '콘센트 미설치, ○○전기 확인.', 1, 2]
-    ];
-    const units = ['101동 1203호', '101동 1204호', '101동 1303호', '102동 803호', '102동 804호', '102동 903호'];
-    let idx = 0;
-    const now = Date.now(), sid = 'analysis-demo-v2';
-    const rows = [];
-    for (const [pos, desc, scene, n] of specs)
-        for (let k = 0; k < n; k++) {
-            idx++;
-            const day = (idx * 3 + k) % 7;
-            rows.push({ id: `demo-v2-${String(idx).padStart(3, '0')}`, sessionId: sid, number: idx, mode: 'demo', createdAt: now - day * 864e5 - idx * 6e4, location: units[(idx - 1) % units.length], text: pos + ' ' + desc, photo: sceneData(scene), photoFormat: 'svg', audioOffsetMs: 0, transcriptionStatus: 'demo', cloudStatus: 'not_connected', demoSource: 'analysis-demo-v2', note: '' });
-        }
-    return rows;
-}
-async function seedExamples(destination = 'analytics') {
-    if (!state.db) {
-        toast('저장소를 사용할 수 없습니다.', true);
-        return;
-    }
-    if (state.active && !state.paused)
-        pauseSession(true);
-    try {
-        const examples = makeDemoRows(), existing = new Set(state.records.map(r => r.id));
-        const add = examples.filter(r => !existing.has(r.id));
-        if (add.length) {
-            await new Promise((resolve, reject) => { const tx = state.db.transaction(['records', 'sessions'], 'readwrite'); for (const r of add)
-                tx.objectStore('records').put(r); tx.objectStore('sessions').put({ id: 'analysis-demo-v2', mode: 'demo', status: 'finished', startedAt: Date.now(), endedAt: Date.now(), mime: '', demoSource: 'analysis-demo-v2' }); tx.oncomplete = resolve; tx.onerror = () => reject(tx.error); tx.onabort = () => reject(tx.error); });
-            state.records.push(...add);
-            if (!state.sessions.some(x => x.id === 'analysis-demo-v2'))
-                state.sessions.push({ id: 'analysis-demo-v2', mode: 'demo', status: 'finished' });
-        }
-        state.analyticsMode = 'demo';
-        state.filter = 'demo';
-        document.querySelectorAll('[data-filter]').forEach(b => b.classList.toggle('selected', b.dataset.filter === 'demo'));
-        resetListFilters(false);
-        $('analysisUnit').value = '';
-        $('analysisFrom').value = '';
-        $('analysisTo').value = '';
-        renderRecords();
-        updateView(destination);
-        toast(add.length ? `체험 기록 ${add.length}건을 추가했습니다. 실제 기록과 분리됩니다.` : '이미 추가된 체험 기록을 보여줍니다.');
-    }
-    catch (e) {
-        console.error(e);
-        toast('체험 데이터를 저장하지 못했습니다.', true);
-    }
+    $('ruleInsights').innerHTML = groups.length ? groups.map(g => `<div class="insight-item"><b>${esc(g.position)} · ${esc(g.trade)} · ${esc(g.defectType)}</b><p>조회 기록에서 같은 조합이 <b style="display:inline;font-size:inherit">${g.count}건</b> 등록됐습니다.${g.units.size ? ' 기록이 있는 동호수는 ' + g.units.size + '개입니다.' : ''} 다음 동일 공정 점검에서 우선 확인할 후보입니다.</p><span>등록 데이터 근거 · 규칙 기반</span></div>`).join('') : `<div class="insight-item"><b>반복 요약을 만들 근거가 부족합니다.</b><p>같은 위치·공종·유형으로 분류된 기록이 3건 이상 쌓이면 반복 조합을 보여줍니다. 데이터가 없을 때 위험도나 예측 결과를 만들지 않습니다.</p></div>`;
 }
 function resetListFilters(rerender = true) { for (const id of ['search', 'filterUnit', 'filterPosition', 'filterTrade', 'filterFrom', 'filterTo'])
     $(id).value = ''; if (rerender)
@@ -1948,14 +1817,14 @@ function showExportProgress(msg) { let e = $('excelProgress'); if (!e) {
     e.setAttribute('aria-live', 'polite');
     document.body.appendChild(e);
 } e.textContent = msg; }
-function sourceLabel(rs) { const demo = rs.filter(r => r.mode === 'demo').length; return demo === rs.length ? '체험 예시 · 실제 현장 아님' : demo ? '실제·체험 혼합 (비고의 체험 표시 확인)' : '실제 촬영 기록'; }
+function sourceLabel() { return '실제 촬영 기록'; }
 function literalCriterion(ref) { return `SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(${ref},"~","~~"),"*","~*"),"?","~?")`; }
 function makeSummarySheet(rs, scope) {
     const map = XLSX_TEMPLATE.styles['xl/worksheets/sheet2.xml'], end = rs.length + 4, n = rs.length;
     const ps = countBy(rs, r => classifyRecord(r).position), ts = countBy(rs, r => classifyRecord(r).trade), us = countBy(rs, r => classifyRecord(r).unit), rows = [];
     rows.push(rowXML(1, textCell('A1', '현장노트 · 등록 데이터 집계', map.A1), 38));
     rows.push(rowXML(2, textCell('A2', `${scope} · ${sourceLabel(rs)} · 등록 건수이며 발생률·AI 예측 아님`, map.A2), 35));
-    rows.push(rowXML(4, textCell('A4', '등록 건수', map.A4) + formulaCell('B4', `COUNTA('등록목록'!$A$5:$A$${end})`, n, map.B4) + textCell('E4', '실제 / 체험', map.A4) + numCell('F4', rs.filter(r => r.mode === 'live').length, map.B4) + numCell('G4', rs.filter(r => r.mode === 'demo').length, map.B4), 30));
+    rows.push(rowXML(4, textCell('A4', '등록 건수', map.A4) + formulaCell('B4', `COUNTA('등록목록'!$A$5:$A$${end})`, n, map.B4) + textCell('E4', '실제 촬영', map.A4) + numCell('F4', n, map.B4), 30));
     rows.push(rowXML(7, ['위치', '등록 건수', '등록 내 비중'].map((v, i) => textCell('ABC'[i] + '7', v, map.A7)).join('') + ['공종', '등록 건수', '등록 내 비중'].map((v, i) => textCell('EFG'[i] + '7', v, map.A7)).join(''), 28));
     for (let i = 0; i < Math.max(ps.length, ts.length); i++) {
         const r = i + 8, p = ps[i], t = ts[i];
@@ -2023,7 +1892,7 @@ async function exportExcel(fromAnalytics = false) { if (state.exporting)
     return; const selected = !fromAnalytics && visibleRecords().some(r => state.selected.has(r.id)); const scope = fromAnalytics ? '집계 화면 조회 범위' : selected ? '선택한 등록 기록' : '등록 목록 조회 범위'; state.exporting = true; $('excelBtn').disabled = true; $('templateExcelBtn').disabled = true; $('analyticsExcel').disabled = true; try {
     const file = await makeExcel(rows, { scope });
     if (file) {
-        downloadBlob(file, `현장노트_${sourceLabel(rows).startsWith('체험') ? '체험_' : ''}사진대지_${dayKey(Date.now()).replaceAll('-', '')}_${rows.length}건.xlsx`);
+        downloadBlob(file, `현장노트_사진대지_${dayKey(Date.now()).replaceAll('-', '')}_${rows.length}건.xlsx`);
         toast(`사진 ${rows.length}장의 사진대지와 집계 시트를 내보냈습니다.`);
     }
 }
@@ -2055,7 +1924,7 @@ async function exportTemplateExcel() {
     try {
         const file = await makeTemplateExcel(rows);
         if (file) {
-            downloadBlob(file, `현장노트_${sourceLabel(rows).startsWith('체험') ? '체험_' : ''}지정양식_사진대지_${dayKey(Date.now()).replaceAll('-', '')}_${rows.length}건.xlsx`);
+            downloadBlob(file, `현장노트_지정양식_사진대지_${dayKey(Date.now()).replaceAll('-', '')}_${rows.length}건.xlsx`);
             toast(`지정 양식 사진대지 ${Math.ceil(rows.length / 2)}장을 만들었습니다.`);
         }
     }
@@ -2136,6 +2005,8 @@ async function importBackup(file) {
                 throw new Error('기록의 ID 또는 날짜가 올바르지 않습니다.');
             if (existing.has(r.id) || newIds.has(r.id))
                 continue;
+            if (r.mode === 'demo')
+                continue;
             let photo = r.photo;
             if (files && r.photoFile) {
                 const bytes = files.get(r.photoFile);
@@ -2147,8 +2018,8 @@ async function importBackup(file) {
             if (!validLocalImage(photo))
                 throw new Error('사진 데이터가 없거나 잘못되었습니다. JSON 목록만 있으면 원래 ZIP을 선택하세요.');
             const importedStatus = ['browser', 'manual', 'pending', 'not_supported'].includes(r.transcriptionStatus) ? r.transcriptionStatus : r.text ? 'manual' : 'pending';
-            const safe = { id: r.id, sessionId: r.sessionId.slice(0, 200), number: Number.isInteger(r.number) ? r.number : added.length + 1, mode: r.mode, buildingMode: r.buildingMode === 'general' ? 'general' : 'apartment', createdAt: r.createdAt, location: String(r.location || '').slice(0, 80), text: String(r.text || '').slice(0, 4000), transcriptRaw: String(r.transcriptRaw || '').slice(0, 4000), photo, photoFormat: /image\/svg/.test(photo) ? 'svg' : /image\/png/.test(photo) ? 'png' : /image\/webp/.test(photo) ? 'webp' : 'jpg', audioOffsetMs: Number.isFinite(r.audioOffsetMs) ? Math.max(0, r.audioOffsetMs) : 0, transcriptionStatus: r.mode === 'demo' ? 'demo' : importedStatus, cloudStatus: 'not_connected', classificationReviewed: !!r.classificationReviewed };
-            for (const k of ['unitOverride', 'positionOverride', 'tradeOverride', 'typeOverride', 'demoSource'])
+            const safe = { id: r.id, sessionId: r.sessionId.slice(0, 200), number: Number.isInteger(r.number) ? r.number : added.length + 1, mode: 'live', buildingMode: r.buildingMode === 'general' ? 'general' : 'apartment', createdAt: r.createdAt, location: String(r.location || '').slice(0, 80), text: String(r.text || '').slice(0, 4000), transcriptRaw: String(r.transcriptRaw || '').slice(0, 4000), photo, photoFormat: /image\/svg/.test(photo) ? 'svg' : /image\/png/.test(photo) ? 'png' : /image\/webp/.test(photo) ? 'webp' : 'jpg', audioOffsetMs: Number.isFinite(r.audioOffsetMs) ? Math.max(0, r.audioOffsetMs) : 0, transcriptionStatus: importedStatus, cloudStatus: 'not_connected', classificationReviewed: !!r.classificationReviewed };
+            for (const k of ['unitOverride', 'positionOverride', 'tradeOverride', 'typeOverride'])
                 if (typeof r[k] === 'string')
                     safe[k] = r[k].slice(0, 80);
             safe.note = String(r.note || '').slice(0, 1000);
@@ -2157,10 +2028,10 @@ async function importBackup(file) {
         }
         const addedS = [], chunks = [];
         for (const s of sessionsIn) {
-            if (typeof s.id !== 'string' || !/^[A-Za-z0-9_.:-]{1,200}$/.test(s.id) || sids.has(s.id) || !['demo', 'live'].includes(s.mode))
+            if (typeof s.id !== 'string' || !/^[A-Za-z0-9_.:-]{1,200}$/.test(s.id) || sids.has(s.id) || s.mode !== 'live')
                 continue;
-            const ns = { id: s.id.slice(0, 200), mode: s.mode, status: 'finished', startedAt: Number(s.startedAt) || Date.now(), endedAt: Number(s.endedAt) || Date.now(), mime: String(s.mime || '').includes('mp4') || /\.m4a$/i.test(s.audioFile || '') ? 'audio/mp4' : 'audio/webm' };
-            if (files && typeof s.audioFile === 'string' && files.has(s.audioFile) && s.mode === 'live') {
+            const ns = { id: s.id.slice(0, 200), mode: 'live', status: 'finished', startedAt: Number(s.startedAt) || Date.now(), endedAt: Number(s.endedAt) || Date.now(), mime: String(s.mime || '').includes('mp4') || /\.m4a$/i.test(s.audioFile || '') ? 'audio/mp4' : 'audio/webm' };
+            if (files && typeof s.audioFile === 'string' && files.has(s.audioFile)) {
                 const audio = files.get(s.audioFile);
                 chunks.push({ id: `${ns.id}:import-0`, sessionId: ns.id, seq: 0, blob: new Blob([audio], { type: ns.mime }) });
             }
@@ -2169,7 +2040,7 @@ async function importBackup(file) {
         }
         for (const r of added)
             if (!sids.has(r.sessionId)) {
-                addedS.push({ id: r.sessionId, mode: r.mode, status: 'finished', startedAt: r.createdAt });
+                addedS.push({ id: r.sessionId, mode: 'live', status: 'finished', startedAt: r.createdAt });
                 sids.add(r.sessionId);
             }
         if (!added.length && !addedS.length) {
@@ -2244,13 +2115,10 @@ function wireV2() {
     $('calendarNext').onclick = () => { state.calendarMonth = new Date(state.calendarMonth.getFullYear(), state.calendarMonth.getMonth() + 1, 1); renderListV2(); };
     $('calendarToday').onclick = () => { const now = new Date(); state.calendarMonth = new Date(now.getFullYear(), now.getMonth(), 1); renderListV2(); };
     $('calendarGrid').onclick = e => { const b = e.target.closest('[data-record]'); if (b) openDetail(b.dataset.record); };
-    $('analyticsLive').onclick = () => { state.analyticsMode = 'live'; $('analysisUnit').value = ''; renderAnalytics(); };
-    $('analyticsDemo').onclick = () => { state.analyticsMode = 'demo'; $('analysisUnit').value = ''; renderAnalytics(); };
     for (const id of ['analysisUnit', 'analysisFrom', 'analysisTo'])
         $(id).onchange = renderAnalytics;
     $('analysisReset').onclick = () => { for (const id of ['analysisUnit', 'analysisFrom', 'analysisTo'])
         $(id).value = ''; renderAnalytics(); };
-    $('seedListBtn').onclick = () => seedExamples('list');
     $('importBtn').onclick = () => { if (state.active) {
         toast('점검 종료 후 가져오세요.');
         return;
@@ -2274,8 +2142,6 @@ $('detailDialog').addEventListener('close', () => { const a = $('detailAudio'); 
 $('captureTab').onclick = () => updateView('capture');
 $('listTab').onclick = () => updateView('list');
 $('viewAll').onclick = () => updateView('list');
-$('demoMode').onclick = () => setMode('demo');
-$('liveMode').onclick = () => setMode('live');
 $('apartmentMode').onclick = () => setBuildingMode('apartment');
 $('generalMode').onclick = () => setBuildingMode('general');
 $('startBtn').onclick = startSession;
@@ -2284,7 +2150,6 @@ $('pauseBtn').onclick = () => pauseSession();
 $('speechBtn').onclick = toggleSpeechRecognition;
 $('finishBtn').onclick = finishSession;
 $('locationBtn').onclick = openLocation;
-$('locationExample').onclick = () => applyLocation($('locationExample').dataset.next);
 $('locationApply').onclick = () => applyLocation($('locationInput').value);
 $('locationInput').onkeydown = e => { if (e.key === 'Enter')
     applyLocation(e.target.value); };
@@ -2307,11 +2172,11 @@ if (window.AndroidBridge) {
 }
 if (!window.AndroidBridge && 'serviceWorker' in navigator)
     window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => { }));
-window.addEventListener('beforeunload', e => { if (state.active && state.mode === 'live') {
+window.addEventListener('beforeunload', e => { if (state.active) {
     e.preventDefault();
     e.returnValue = '';
 } });
-document.addEventListener('visibilitychange', () => { if (document.hidden && state.active && !state.paused && state.mode === 'live') {
+document.addEventListener('visibilitychange', () => { if (document.hidden && state.active && !state.paused) {
     pauseSession(true);
     alertBox('다른 앱·탭으로 이동해 녹음을 일시정지했습니다. 화면을 켠 상태에서 이어하기를 눌러주세요.');
 } });
@@ -2326,12 +2191,12 @@ window.addEventListener('pagehide', () => { stopSpeechRecognition(true); state.s
             await put('sessions', s);
         }
     }
-    state.demoLocation = readSetting('demoLocation', '');
     state.liveLocation = readSetting('liveLocation', '');
     state.keep = readSetting('keep', true);
     state.buildingMode = readSetting('buildingMode', 'apartment');
     setBuildingMode(state.buildingMode);
-    setMode('live');
+    state.location = readSetting(locationSettingKey(), state.buildingMode === 'apartment' ? state.liveLocation : '');
+    uiState();
     renderRecords();
 }
 catch (e) {

@@ -18,7 +18,6 @@
 <main class="app">
  <div class="topbar">
   <nav class="tabs" aria-label="주 메뉴"><button class="tab active" id="captureTab"><i data-icon="camera"></i>현장 등록</button><button class="tab" id="listTab"><i data-icon="grid"></i>내 등록 <span class="count-pill" id="totalCount">0</span></button><button class="tab" id="analyticsTab"><i data-icon="chart"></i>집계·분석</button></nav>
-  <div class="mode-switch" aria-label="기록 모드 선택"><button id="liveMode" class="selected">실제 촬영·음성인식</button><button id="demoMode">화면 체험</button></div>
  </div>
  <div id="runtimeAlert" class="runtime-alert hidden" role="alert"></div>
  <section id="captureView">
@@ -32,7 +31,7 @@
     </div>
     <div class="camera-shell">
      <div class="camera-stage" id="cameraStage">
-      <img class="demo-scene" id="sceneImage" alt="체험용 시공 부위 예시 이미지">
+      <img class="demo-scene" id="sceneImage" alt="카메라 촬영 대기 화면">
       <video id="liveVideo" autoplay playsinline muted class="hidden" aria-label="카메라 화면"></video>
       <div class="hud"><span class="state-badge" id="stateBadge"><span class="state-dot"></span><span id="stateLabel">점검 시작 전</span></span><span class="elapsed mono"><i data-icon="clock"></i><span id="elapsed">00:00</span></span></div>
       <div class="sample-badge" id="sampleBadge">대기 화면 · 시작 시 카메라 연결</div>
@@ -60,7 +59,7 @@
  </section>
  <section id="listView" class="hidden">
   <div class="list-heading"><div><div class="eyebrow">RECORDS → EXCEL</div><h1>내가 남긴 기록 <span id="listCount" class="muted">0</span></h1><p>현장에서는 계속 촬영하세요. 위치·공종 정리와 사진대지는 여기서.<br>선택 기록이 있으면 선택 항목만, 없으면 조회 중인 기록을 내보냅니다.</p></div><div class="toolbar-actions"><button class="subtle-btn" id="importBtn"><i data-icon="upload"></i>기록 가져오기</button><button class="secondary" id="exportBtn"><i data-icon="download"></i>기록 백업</button><button class="primary excel-btn" id="templateExcelBtn"><i data-icon="sheet"></i>사진대지 내보내기</button><button class="primary excel-btn" id="excelBtn"><i data-icon="sheet"></i>하자목록 내보내기</button></div></div>
-  <div class="list-tools"><div class="filters"><button class="filter selected" data-filter="all">전체</button><button class="filter" data-filter="live">실제 기록</button><button class="filter" data-filter="pending">음성 확인 필요</button><button class="filter" data-filter="demo">체험 기록</button></div><div class="search-wrap"><i data-icon="search"></i><input class="search-input" id="search" placeholder="위치 · 공종 · 업체명 · 내용 검색" aria-label="기록 검색"></div></div>
+  <div class="list-tools"><div class="filters"><button class="filter selected" data-filter="all">전체</button><button class="filter" data-filter="pending">음성 확인 필요</button></div><div class="search-wrap"><i data-icon="search"></i><input class="search-input" id="search" placeholder="위치 · 공종 · 업체명 · 내용 검색" aria-label="기록 검색"></div></div>
   <button class="subtle-btn filter-toggle" id="filterToggle" aria-expanded="false" aria-controls="listFilterBlock">위치·공종·날짜 필터 <span id="filterBadge"></span></button>
   <div class="list-filter-block" id="listFilterBlock">
   <div class="data-filters"><div class="filter-field"><label for="filterUnit">위치 정보</label><select id="filterUnit"><option value="">전체 위치 정보</option></select></div><div class="filter-field"><label for="filterPosition">세부 위치</label><select id="filterPosition"><option value="">전체 세부 위치</option></select></div><div class="filter-field"><label for="filterTrade">공종</label><select id="filterTrade"><option value="">전체 공종</option></select></div><div class="filter-field"><label for="filterFrom">시작일</label><input type="date" id="filterFrom"></div><div class="filter-field"><label for="filterTo">종료일</label><input type="date" id="filterTo"></div><button class="text-button" id="resetFilters">초기화</button></div>
@@ -70,10 +69,10 @@
   <div id="recordTableWrap" class="table-shell"><table class="records-table"><thead><tr><th class="row-selection"></th><th>날짜</th><th>동호수 / 층·실명</th><th>세부 위치</th><th>공종</th><th>내용</th><th>비고</th><th>해당사진</th></tr></thead><tbody id="recordTableBody"></tbody></table></div>
   <div class="record-grid cards-v2 hidden" id="recordGrid"></div>
   <div class="calendar-shell hidden" id="calendarView"><div class="calendar-head"><button class="calendar-nav" id="calendarPrev" aria-label="이전 달">‹</button><h2 id="calendarTitle"></h2><button class="calendar-nav" id="calendarNext" aria-label="다음 달">›</button><button class="text-button" id="calendarToday">오늘</button></div><div class="calendar-week"><span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span></div><div class="calendar-grid" id="calendarGrid"></div></div>
-  <div class="after-list"><span id="listFootnote">사진대지 순서: 날짜 / 동호수·층실 / 세부 위치 / 공종 / 내용 / 비고 / 해당사진</span><button class="text-button" id="seedListBtn">예시 36건으로 기능 체험</button></div>
+  <div class="after-list"><span id="listFootnote">사진대지 순서: 날짜 / 동호수·층실 / 세부 위치 / 공종 / 내용 / 비고 / 해당사진</span></div>
  </section>
  <section id="analyticsView" class="hidden">
-  <div class="analysis-heading"><div><div class="eyebrow">QUALITY INSIGHTS / DRAFT 02</div><h1>기록을 모으면, 점검할 곳이 보입니다.</h1><p>어디에 지적이 모이는지 확인하고, 다음 점검의 우선순위를 잡으세요.</p></div><div class="source-switch" aria-label="집계 데이터 구분"><button id="analyticsLive" class="active">내 실제 기록</button><button id="analyticsDemo">체험 기록</button></div></div>
+  <div class="analysis-heading"><div><div class="eyebrow">QUALITY INSIGHTS / DRAFT 02</div><h1>기록을 모으면, 점검할 곳이 보입니다.</h1><p>어디에 지적이 모이는지 확인하고, 다음 점검의 우선순위를 잡으세요.</p></div></div>
   <div class="analysis-banner" id="analysisBanner"></div>
   <div class="data-filters"><div class="filter-field"><label for="analysisUnit">동호수</label><select id="analysisUnit"><option value="">전체 동호수</option></select></div><div class="filter-field"><label for="analysisFrom">시작일</label><input id="analysisFrom" type="date"></div><div class="filter-field"><label for="analysisTo">종료일</label><input id="analysisTo" type="date"></div><button class="text-button" id="analysisReset">초기화</button></div>
   <div id="analysisEmpty" class="data-empty hidden"></div>
@@ -90,13 +89,13 @@
    <div class="analysis-caveat"><i data-icon="info"></i><span><b>많이 등록됐다는 것과 발생률이 높다는 것은 다릅니다.</b> 현재는 지적 등록 건수만 집계합니다. 점검한 전체 세대·부위 수, 정상 사례, 중복·재점검 여부가 없으므로 하자율이나 업체 품질순위로 해석하지 마세요.</span></div>
   </div>
   <div class="ai-panel"><div class="ai-panel-head"><div><h2>AI 분석으로 이어지는 다음 단계</h2><p>현재 확인 가능한 사실과 미래 예측을 분리합니다.</p></div><span class="planned-tag">예측 모델 미연결</span></div><div class="ai-cols"><div class="ai-current"><div class="step-label">NOW · 등록 데이터 요약</div><h3>다음 점검에서 먼저 확인할 항목</h3><div id="ruleInsights"></div><p class="ai-disclaimer">동일 위치·공종·유형 3건 이상을 보여주는 규칙 기반 요약입니다. AI 추론 또는 실제 하자 발생 가능성 예측이 아닙니다.</p></div><div class="ai-future"><div class="step-label">NEXT · AI 예측 화면 시안</div><h3>“어떤 하자가 다시 생길 가능성이 클까?”</h3><div class="ai-example"><span class="example-label">아래 문구는 화면 예시 · 실제 분석 결과 아님</span><strong>동일 조건의 욕실 타일 단차<br>하자 발생 가능성 높음</strong><p>연관 시공 조건 / 과거 반복 사례 / 우선 점검 부위를 함께 설명하는 형태로 구현 예정입니다.</p><p><b>현재 예측 확률: 산출하지 않음</b></p></div><p class="ai-data-needs"><b>예측 전에 필요한 데이터</b><br>점검 대상 수와 정상 사례 · 공정 단계와 시공일<br>동일 하자 연결 및 조치 결과 · 향후 발생 여부<br>데이터 축적 후 현장별 검증을 거쳐 적용합니다.</p></div></div></div>
-  <div class="analysis-actions"><p>실제·체험 기록은 따로 집계합니다. 서버와 AI로 사진이나 내용을 전송하지 않습니다.</p><button class="secondary" id="analyticsExcel"><i data-icon="sheet"></i>이 범위 사진 엑셀로 받기</button></div>
+  <div class="analysis-actions"><p>기록은 이 기기에 저장되며 서버와 AI로 사진이나 내용을 전송하지 않습니다.</p><button class="secondary" id="analyticsExcel"><i data-icon="sheet"></i>이 범위 사진 엑셀로 받기</button></div>
  </section>
  <footer class="page-foot"><b>FIELD NOTE / VOICE BETA</b><span>한국어 음성인식 · 사진·녹음은 현재 브라우저에 저장</span></footer>
 </main>
 <input type="file" id="importInput" accept=".zip,.json" hidden>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
-<dialog class="dialog" id="locationDialog"><div class="dialog-head"><h2>위치 변경</h2><button class="close-btn" data-close="locationDialog" aria-label="닫기"><i data-icon="close"></i></button></div><div class="dialog-body"><p id="locationHelp">점검 중에는 위치와 내용을 순서 없이 말해도 인식합니다. 여기서는 결과를 수동 보정할 수 있습니다.</p><label class="field-label" id="locationInputLabel" for="locationInput">현재 동·호수</label><input id="locationInput" class="field" maxlength="80" placeholder="예: 101동 1203호"><button class="voice-example" id="locationExample"><i data-icon="mic"></i><span><span id="locationExampleText">“위치 변경, 101동 1204호”</span><small>체험 모드에서 예시 위치를 적용합니다.</small></span></button><p class="small-note">변경 이후 사진에만 적용됩니다. 이전 기록의 위치는 바뀌지 않습니다.</p><div class="dialog-actions"><button class="primary" id="locationApply">위치 적용</button></div></div></dialog>
+<dialog class="dialog" id="locationDialog"><div class="dialog-head"><h2>위치 변경</h2><button class="close-btn" data-close="locationDialog" aria-label="닫기"><i data-icon="close"></i></button></div><div class="dialog-body"><p id="locationHelp">점검 중에는 위치와 내용을 순서 없이 말해도 인식합니다. 여기서는 결과를 수동 보정할 수 있습니다.</p><label class="field-label" id="locationInputLabel" for="locationInput">현재 동·호수</label><input id="locationInput" class="field" maxlength="80" placeholder="예: 101동 1203호"><p class="small-note">변경 이후 사진에만 적용됩니다. 이전 기록의 위치는 바뀌지 않습니다.</p><div class="dialog-actions"><button class="primary" id="locationApply">위치 적용</button></div></div></dialog>
 <dialog class="dialog" id="infoDialog"><div class="dialog-head"><h2>현장노트 Voice 안내</h2><button class="close-btn" data-close="infoDialog" aria-label="닫기"><i data-icon="close"></i></button></div><div class="dialog-body"><div class="info-box warn">사진·인식 문장·원본 녹음은 이 브라우저에 저장됩니다. 브라우저 데이터 삭제 전에 기록 백업을 받으세요. 브라우저 음성인식 과정에서는 음성이 브라우저 제공자의 서버로 전송될 수 있습니다.</div><h3>자유발화 음성인식</h3><p>문장 순서를 정하지 않아도 됩니다. “안방 창틀 코킹 누락이고 101동 302호입니다”처럼 말하면 동·호수와 지적 내용을 나눠 저장합니다. 화면에 인식 문장이 보인 뒤 촬영하는 흐름이 가장 안정적입니다.</p><h3>카메라·연속 녹음</h3><p>카메라·마이크를 허용하면 실제 촬영과 연속 녹음이 됩니다. 음성인식이 중단되거나 오프라인이어도 사진과 원본 음성은 계속 기기에 저장됩니다. 점검 종료 후 상세 화면에서 원본 녹음을 들을 수 있습니다.</p><h3>현재 범위</h3><p>사진 포함 엑셀, 위치·공종별 집계, 반복 지적 요약을 사용할 수 있습니다. 사용자 로그인, 여러 기기 공유, CLOVA 전용 건설 용어 모델과 AI 하자 예측은 아직 연결되지 않았습니다.</p><div class="info-box">카메라·마이크 사용은 HTTPS가 필요합니다. Chrome 또는 Edge 최신 버전을 권장하며, 실제 현장 소음에서는 인식 내용을 확인하세요.</div><p class="small-note">기록 백업에는 사진, 목록 JSON, 연속 녹음 원본이 포함됩니다. 타인의 불필요한 대화는 녹음하지 않도록 일시정지를 이용하세요.</p></div></dialog>
 <dialog class="dialog" id="detailDialog"><div class="dialog-head"><h2>등록 기록</h2><button class="close-btn" data-close="detailDialog" aria-label="닫기"><i data-icon="close"></i></button></div><div class="dialog-body" id="detailBody"></div></dialog>
 <script src="js/core.js"></script>
