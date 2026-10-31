@@ -6,31 +6,35 @@ const vm = require('node:vm');
 
 const source = fs.readFileSync(path.join(__dirname, '..', 'src', 'js', 'speech.js'), 'utf8');
 const context = { window: {}, state: {}, console, setTimeout, clearTimeout };
-vm.runInNewContext(source + '\n;globalThis.__speechTest = { spokenNumberToDigits, parseVoiceInput, shouldRecognizeSpeech };', context);
-const { spokenNumberToDigits, parseVoiceInput, shouldRecognizeSpeech } = context.__speechTest;
+vm.runInNewContext(source + '\n;globalThis.__speechTest = { spokenNumberToDigits, parseVoiceInput, selectBestTranscript, shouldRecognizeSpeech };', context);
+const { spokenNumberToDigits, parseVoiceInput, selectBestTranscript, shouldRecognizeSpeech } = context.__speechTest;
 
 assert.equal(spokenNumberToDigits('백일'), '101');
 assert.equal(spokenNumberToDigits('삼공이'), '302');
-assert.deepEqual(
-    { ...parseVoiceInput('안방 창틀 우측 코킹이 빠졌고 여기는 101동 302호예요') },
-    { raw: '안방 창틀 우측 코킹이 빠졌고 여기는 101동 302호예요', location: '101동 302호', text: '안방 창틀 우측 코킹이 빠졌고' }
-);
-assert.deepEqual(
-    { ...parseVoiceInput('위치 변경 백일동 삼공이호') },
-    { raw: '위치 변경 백일동 삼공이호', location: '101동 302호', text: '' }
-);
-assert.deepEqual(
-    { ...parseVoiceInput('101동에 302호 욕실 타일 단차 보수 요청') },
-    { raw: '101동에 302호 욕실 타일 단차 보수 요청', location: '101동 302호', text: '욕실 타일 단차 보수 요청' }
-);
-assert.deepEqual(
-    { ...parseVoiceInput('천장 누수고 여기는 삼층 회의실입니다', 'general') },
-    { raw: '천장 누수고 여기는 삼층 회의실입니다', location: '3층 회의실', text: '천장 누수고' }
-);
-assert.deepEqual(
-    { ...parseVoiceInput('기계실 배관 누수 지하 일층', 'general') },
-    { raw: '기계실 배관 누수 지하 일층', location: '지하 1층 기계실', text: '배관 누수' }
-);
+let parsed = parseVoiceInput('안방 창틀 우측 코킹이 빠졌고 여기는 101동 302호예요');
+assert.equal(parsed.location, '101동 302호');
+assert.equal(parsed.text, '안방 창틀 우측 코킹이 빠졌고');
+assert.equal(parsed.position, '안방');
+assert.equal(parsed.trade, '창호');
+assert.equal(parsed.defectType, '누락·미시공');
+assert.deepEqual([...parsed.missing], []);
+parsed = parseVoiceInput('창호 공종이고 삼공이호 안방 창틀 코킹 누락 백일동');
+assert.equal(parsed.location, '101동 302호');
+assert.equal(parsed.position, '안방');
+assert.equal(parsed.trade, '창호');
+parsed = parseVoiceInput('302호 욕실 타일 단차 보수 요청 101동에');
+assert.equal(parsed.location, '101동 302호');
+assert.equal(parsed.position, '욕실');
+assert.equal(parsed.trade, '타일');
+assert.equal(parsed.defectType, '단차');
+parsed = parseVoiceInput('천장 누수고 여기는 삼층 회의실입니다', 'general');
+assert.equal(parsed.location, '3층 회의실');
+assert.equal(parsed.room, '회의실');
+assert.equal(parsed.defectType, '누수');
+parsed = parseVoiceInput('기계실 배관 누수 지하 일층', 'general');
+assert.equal(parsed.location, '지하 1층 기계실');
+assert.equal(parsed.trade, '설비');
+assert.equal(selectBestTranscript([{ transcript: '창고 누락', confidence: .9 }, { transcript: '101동 302호 창호 누락', confidence: .5 }]), '101동 302호 창호 누락');
 context.state.draftPhoto = '';
 assert.equal(shouldRecognizeSpeech(), false);
 context.state.draftPhoto = 'data:image/jpeg;base64,test';

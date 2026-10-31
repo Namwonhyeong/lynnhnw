@@ -353,7 +353,7 @@ async function capture() {
         stopSpeechRecognition(true);
         speechState.manualPaused = false;
         const photoTime = state.draftCreatedAt, photo = state.draftPhoto, offset = state.draftAudioOffsetMs;
-        const r = { id: uid(), sessionId: state.session.id, number: actualRecords().filter(r => r.sessionId === state.session.id).length + 1, mode: 'live', buildingMode: state.buildingMode, createdAt: photoTime, location: state.location, text, transcriptRaw, photo, photoFormat: 'jpg', audioOffsetMs: offset, transcriptionStatus, cloudStatus: 'not_connected' };
+        const r = { id: uid(), sessionId: state.session.id, number: actualRecords().filter(r => r.sessionId === state.session.id).length + 1, mode: 'live', buildingMode: state.buildingMode, createdAt: photoTime, location: state.location, text, transcriptRaw, photo, photoFormat: 'jpg', audioOffsetMs: offset, transcriptionStatus, cloudStatus: 'not_connected', unitOverride: speech.location || '', positionOverride: speech.position || '', tradeOverride: speech.trade || '', typeOverride: speech.defectType || '', speechFields: { building: speech.building, floor: speech.floor, unit: speech.unit, room: speech.room, missing: speech.missing } };
         await put('records', r);
         state.records.push(r);
         $('saveStatus').textContent = `${fmtTime(photoTime)} · 사진 ${String(r.number).padStart(2, '0')} 저장됨`;

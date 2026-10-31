@@ -1074,7 +1074,7 @@ async function capture() {
         stopSpeechRecognition(true);
         speechState.manualPaused = false;
         const photoTime = state.draftCreatedAt, photo = state.draftPhoto, offset = state.draftAudioOffsetMs;
-        const r = { id: uid(), sessionId: state.session.id, number: actualRecords().filter(r => r.sessionId === state.session.id).length + 1, mode: 'live', buildingMode: state.buildingMode, createdAt: photoTime, location: state.location, text, transcriptRaw, photo, photoFormat: 'jpg', audioOffsetMs: offset, transcriptionStatus, cloudStatus: 'not_connected' };
+        const r = { id: uid(), sessionId: state.session.id, number: actualRecords().filter(r => r.sessionId === state.session.id).length + 1, mode: 'live', buildingMode: state.buildingMode, createdAt: photoTime, location: state.location, text, transcriptRaw, photo, photoFormat: 'jpg', audioOffsetMs: offset, transcriptionStatus, cloudStatus: 'not_connected', unitOverride: speech.location || '', positionOverride: speech.position || '', tradeOverride: speech.trade || '', typeOverride: speech.defectType || '', speechFields: { building: speech.building, floor: speech.floor, unit: speech.unit, room: speech.room, missing: speech.missing } };
         await put('records', r);
         state.records.push(r);
         $('saveStatus').textContent = `${fmtTime(photoTime)} · 사진 ${String(r.number).padStart(2, '0')} 저장됨`;
@@ -1287,6 +1287,9 @@ window.__nativeSpeechEnd = () => { const instance = nativeSpeechInstance; native
 const SpeechRecognitionApi = window.AndroidBridge ? NativeSpeechRecognition : window.SpeechRecognition || window.webkitSpeechRecognition;
 const KOREAN_DIGITS = { '영': '0', '공': '0', '일': '1', '이': '2', '삼': '3', '사': '4', '오': '5', '육': '6', '칠': '7', '팔': '8', '구': '9' };
 const KOREAN_UNITS = { '십': 10, '백': 100, '천': 1000 };
+const SPEECH_POSITIONS = [['공용욕실', /공용\s*욕실|거실\s*욕실/], ['안방욕실', /안방\s*욕실|부부\s*욕실/], ['욕실', /욕실|화장실/], ['거실', /거실/], ['안방', /안방/], ['작은방', /작은\s*방/], ['침실', /침실/], ['주방', /주방|부엌/], ['현관', /현관/], ['발코니', /발코니|베란다/], ['다용도실', /다용도실|세탁실/], ['드레스룸', /드레스\s*룸/], ['복도', /복도/], ['계단실', /계단실/], ['지하주차장', /지하\s*주차장/]];
+const SPEECH_TRADES = [['타일', /타일|줄눈|메지/], ['도배', /도배|벽지/], ['창호', /창호|창틀|창짝|방충망|유리/], ['내장', /문선|몰딩|내장|걸레받이|문틀|문짝/], ['가구', /가구|싱크대|붙박이|수납장|주방\s*걸레받이/], ['방수', /방수/], ['도장', /도장|도색|페인트|퍼티/], ['전기', /전기|콘센트|스위치|조명|배선/], ['설비', /설비|배관|수전|배수|환기구|위생도기/], ['골조', /골조|철근|거푸집|알폼|갱폼|콘크리트|동바리/], ['실란트', /코킹|실리콘|실란트/]];
+const SPEECH_TYPES = [['단차', /단차/], ['들뜸', /들뜸|들뜬/], ['누락·미시공', /누락|미시공|미설치|미충진|미충전|빠졌/], ['찍힘·파손', /찍힘|파손|깨짐|찍힌/], ['균열', /균열|크랙/], ['틈새', /틈새|벌어짐|이격/], ['누수', /누수|물이\s*샘/], ['오염', /오염|얼룩/], ['수직·수평', /수직|수평/], ['작동 불량', /작동\s*불량|개폐\s*불량|고장/]];
 const speechState = { supported: !!SpeechRecognitionApi, recognition: null, listening: false, disabled: false, manualPaused: false, finalText: '', interimText: '', restartTimer: null, lastError: '' };
 
 function spokenNumberToDigits(value) {
@@ -1311,31 +1314,48 @@ function spokenNumberToDigits(value) {
 
 function parseVoiceInput(value, buildingMode = 'apartment') {
     const raw = String(value || '').replace(/\s+/g, ' ').trim();
-    const number = '[0-9영공일이삼사오육칠팔구십백천]';
-    if (buildingMode === 'general') {
-        const basement = raw.match(/\bB\s*(\d{1,3})\s*층?\b/i);
-        const floorMatch = basement || raw.match(new RegExp(`(지하|지상)?\\s*(${number}{1,4})\\s*층`));
-        const floorNumber = floorMatch ? spokenNumberToDigits(basement ? floorMatch[1] : floorMatch[2]) : '';
-        const floor = floorNumber ? `${basement || floorMatch[1] === '지하' ? '지하 ' : ''}${floorNumber}층` : '';
-        const roomMatch = raw.match(/([가-힣A-Za-z0-9]{1,12}실|로비|복도|옥상|주차장|식당|창고|강당|점포)/);
-        const room = roomMatch?.[1] || '';
-        let text = raw;
-        if (floorMatch)
-            text = text.replace(floorMatch[0], ' ');
-        if (roomMatch)
-            text = text.replace(roomMatch[0], ' ');
-        return { raw, location: [floor, room].filter(Boolean).join(' '), text: cleanVoiceText(text) };
-    }
-    const unitPattern = new RegExp(`(${number}{1,8})\\s*동\\s*(?:에|의|이고|에서|으로)?\\s*(${number}{1,8})\\s*호`);
-    const match = raw.match(unitPattern);
-    const building = match ? spokenNumberToDigits(match[1]) : '';
-    const room = match ? spokenNumberToDigits(match[2]) : '';
-    const location = building && room ? `${building}동 ${room}호` : '';
+    const number = '[0-9영공일이삼사오육칠팔구십백천](?:\\s*[0-9영공일이삼사오육칠팔구십백천])*';
+    const buildingMatch = buildingMode === 'apartment' ? raw.match(new RegExp(`(${number})\\s*동`)) : null;
+    const unitMatch = buildingMode === 'apartment' ? raw.match(new RegExp(`(${number})\\s*호`)) : null;
+    const basement = raw.match(/\bB\s*(\d{1,3})\s*층?\b/i);
+    const floorMatch = basement || raw.match(new RegExp(`(지하|지상)?\\s*(${number})\\s*층`));
+    const building = buildingMatch ? spokenNumberToDigits(buildingMatch[1]) : '';
+    const unit = unitMatch ? spokenNumberToDigits(unitMatch[1]) : '';
+    const floorNumber = floorMatch ? spokenNumberToDigits(basement ? floorMatch[1] : floorMatch[2]) : '';
+    const floor = floorNumber ? `${basement || floorMatch[1] === '지하' ? '지하 ' : ''}${floorNumber}층` : '';
+    const roomMatch = buildingMode === 'general' ? raw.match(/([가-힣A-Za-z0-9]{1,12}실|로비|복도|옥상|주차장|식당|창고|강당|점포)/) : null;
+    const room = roomMatch?.[1] || '';
+    const position = firstRule(raw, SPEECH_POSITIONS) || room;
+    const trade = chooseTrade(raw);
+    const defectType = firstRule(raw, SPEECH_TYPES);
+    const location = buildingMode === 'general'
+        ? [floor, room].filter(Boolean).join(' ')
+        : [`${building || ''}${building ? '동' : ''}`, `${unit || ''}${unit ? '호' : ''}`, floor].filter(Boolean).join(' ');
     let text = raw;
-    if (match)
-        text = text.replace(match[0], ' ');
+    for (const match of [buildingMatch, unitMatch, floorMatch, roomMatch])
+        if (match)
+            text = text.replace(match[0], ' ');
     text = cleanVoiceText(text);
-    return { raw, location, text };
+    const missing = buildingMode === 'apartment'
+        ? [['동', building], ['호', unit]].filter(([, found]) => !found).map(([name]) => name)
+        : [['층', floor], ['실명', room]].filter(([, found]) => !found).map(([name]) => name);
+    return { raw, location, text, building, floor, unit, room, position, trade, defectType, missing };
+}
+
+function firstRule(text, rules) { return rules.find(([, re]) => re.test(text))?.[0] || ''; }
+function chooseTrade(text) {
+    const trades = SPEECH_TRADES.filter(([, re]) => re.test(text)).map(([name]) => name);
+    const effective = trades.filter(name => !(name === '실란트' && trades.includes('창호')) && !(name === '내장' && trades.includes('가구')));
+    return effective.length === 1 ? effective[0] : '';
+}
+
+function selectBestTranscript(result, buildingMode = 'apartment') {
+    const choices = Array.from(result || []).map((candidate, index) => {
+        const parsed = parseVoiceInput(candidate?.transcript || '', buildingMode);
+        const fields = [parsed.building, parsed.floor, parsed.unit, parsed.room, parsed.position, parsed.trade, parsed.defectType].filter(Boolean).length;
+        return { text: parsed.raw, score: fields * 10 + Number(candidate?.confidence || 0) - index / 100 };
+    });
+    return choices.sort((a, b) => b.score - a.score)[0]?.text || '';
 }
 
 function cleanVoiceText(text) {
@@ -1385,8 +1405,9 @@ function renderSpeechCaption() {
     const parsed = parseVoiceInput(phrase, state.buildingMode);
     $('captionLabel').textContent = speechState.listening ? '한국어 음성인식 중' : speechState.manualPaused ? '음성인식 일시 중지' : speechState.supported && !speechState.disabled ? '음성인식 다시 연결 중' : '원본 녹음 중';
     $('captionText').textContent = phrase || '지적 내용을 자유롭게 말해 주세요.';
-    $('captionSub').textContent = parsed.location
-        ? `${parsed.location} 인식 · 설명이 끝나면 녹음 완료 OK를 누르세요.`
+    const fields = [parsed.location, parsed.position && `실명 ${parsed.position}`, parsed.trade && `공종 ${parsed.trade}`, parsed.defectType && `유형 ${parsed.defectType}`].filter(Boolean);
+    $('captionSub').textContent = fields.length
+        ? `${fields.join(' · ')}${parsed.missing.length ? ` · ${parsed.missing.join('·')} 확인 필요` : ''}`
         : speechState.listening ? '설명이 끝나면 녹음 완료 OK를 누르세요. 순서는 자유롭습니다.' : '인식이 안 되어도 사진과 원본 음성은 저장됩니다.';
     $('speechBtn')?.classList.toggle('listening', speechState.listening);
     $('speechBtn')?.setAttribute('aria-label', speechState.listening ? '음성인식 일시 중지' : '음성인식 다시 시작');
@@ -1408,12 +1429,12 @@ function makeSpeechRecognition() {
     recognition.lang = 'ko-KR';
     recognition.continuous = true;
     recognition.interimResults = true;
-    recognition.maxAlternatives = 1;
+    recognition.maxAlternatives = 5;
     recognition.onstart = () => { speechState.listening = true; speechState.lastError = ''; renderSpeechCaption(); };
     recognition.onresult = event => {
         let interim = '';
         for (let i = event.resultIndex; i < event.results.length; i++) {
-            const text = event.results[i][0]?.transcript?.trim();
+            const text = selectBestTranscript(event.results[i], state.buildingMode);
             if (!text)
                 continue;
             if (event.results[i].isFinal)
