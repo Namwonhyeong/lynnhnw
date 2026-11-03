@@ -21,6 +21,7 @@ import android.webkit.WebViewClient;
 import android.widget.Toast;
 
 import org.json.JSONObject;
+import org.json.JSONArray;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -121,7 +122,7 @@ public class MainActivity extends Activity {
             .putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
             .putExtra(RecognizerIntent.EXTRA_LANGUAGE, "ko-KR")
             .putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
-            .putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1);
+            .putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 5);
         speechRecognizer.startListening(intent);
     }
 
@@ -129,7 +130,7 @@ public class MainActivity extends Activity {
         ArrayList<String> matches = bundle.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
         if (matches == null || matches.isEmpty())
             return;
-        sendJs("window.__nativeSpeechResult(" + JSONObject.quote(matches.get(0)) + "," + isFinal + ");");
+        sendJs("window.__nativeSpeechResults(" + new JSONArray(matches) + "," + isFinal + ");");
     }
 
     private String speechError(int error) {

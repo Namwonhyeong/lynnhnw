@@ -14,6 +14,13 @@ window.__nativeSpeechResult = (text, isFinal) => {
     result.isFinal = !!isFinal;
     nativeSpeechInstance.onresult?.({ resultIndex: 0, results: [result] });
 };
+window.__nativeSpeechResults = (texts, isFinal) => {
+    if (!nativeSpeechInstance || !Array.isArray(texts) || !texts.length)
+        return;
+    const result = texts.filter(Boolean).map(transcript => ({ transcript }));
+    result.isFinal = !!isFinal;
+    nativeSpeechInstance.onresult?.({ resultIndex: 0, results: [result] });
+};
 window.__nativeSpeechError = error => nativeSpeechInstance?.onerror?.({ error });
 window.__nativeSpeechEnd = () => { const instance = nativeSpeechInstance; nativeSpeechInstance = null; instance?.onend?.(); };
 const SpeechRecognitionApi = window.AndroidBridge ? NativeSpeechRecognition : window.SpeechRecognition || window.webkitSpeechRecognition;
