@@ -108,9 +108,9 @@ function uiState() {
     $('pauseBtn').ariaLabel = state.paused ? '녹음 이어하기' : '녹음 일시정지';
     $('shutter').disabled = state.paused || state.busy || state.stopping;
     $('shutter').classList.toggle('review', describing);
-    $('shutter').innerHTML = `<span class="shutter-inner">${icon(describing ? 'check' : 'camera')}</span>`;
-    $('shutter').ariaLabel = describing ? '음성 설명 완료하고 기록 저장' : '사진 촬영';
-    $('shutterLabel').textContent = describing ? '녹음 완료 OK' : '사진 촬영';
+    $('shutter').innerHTML = `<span class="shutter-inner">${icon(describing ? 'mic' : 'camera')}</span>`;
+    $('shutter').ariaLabel = describing ? '음성 입력 완료하고 기록 저장' : '사진 촬영';
+    $('shutterLabel').textContent = describing ? '음성 입력 완료' : '사진 촬영';
     $('finishBtn').disabled = state.stopping || describing;
     $('apartmentMode').disabled = state.active || state.busy;
     $('generalMode').disabled = state.active || state.busy;
@@ -266,7 +266,7 @@ async function finishSession() {
     if (!state.active || state.stopping || state.busy)
         return;
     if (state.draftPhoto) {
-        toast('촬영한 사진의 녹음 완료 OK를 먼저 눌러주세요.', true);
+        toast('촬영한 사진의 음성 입력을 먼저 완료해 주세요.', true);
         return;
     }
     state.stopping = true;
@@ -344,9 +344,9 @@ async function capture() {
             startSpeechRecognition();
             $('captionLabel').textContent = speechState.supported ? '이 사진의 한국어 음성인식 중' : '이 사진의 원본 녹음 중';
             $('captionText').textContent = '이 사진의 하자 내용을 말해 주세요.';
-            $('captionSub').textContent = '설명이 끝나면 녹음 완료 OK를 누르세요.';
+            $('captionSub').textContent = '설명이 끝나면 중앙 마이크 버튼을 다시 누르세요.';
             $('saveStatus').textContent = `${fmtTime(state.draftCreatedAt)} · 사진 촬영됨 · 설명 대기`;
-            toast('사진 촬영 완료 · 설명한 뒤 녹음 완료 OK를 누르세요.');
+            toast('사진 촬영 완료 · 설명한 뒤 중앙 마이크 버튼을 누르세요.');
             return;
         }
         const speech = takeSpeechSnapshot();

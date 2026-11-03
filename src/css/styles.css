@@ -354,6 +354,7 @@ textarea.field{resize:vertical;min-height:106px;font-size:14px;line-height:1.7}
 .session-on .controls{background:#0d1517}.session-on .shutter{border-color:#e4eceb;background:#0d1517;box-shadow:0 0 0 4px #ffffff12}.session-on .shutter-inner{background:white;color:#122124}.session-on .shutter.review{border-color:#35d0b0}.session-on .shutter.review .shutter-inner{background:#12b89a;color:white}
 .session-on .last-shortcut{min-width:78px;color:white;border:1px solid #2d8f7c;border-radius:12px;padding:6px 7px;background:#11221f}.session-on .last-thumb{width:36px;height:36px;border:0}.session-on .last-shortcut b{color:#58ddc0}.session-on .last-shortcut small{color:#8ea09f;font-size:8px}
 .session-on .pause-btn{background:#152124;border-color:#304044;color:#dfe8e9}.session-on .finish-btn{color:#93a3a6}.session-on .camera-footer{background:#0d1517;border-color:#293639;color:#829296}.session-on .save-status .icon{color:#51d4b8}.session-on .subhint{color:#758589}
+.session-on .wave,.session-on #speechBtn{display:none}
 }
 
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}

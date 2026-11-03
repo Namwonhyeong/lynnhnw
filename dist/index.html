@@ -365,6 +365,7 @@ textarea.field{resize:vertical;min-height:106px;font-size:14px;line-height:1.7}
 .session-on .controls{background:#0d1517}.session-on .shutter{border-color:#e4eceb;background:#0d1517;box-shadow:0 0 0 4px #ffffff12}.session-on .shutter-inner{background:white;color:#122124}.session-on .shutter.review{border-color:#35d0b0}.session-on .shutter.review .shutter-inner{background:#12b89a;color:white}
 .session-on .last-shortcut{min-width:78px;color:white;border:1px solid #2d8f7c;border-radius:12px;padding:6px 7px;background:#11221f}.session-on .last-thumb{width:36px;height:36px;border:0}.session-on .last-shortcut b{color:#58ddc0}.session-on .last-shortcut small{color:#8ea09f;font-size:8px}
 .session-on .pause-btn{background:#152124;border-color:#304044;color:#dfe8e9}.session-on .finish-btn{color:#93a3a6}.session-on .camera-footer{background:#0d1517;border-color:#293639;color:#829296}.session-on .save-status .icon{color:#51d4b8}.session-on .subhint{color:#758589}
+.session-on .wave,.session-on #speechBtn{display:none}
 }
 
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}
@@ -657,7 +658,7 @@ select{font:inherit;color:var(--ink)}
  <section id="captureView">
   <div class="workspace">
    <div class="main-column">
-    <div class="section-intro"><div><div class="eyebrow">PHOTO-FIRST INSPECTION</div><h1>찍고 말한 뒤, OK로 저장합니다.</h1><p id="modeNote" class="mode-note"><b>음성·카메라 실사용</b> · 사진을 찍고 설명한 뒤 녹음 완료 OK를 누르세요.</p></div></div>
+    <div class="section-intro"><div><div class="eyebrow">PHOTO-FIRST INSPECTION</div><h1>찍고 말한 뒤, 중앙 버튼으로 저장합니다.</h1><p id="modeNote" class="mode-note"><b>음성·카메라 실사용</b> · 촬영 후 셔터가 마이크 버튼으로 바뀝니다.</p></div></div>
     <div class="building-mode-row"><div><b>건축물 유형</b><small id="buildingModeHelp">동·호수를 음성에서 인식합니다.</small></div><div class="mode-switch" aria-label="건축물 유형 선택"><button id="apartmentMode" class="selected">공동주택</button><button id="generalMode">일반건축물</button></div></div>
     <div class="location-card">
      <div class="location-main"><div class="location-icon"><i data-icon="pin"></i></div><div><div class="location-label">현재 위치</div><div class="location-value" id="locationText">점검 시작 시 위치 설정</div></div></div>
@@ -670,7 +671,7 @@ select{font:inherit;color:var(--ink)}
       <div class="hud"><span class="state-badge" id="stateBadge"><span class="state-dot"></span><span id="stateLabel">점검 시작 전</span></span><span class="elapsed mono"><i data-icon="clock"></i><span id="elapsed">00:00</span></span></div>
       <div class="sample-badge" id="sampleBadge">대기 화면 · 시작 시 카메라 연결</div>
       <div class="viewfinder" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
-      <div class="live-caption"><div class="caption-kicker"><i data-icon="mic"></i><span id="captionLabel">사진별 음성 기록</span><span class="wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span></div><p class="caption-text" id="captionText">사진을 찍고 설명한 뒤<br>녹음 완료 OK로 저장합니다.</p><p class="caption-sub" id="captionSub">사진마다 음성 구간을 명확하게 나눕니다.</p></div>
+      <div class="live-caption"><div class="caption-kicker"><i data-icon="mic"></i><span id="captionLabel">사진별 음성 기록</span><span class="wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span></div><p class="caption-text" id="captionText">사진을 찍고 설명한 뒤<br>중앙 버튼으로 저장합니다.</p><p class="caption-sub" id="captionSub">촬영 후 중앙 버튼이 마이크로 바뀝니다.</p></div>
       <div class="flash" id="flash"></div>
      </div>
      <div class="controls">
@@ -843,9 +844,9 @@ function uiState() {
     $('pauseBtn').ariaLabel = state.paused ? '녹음 이어하기' : '녹음 일시정지';
     $('shutter').disabled = state.paused || state.busy || state.stopping;
     $('shutter').classList.toggle('review', describing);
-    $('shutter').innerHTML = `<span class="shutter-inner">${icon(describing ? 'check' : 'camera')}</span>`;
-    $('shutter').ariaLabel = describing ? '음성 설명 완료하고 기록 저장' : '사진 촬영';
-    $('shutterLabel').textContent = describing ? '녹음 완료 OK' : '사진 촬영';
+    $('shutter').innerHTML = `<span class="shutter-inner">${icon(describing ? 'mic' : 'camera')}</span>`;
+    $('shutter').ariaLabel = describing ? '음성 입력 완료하고 기록 저장' : '사진 촬영';
+    $('shutterLabel').textContent = describing ? '음성 입력 완료' : '사진 촬영';
     $('finishBtn').disabled = state.stopping || describing;
     $('apartmentMode').disabled = state.active || state.busy;
     $('generalMode').disabled = state.active || state.busy;
@@ -1001,7 +1002,7 @@ async function finishSession() {
     if (!state.active || state.stopping || state.busy)
         return;
     if (state.draftPhoto) {
-        toast('촬영한 사진의 녹음 완료 OK를 먼저 눌러주세요.', true);
+        toast('촬영한 사진의 음성 입력을 먼저 완료해 주세요.', true);
         return;
     }
     state.stopping = true;
@@ -1079,9 +1080,9 @@ async function capture() {
             startSpeechRecognition();
             $('captionLabel').textContent = speechState.supported ? '이 사진의 한국어 음성인식 중' : '이 사진의 원본 녹음 중';
             $('captionText').textContent = '이 사진의 하자 내용을 말해 주세요.';
-            $('captionSub').textContent = '설명이 끝나면 녹음 완료 OK를 누르세요.';
+            $('captionSub').textContent = '설명이 끝나면 중앙 마이크 버튼을 다시 누르세요.';
             $('saveStatus').textContent = `${fmtTime(state.draftCreatedAt)} · 사진 촬영됨 · 설명 대기`;
-            toast('사진 촬영 완료 · 설명한 뒤 녹음 완료 OK를 누르세요.');
+            toast('사진 촬영 완료 · 설명한 뒤 중앙 마이크 버튼을 누르세요.');
             return;
         }
         const speech = takeSpeechSnapshot();
