@@ -29,7 +29,8 @@
      <div class="location-main"><div class="location-icon"><i data-icon="pin"></i></div><div><div class="location-label">현재 위치</div><div class="location-value" id="locationText">점검 시작 시 위치 설정</div></div></div>
      <div class="location-actions"><label class="keep-location"><span>다음 사진에도 유지</span><span class="switch"><input id="keepLocation" type="checkbox" checked aria-label="다음 사진에도 위치 유지"><span></span></span></label><button class="text-button" id="locationBtn">위치 변경</button></div>
     </div>
-    <div class="camera-shell">
+    <div class="camera-shell" id="cameraShell">
+     <div class="capture-steps" id="captureSteps" aria-label="등록 진행 단계"><span class="active">1 촬영</span><span>2 음성</span><span>3 확인</span><span>4 완료</span></div>
      <div class="camera-stage" id="cameraStage">
       <img class="demo-scene" id="sceneImage" alt="카메라 촬영 대기 화면">
       <video id="liveVideo" autoplay playsinline muted class="hidden" aria-label="카메라 화면"></video>
@@ -39,6 +40,26 @@
       <div class="live-caption"><div class="caption-kicker"><i data-icon="mic"></i><span id="captionLabel">사진별 음성 기록</span><span class="wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span></div><p class="caption-text" id="captionText">사진을 찍고 설명한 뒤<br>녹음 완료 OK로 저장합니다.</p><p class="caption-sub" id="captionSub">사진마다 음성 구간을 명확하게 나눕니다.</p></div>
       <div class="flash" id="flash"></div>
      </div>
+     <section class="capture-review hidden" id="captureReview" aria-labelledby="reviewTitle">
+      <div class="phase-head"><span>03</span><div><h2 id="reviewTitle">내용 확인</h2><p>음성으로 작성된 내용을 확인하고 수정하세요.</p></div></div>
+      <img id="reviewPhoto" alt="확인할 촬영 사진">
+      <div class="review-fields">
+       <label class="apartment-review">동<input id="reviewBuilding" inputmode="numeric" placeholder="101"></label>
+       <label class="apartment-review">호수<input id="reviewUnit" inputmode="numeric" placeholder="302"></label>
+       <label class="general-review hidden">층<input id="reviewFloor" placeholder="지하 1층"></label>
+       <label class="general-review hidden">실명<input id="reviewRoom" placeholder="기계실"></label>
+       <label>실명·부위<input id="reviewPosition" placeholder="안방"></label>
+       <label>공종<input id="reviewTrade" placeholder="창호"></label>
+       <label>하자 유형<input id="reviewType" placeholder="누락·미시공"></label>
+       <label class="review-wide">상세 내용<textarea id="reviewText" rows="3" maxlength="4000"></textarea></label>
+      </div>
+      <div class="phase-actions"><button class="secondary" id="reviewRetry">다시 말하기</button><button class="primary" id="reviewSave"><i data-icon="check"></i>저장하기</button></div>
+     </section>
+     <section class="capture-complete hidden" id="captureComplete" aria-labelledby="completeTitle">
+      <div class="complete-check"><i data-icon="check"></i></div><h2 id="completeTitle">저장 완료</h2><p>사진과 현장 기록이 이 기기에 저장되었습니다.</p>
+      <div class="complete-card" id="completeCard"></div>
+      <div class="complete-actions"><button class="primary" id="nextCapture"><i data-icon="camera"></i>다음 사진 촬영</button><button class="secondary" id="completeList">등록 목록 보기</button></div>
+     </section>
      <div class="controls">
       <div class="start-area" id="startArea"><button class="primary" id="startBtn"><i data-icon="camera"></i>카메라·마이크 켜기</button><div class="start-description" id="startDescription">권한을 허용하고 사진을 먼저 촬영하세요.<br>촬영한 사진에 붙일 음성인식이 바로 시작됩니다.</div></div>
       <button class="last-shortcut hidden" id="lastShortcut" aria-label="방금 저장한 기록 보기"><span class="last-thumb" id="lastThumb"><i data-icon="image"></i></span><span><b id="sessionCount">0건</b><small>이번 점검</small></span></button>
