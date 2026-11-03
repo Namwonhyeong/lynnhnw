@@ -23,7 +23,7 @@
  <section id="captureView">
   <div class="workspace">
    <div class="main-column">
-    <div class="section-intro"><div><div class="eyebrow">PHOTO-FIRST INSPECTION</div><h1>찍고 말한 뒤, OK로 저장합니다.</h1><p id="modeNote" class="mode-note"><b>음성·카메라 실사용</b> · 사진을 찍고 설명한 뒤 녹음 완료 OK를 누르세요.</p></div></div>
+    <div class="section-intro"><div><div class="eyebrow">PHOTO-FIRST INSPECTION</div><h1>찍고 말한 뒤, 중앙 버튼으로 저장합니다.</h1><p id="modeNote" class="mode-note"><b>음성·카메라 실사용</b> · 촬영 후 셔터가 마이크 버튼으로 바뀝니다.</p></div></div>
     <div class="building-mode-row"><div><b>건축물 유형</b><small id="buildingModeHelp">동·호수를 음성에서 인식합니다.</small></div><div class="mode-switch" aria-label="건축물 유형 선택"><button id="apartmentMode" class="selected">공동주택</button><button id="generalMode">일반건축물</button></div></div>
     <div class="location-card">
      <div class="location-main"><div class="location-icon"><i data-icon="pin"></i></div><div><div class="location-label">현재 위치</div><div class="location-value" id="locationText">점검 시작 시 위치 설정</div></div></div>
@@ -33,15 +33,17 @@
      <div class="camera-stage" id="cameraStage">
       <img class="demo-scene" id="sceneImage" alt="카메라 촬영 대기 화면">
       <video id="liveVideo" autoplay playsinline muted class="hidden" aria-label="카메라 화면"></video>
+      <canvas id="annotationCanvas" class="annotation-canvas" aria-label="촬영 사진 필기 영역"></canvas>
+      <div class="annotation-tools hidden" id="annotationTools"><button id="penTool" type="button" aria-label="연필로 표시"><i data-icon="pencil"></i></button><button id="circleTool" type="button" aria-label="동그라미로 표시"><i data-icon="circle"></i></button><button id="eraserTool" type="button" aria-label="필기 지우기"><i data-icon="eraser"></i></button></div>
       <div class="hud"><span class="state-badge" id="stateBadge"><span class="state-dot"></span><span id="stateLabel">점검 시작 전</span></span><span class="elapsed mono"><i data-icon="clock"></i><span id="elapsed">00:00</span></span></div>
       <div class="sample-badge" id="sampleBadge">대기 화면 · 시작 시 카메라 연결</div>
       <div class="viewfinder" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
-      <div class="live-caption"><div class="caption-kicker"><i data-icon="mic"></i><span id="captionLabel">사진별 음성 기록</span><span class="wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span></div><p class="caption-text" id="captionText">사진을 찍고 설명한 뒤<br>녹음 완료 OK로 저장합니다.</p><p class="caption-sub" id="captionSub">사진마다 음성 구간을 명확하게 나눕니다.</p></div>
+      <div class="live-caption"><div class="caption-kicker"><i data-icon="mic"></i><span id="captionLabel">사진별 음성 기록</span><span class="wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span></div><p class="caption-text" id="captionText">사진을 찍고 설명한 뒤<br>중앙 버튼으로 저장합니다.</p><p class="caption-sub" id="captionSub">촬영 후 중앙 버튼이 마이크로 바뀝니다.</p></div>
       <div class="flash" id="flash"></div>
      </div>
      <div class="controls">
       <div class="start-area" id="startArea"><button class="primary" id="startBtn"><i data-icon="camera"></i>카메라·마이크 켜기</button><div class="start-description" id="startDescription">권한을 허용하고 사진을 먼저 촬영하세요.<br>촬영한 사진에 붙일 음성인식이 바로 시작됩니다.</div></div>
-      <button class="last-shortcut hidden" id="lastShortcut" aria-label="방금 저장한 기록 보기"><span class="last-thumb" id="lastThumb"><i data-icon="image"></i></span><span><b id="sessionCount">0건</b><small>이번 점검</small></span></button>
+      <button class="last-shortcut hidden" id="lastShortcut" aria-label="방금 저장한 기록 수정"><span class="last-thumb" id="lastThumb"><i data-icon="image"></i></span><span><b>수정</b><small id="sessionCount">0건 · 방금 기록</small></span></button>
       <div class="shutter-wrap hidden" id="shutterWrap"><button id="shutter" class="shutter" aria-label="사진 촬영"><span class="shutter-inner"><i data-icon="camera"></i></span></button><span id="shutterLabel">사진 촬영</span></div>
       <div class="session-actions hidden" id="sessionActions"><button id="speechBtn" class="pause-btn speech-btn" aria-label="음성인식 다시 시작"><i data-icon="mic"></i></button><button id="pauseBtn" class="pause-btn" aria-label="녹음 일시정지"><i data-icon="pause"></i></button><button id="finishBtn" class="finish-btn">점검 종료</button></div>
      </div>

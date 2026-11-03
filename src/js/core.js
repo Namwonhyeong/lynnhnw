@@ -6,7 +6,7 @@
 'use strict';
 // Self-contained prototype. No cloud SDK, API key, speech service, or external request.
 const $ = id => document.getElementById(id);
-const icons = { brand: '<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="m14 18 3 3 5-7"/>', camera: '<path d="M8 6 9.5 3.8h5L16 6h3.5A1.5 1.5 0 0 1 21 7.5v11a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 18.5v-11A1.5 1.5 0 0 1 4.5 6z"/><circle cx="12" cy="12.5" r="3.6"/>', grid: '<rect x="3" y="3" width="7" height="7" rx="1.4"/><rect x="14" y="3" width="7" height="7" rx="1.4"/><rect x="3" y="14" width="7" height="7" rx="1.4"/><rect x="14" y="14" width="7" height="7" rx="1.4"/>', pin: '<path d="M19 10c0 5-7 11-7 11S5 15 5 10a7 7 0 1 1 14 0Z"/><circle cx="12" cy="10" r="2.5"/>', mic: '<rect x="9" y="2" width="6" height="13" rx="3"/><path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3M8 22h8"/>', clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>', check: '<circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/>', arrow: '<path d="M5 12h14m-5-5 5 5-5 5"/>', pause: '<path d="M8 5v14M16 5v14" stroke-width="3"/>', play: '<path d="m8 4 12 8-12 8Z"/>', image: '<rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.5"/><path d="m3 17 6-6 4 4 3-3 5 5"/>', info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7h.01"/>', device: '<rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M10 18h4"/>', close: '<path d="m6 6 12 12M6 18 18 6"/>', download: '<path d="M12 3v12m-5-5 5 5 5-5M4 16v5h16v-5"/>', search: '<circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/>' };
+const icons = { brand: '<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="m14 18 3 3 5-7"/>', camera: '<path d="M8 6 9.5 3.8h5L16 6h3.5A1.5 1.5 0 0 1 21 7.5v11a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 18.5v-11A1.5 1.5 0 0 1 4.5 6z"/><circle cx="12" cy="12.5" r="3.6"/>', grid: '<rect x="3" y="3" width="7" height="7" rx="1.4"/><rect x="14" y="3" width="7" height="7" rx="1.4"/><rect x="3" y="14" width="7" height="7" rx="1.4"/><rect x="14" y="14" width="7" height="7" rx="1.4"/>', pin: '<path d="M19 10c0 5-7 11-7 11S5 15 5 10a7 7 0 1 1 14 0Z"/><circle cx="12" cy="10" r="2.5"/>', mic: '<rect x="9" y="2" width="6" height="13" rx="3"/><path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3M8 22h8"/>', pencil: '<path d="m4 20 4.5-1 10-10a2.1 2.1 0 0 0-3-3l-10 10L4 20Z"/><path d="m14 7 3 3M5.5 16l3 3"/>', circle: '<circle cx="12" cy="12" r="8.5"/>', eraser: '<path d="m4 15 8-10a2 2 0 0 1 3-.2l4.2 3.6a2 2 0 0 1 .2 3L12 20H7l-3-2.5a2 2 0 0 1 0-2.5Z"/><path d="m9 9 7 6M12 20h8"/>', clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>', check: '<circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/>', arrow: '<path d="M5 12h14m-5-5 5 5-5 5"/>', pause: '<path d="M8 5v14M16 5v14" stroke-width="3"/>', play: '<path d="m8 4 12 8-12 8Z"/>', image: '<rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.5"/><path d="m3 17 6-6 4 4 3-3 5 5"/>', info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7h.01"/>', device: '<rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M10 18h4"/>', close: '<path d="m6 6 12 12M6 18 18 6"/>', download: '<path d="M12 3v12m-5-5 5 5 5-5M4 16v5h16v-5"/>', search: '<circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/>' };
 function icon(name) { return `<svg class="icon" viewBox="0 0 24 24" aria-hidden="true">${icons[name] || icons.info}</svg>`; }
 function hydrateIcons(root = document) { root.querySelectorAll('[data-icon]').forEach(el => { el.outerHTML = icon(el.dataset.icon); }); }
 function esc(v = '') { return String(v).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
@@ -31,7 +31,7 @@ function sceneData(index = 0) {
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="780" height="450" viewBox="0 0 780 450"><defs><linearGradient id="light" x2="1" y2="1"><stop stop-color="${p[0]}"/><stop offset="1" stop-color="${p[1]}"/></linearGradient><linearGradient id="floor" x2="0" y2="1"><stop stop-color="${p[2]}"/><stop offset="1" stop-color="#78908b"/></linearGradient></defs><rect width="780" height="450" fill="url(#light)"/><path d="M0 0h86v314L0 383" fill="#829896" opacity=".3"/><path d="M0 365 85 310h626l69 55v85H0" fill="url(#floor)"/><path d="M85 310h625M0 401h780M187 310 107 450M334 310 310 450M481 310 513 450M629 310 718 450" stroke="#ccdad0" opacity=".35" stroke-width="1.4"/>${detail}<path d="M0 361 85 306h60M632 306h78l70 55" stroke="#e1e4d5" stroke-width="8"/><path d="M0 0h780v450H0Z" fill="#173239" opacity=".06"/></svg>`;
     return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
 }
-const state = { buildingMode: 'apartment', active: false, paused: false, session: null, records: [], sessions: [], db: null, location: '', keep: true, filter: 'all', stream: null, recorder: null, chunkSeq: 0, chunkChain: Promise.resolve(), timer: null, origin: 0, pauseAt: 0, pausedMs: 0, busy: false, stopping: false, detailId: null, audioURL: null, wake: null, saveFailures: 0, view: 'capture', liveLocation: '', draftPhoto: '', draftCreatedAt: 0, draftAudioOffsetMs: 0 };
+const state = { buildingMode: 'apartment', active: false, paused: false, session: null, records: [], sessions: [], db: null, location: '', keep: true, filter: 'all', stream: null, recorder: null, chunkSeq: 0, chunkChain: Promise.resolve(), timer: null, origin: 0, pauseAt: 0, pausedMs: 0, busy: false, stopping: false, detailId: null, audioURL: null, wake: null, saveFailures: 0, view: 'capture', liveLocation: '', draftPhoto: '', draftCreatedAt: 0, draftAudioOffsetMs: 0, annotating: false, annotationMode: 'pen', annotationDirty: false };
 function toast(msg, error = false) { $('toast').textContent = msg; $('toast').classList.toggle('error', error); $('toast').classList.add('visible'); clearTimeout(toast.t); toast.t = setTimeout(() => $('toast').classList.remove('visible'), 3200); }
 function alertBox(msg) { $('runtimeAlert').textContent = msg; $('runtimeAlert').classList.toggle('hidden', !msg); }
 function fmtClock(ms) { const s = Math.floor(Math.max(0, ms) / 1000); return `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`; }
@@ -79,7 +79,9 @@ function renderRecordsCore() {
     $('recentCounter').textContent = `${rs.length}건`;
     $('recentList').innerHTML = rs.length ? rs.slice(0, 3).map(r => `<button class="recent-card" data-record="${r.id}"><img src="${r.photo}" alt="${esc(r.location || '위치 미지정')} 촬영 기록"><div class="recent-body"><div class="recent-meta"><b>${esc(r.location || '위치 미지정')}</b><span>· ${fmtTime(r.createdAt)}</span></div><p class="recent-text">${esc(recordDescription(r))}</p><div class="record-tags">${tagMarkup(r)}</div></div></button>`).join('') : `<div class="empty-recent">${icon('image')}<strong>촬영하면 여기에 쌓입니다.</strong><p>사진을 고르고 설명을 다시 붙이는 대신<br>기록이 남았는지만 확인하세요.</p></div>`;
     const current = state.session ? rs.filter(r => r.sessionId === state.session.id) : [];
-    $('sessionCount').textContent = `${current.length}건`;
+    $('sessionCount').textContent = `${current.length}건 · 방금 기록`;
+    $('lastShortcut').classList.toggle('available', !!current.length);
+    $('lastShortcut').disabled = !current.length;
     $('lastThumb').innerHTML = current.length ? `<img src="${current[0].photo}" alt="최근 등록 사진">` : icon('image');
     const query = $('search').value.trim().toLowerCase();
     const filtered = rs.filter(r => (state.filter === 'all' || state.filter === 'pending' && !r.text) && `${r.location} ${r.text}`.toLowerCase().includes(query));
@@ -91,6 +93,41 @@ function updateViewLegacy(view) { state.view = view; $('captureView').classList.
     toast('목록을 보는 동안 녹음을 일시정지합니다.');
 } }
 function setScene() { $('sceneImage').src = sceneData(0); }
+function prepareAnnotation(width, height) {
+    const canvas = $('annotationCanvas');
+    $('cameraStage').classList.add('photo-captured');
+    canvas.width = width;
+    canvas.height = height;
+    canvas.getContext('2d').clearRect(0, 0, width, height);
+    state.annotating = false;
+    state.annotationDirty = false;
+    canvas.classList.remove('drawing');
+    for (const id of ['penTool', 'circleTool', 'eraserTool'])
+        $(id).classList.remove('active');
+    $('annotationTools').classList.remove('hidden');
+}
+function selectAnnotationTool(mode) {
+    state.annotationMode = mode;
+    state.annotating = true;
+    $('annotationCanvas').classList.add('drawing');
+    $('penTool').classList.toggle('active', mode === 'pen');
+    $('circleTool').classList.toggle('active', mode === 'circle');
+    $('eraserTool').classList.toggle('active', mode === 'eraser');
+}
+async function mergeAnnotation() {
+    if (!state.annotationDirty)
+        return;
+    const marks = $('annotationCanvas'), image = new Image();
+    image.src = state.draftPhoto;
+    await image.decode();
+    const merged = document.createElement('canvas');
+    merged.width = marks.width;
+    merged.height = marks.height;
+    const context = merged.getContext('2d');
+    context.drawImage(image, 0, 0, merged.width, merged.height);
+    context.drawImage(marks, 0, 0);
+    state.draftPhoto = merged.toDataURL('image/jpeg', .87);
+}
 function uiState() {
     const describing = !!state.draftPhoto;
     document.body.classList.toggle('session-on', state.active);
@@ -106,9 +143,9 @@ function uiState() {
     $('pauseBtn').ariaLabel = state.paused ? '녹음 이어하기' : '녹음 일시정지';
     $('shutter').disabled = state.paused || state.busy || state.stopping;
     $('shutter').classList.toggle('review', describing);
-    $('shutter').innerHTML = `<span class="shutter-inner">${icon(describing ? 'check' : 'camera')}</span>`;
-    $('shutter').ariaLabel = describing ? '음성 설명 완료하고 기록 저장' : '사진 촬영';
-    $('shutterLabel').textContent = describing ? '녹음 완료 OK' : '사진 촬영';
+    $('shutter').innerHTML = `<span class="shutter-inner">${icon(describing ? 'mic' : 'camera')}</span>`;
+    $('shutter').ariaLabel = describing ? '음성 입력 완료하고 기록 저장' : '사진 촬영';
+    $('shutterLabel').textContent = describing ? '음성 입력 완료' : '사진 촬영';
     $('finishBtn').disabled = state.stopping || describing;
     $('apartmentMode').disabled = state.active || state.busy;
     $('generalMode').disabled = state.active || state.busy;
@@ -264,7 +301,7 @@ async function finishSession() {
     if (!state.active || state.stopping || state.busy)
         return;
     if (state.draftPhoto) {
-        toast('촬영한 사진의 녹음 완료 OK를 먼저 눌러주세요.', true);
+        toast('촬영한 사진의 음성 입력을 먼저 완료해 주세요.', true);
         return;
     }
     state.stopping = true;
@@ -327,6 +364,7 @@ async function capture() {
             canvas.height = Math.round(v.videoHeight * scale);
             canvas.getContext('2d').drawImage(v, 0, 0, canvas.width, canvas.height);
             state.draftPhoto = canvas.toDataURL('image/jpeg', .87);
+            prepareAnnotation(canvas.width, canvas.height);
             state.draftCreatedAt = Date.now();
             state.draftAudioOffsetMs = Math.round(elapsed());
             $('sceneImage').src = state.draftPhoto;
@@ -342,11 +380,12 @@ async function capture() {
             startSpeechRecognition();
             $('captionLabel').textContent = speechState.supported ? '이 사진의 한국어 음성인식 중' : '이 사진의 원본 녹음 중';
             $('captionText').textContent = '이 사진의 하자 내용을 말해 주세요.';
-            $('captionSub').textContent = '설명이 끝나면 녹음 완료 OK를 누르세요.';
+            $('captionSub').textContent = '설명이 끝나면 중앙 마이크 버튼을 다시 누르세요.';
             $('saveStatus').textContent = `${fmtTime(state.draftCreatedAt)} · 사진 촬영됨 · 설명 대기`;
-            toast('사진 촬영 완료 · 설명한 뒤 녹음 완료 OK를 누르세요.');
+            toast('사진 촬영 완료 · 설명한 뒤 중앙 마이크 버튼을 누르세요.');
             return;
         }
+        await mergeAnnotation();
         const speech = takeSpeechSnapshot();
         const text = speech.text, transcriptRaw = speech.raw;
         const transcriptionStatus = text ? window.AndroidBridge ? 'native' : 'browser' : speechState.supported ? 'pending' : 'not_supported';
@@ -361,6 +400,9 @@ async function capture() {
         state.draftCreatedAt = 0;
         state.draftAudioOffsetMs = 0;
         $('sampleBadge').classList.add('hidden');
+        $('annotationTools').classList.add('hidden');
+        $('annotationCanvas').classList.remove('drawing');
+        $('cameraStage').classList.remove('photo-captured');
         $('sceneImage').classList.add('hidden');
         $('liveVideo').classList.remove('hidden');
         if (!state.keep) {

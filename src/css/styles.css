@@ -62,6 +62,7 @@ svg.icon{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;s
 .camera-shell{background:white;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
 .camera-stage{height:370px;position:relative;isolation:isolate;overflow:hidden;background:#243238;color:white}
 .demo-scene,.camera-stage video{width:100%;height:100%;position:absolute;inset:0;object-fit:cover}
+.annotation-canvas{position:absolute;inset:0;width:100%;height:100%;z-index:2;pointer-events:none;touch-action:none}.annotation-canvas.drawing{pointer-events:auto;cursor:crosshair}.annotation-tools{position:absolute;z-index:6;left:15px;top:58px;display:flex;gap:7px}.annotation-tools button{width:38px;height:38px;display:grid;place-items:center;border:1px solid #ffffff4d;background:#07121480;color:white;border-radius:10px;padding:0;backdrop-filter:blur(6px)}.annotation-tools button .icon{width:19px;height:19px}.annotation-tools button.active{background:#12b89acc;border-color:#63e7cd}
 .demo-scene{transition:filter .4s}
 .camera-stage video{background:#19282f}
 .camera-stage:after{position:absolute;content:"";inset:0;pointer-events:none;background:linear-gradient(180deg,#0c1b2545,transparent 32%,transparent 48%,#0d1b22dc);z-index:1}
@@ -99,6 +100,7 @@ svg.icon{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;s
 .primary:hover{background:var(--accent-dark)}
 .start-description{font-size:12px;color:#7f8b91;line-height:1.7}
 .last-shortcut{display:flex;align-items:center;gap:10px;min-width:100px;border:0;background:none;text-align:left;padding:0}
+.last-shortcut:not(.available){visibility:hidden}
 .last-thumb{width:52px;height:52px;border:1px solid var(--line);border-radius:12px;display:grid;place-items:center;background:#f3f6f6;color:#a2adb3;overflow:hidden}
 .last-thumb img{width:100%;height:100%;object-fit:cover}
 .last-shortcut b{font-size:14px;display:block}
@@ -340,6 +342,21 @@ textarea.field{resize:vertical;min-height:106px;font-size:14px;line-height:1.7}
 .session-on .topbar{padding-bottom:0;margin-bottom:13px}
 .session-on .camera-stage{height:clamp(220px,calc(100dvh - 390px),440px)}
 .session-on .location-card{margin-bottom:10px}
+}
+
+/* UI redesign draft: keeps the existing capture -> voice -> immediate save logic. */
+@media(max-width:480px){
+.session-on{background:#0d1112;color:#f5f8f8}
+.session-on .header,.session-on .app{background:#0d1112}
+.session-on .header{padding-bottom:10px}.session-on .mark{background:#12b89a}.session-on .brand strong{color:white}.session-on .prototype{border-color:#28504a;color:#66ddc4}
+.session-on .topbar{border-color:#273437}.session-on .tab{color:#75868a}.session-on .tab.active{color:white;border-color:#12b89a}.session-on .tab.active .count-pill{background:#12b89a}
+.session-on .building-mode-row,.session-on .location-card{background:#151e20;border-color:#2a373a}.session-on .building-mode-row small,.session-on .location-label{color:#829396}.session-on .mode-switch{background:#0b1214;border-color:#2a373a}.session-on .mode-switch button.selected{background:#203033;color:#62ddc2}.session-on .location-value{color:white}.session-on .location-icon{background:#173b35;color:#51d4b8}.session-on .text-button{color:#70d7c1}
+.session-on .camera-shell{background:#0d1517;border-color:#2b383b;box-shadow:0 18px 50px #0005}.session-on .camera-stage:after{background:linear-gradient(180deg,#0710138c,transparent 35%,transparent 50%,#071013e8)}
+.session-on .controls{background:#0d1517}.session-on .shutter{border-color:#e4eceb;background:#0d1517;box-shadow:0 0 0 4px #ffffff12}.session-on .shutter-inner{background:white;color:#122124}.session-on .shutter.review{border-color:#35d0b0}.session-on .shutter.review .shutter-inner{background:#12b89a;color:white}
+.session-on .last-shortcut{min-width:78px;color:white;border:1px solid #2d8f7c;border-radius:12px;padding:6px 7px;background:#11221f}.session-on .last-thumb{width:36px;height:36px;border:0}.session-on .last-shortcut b{color:#58ddc0}.session-on .last-shortcut small{color:#8ea09f;font-size:8px}
+.session-on .pause-btn{background:#152124;border-color:#304044;color:#dfe8e9}.session-on .finish-btn{color:#93a3a6}.session-on .camera-footer{background:#0d1517;border-color:#293639;color:#829296}.session-on .save-status .icon{color:#51d4b8}.session-on .subhint{color:#758589}
+.session-on .wave,.session-on #speechBtn{display:none}
+.session-on .camera-stage.photo-captured{height:calc((100vw - 28px)*.5625)}
 }
 
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}
