@@ -62,6 +62,7 @@ svg.icon{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;s
 .camera-shell{background:white;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
 .camera-stage{height:370px;position:relative;isolation:isolate;overflow:hidden;background:#243238;color:white}
 .demo-scene,.camera-stage video{width:100%;height:100%;position:absolute;inset:0;object-fit:cover}
+.annotation-canvas{position:absolute;inset:0;width:100%;height:100%;z-index:2;pointer-events:none;touch-action:none}.annotation-canvas.drawing{pointer-events:auto;cursor:crosshair}.annotation-tools{position:absolute;z-index:6;left:15px;top:58px;display:flex;gap:7px}.annotation-tools button{width:38px;height:38px;display:grid;place-items:center;border:1px solid #ffffff4d;background:#07121480;color:white;border-radius:10px;padding:0;backdrop-filter:blur(6px)}.annotation-tools button .icon{width:19px;height:19px}.annotation-tools button.active{background:#12b89acc;border-color:#63e7cd}
 .demo-scene{transition:filter .4s}
 .camera-stage video{background:#19282f}
 .camera-stage:after{position:absolute;content:"";inset:0;pointer-events:none;background:linear-gradient(180deg,#0c1b2545,transparent 32%,transparent 48%,#0d1b22dc);z-index:1}
@@ -355,6 +356,7 @@ textarea.field{resize:vertical;min-height:106px;font-size:14px;line-height:1.7}
 .session-on .last-shortcut{min-width:78px;color:white;border:1px solid #2d8f7c;border-radius:12px;padding:6px 7px;background:#11221f}.session-on .last-thumb{width:36px;height:36px;border:0}.session-on .last-shortcut b{color:#58ddc0}.session-on .last-shortcut small{color:#8ea09f;font-size:8px}
 .session-on .pause-btn{background:#152124;border-color:#304044;color:#dfe8e9}.session-on .finish-btn{color:#93a3a6}.session-on .camera-footer{background:#0d1517;border-color:#293639;color:#829296}.session-on .save-status .icon{color:#51d4b8}.session-on .subhint{color:#758589}
 .session-on .wave,.session-on #speechBtn{display:none}
+.session-on .camera-stage.photo-captured{height:calc((100vw - 28px)*.5625)}
 }
 
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}

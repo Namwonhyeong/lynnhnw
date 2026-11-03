@@ -177,6 +177,7 @@ def run() -> None:
             page2.wait_for_function('state.active && !state.busy')
             page2.locator('#shutter').click()
             page2.wait_for_function('!!state.draftPhoto && state.records.length === 36 && !state.busy')
+            assert page2.locator('#annotationTools').is_visible()
             assert page2.locator('#shutterLabel').inner_text() == '음성 입력 완료'
             page2.locator('#shutter').click()
             page2.wait_for_function('!state.draftPhoto && state.records.length === 37 && !state.busy')

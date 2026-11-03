@@ -69,6 +69,18 @@ $('apartmentMode').onclick = () => setBuildingMode('apartment');
 $('generalMode').onclick = () => setBuildingMode('general');
 $('startBtn').onclick = startSession;
 $('shutter').onclick = capture;
+$('penTool').onclick = () => selectAnnotationTool('pen');
+$('circleTool').onclick = () => selectAnnotationTool('circle');
+$('eraserTool').onclick = () => selectAnnotationTool('eraser');
+{
+    const canvas = $('annotationCanvas');
+    let drawing = false, start = null, beforeCircle = null;
+    const point = event => { const rect = canvas.getBoundingClientRect(); return [(event.clientX - rect.left) * canvas.width / rect.width, (event.clientY - rect.top) * canvas.height / rect.height]; };
+    const style = context => { context.lineCap = 'round'; context.lineJoin = 'round'; context.globalCompositeOperation = state.annotationMode === 'eraser' ? 'destination-out' : 'source-over'; context.strokeStyle = '#ff4d3d'; context.lineWidth = state.annotationMode === 'eraser' ? Math.max(18, canvas.width / 45) : Math.max(5, canvas.width / 180); };
+    canvas.onpointerdown = event => { if (!state.annotating) return; drawing = true; canvas.setPointerCapture(event.pointerId); start = point(event); const context = canvas.getContext('2d'); style(context); if (state.annotationMode === 'circle') beforeCircle = context.getImageData(0, 0, canvas.width, canvas.height); else { context.beginPath(); context.moveTo(...start); } };
+    canvas.onpointermove = event => { if (!drawing || !state.annotating) return; const end = point(event), context = canvas.getContext('2d'); style(context); if (state.annotationMode === 'circle') { context.putImageData(beforeCircle, 0, 0); context.beginPath(); context.ellipse((start[0] + end[0]) / 2, (start[1] + end[1]) / 2, Math.abs(end[0] - start[0]) / 2, Math.abs(end[1] - start[1]) / 2, 0, 0, Math.PI * 2); context.stroke(); } else { context.lineTo(...end); context.stroke(); } state.annotationDirty = true; };
+    canvas.onpointerup = canvas.onpointercancel = () => { drawing = false; start = beforeCircle = null; };
+}
 $('pauseBtn').onclick = () => pauseSession();
 $('speechBtn').onclick = toggleSpeechRecognition;
 $('finishBtn').onclick = finishSession;
