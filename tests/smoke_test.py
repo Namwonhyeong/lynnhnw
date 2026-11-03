@@ -180,6 +180,8 @@ def run() -> None:
             assert page2.locator('#shutterLabel').inner_text() == '녹음 완료 OK'
             page2.locator('#shutter').click()
             page2.wait_for_function('!state.draftPhoto && state.records.length === 37 && !state.busy')
+            assert page2.locator('#lastShortcut').is_enabled()
+            assert '수정' in page2.locator('#lastShortcut').inner_text()
             page2.locator('#shutter').click()
             page2.wait_for_function('!!state.draftPhoto && state.records.length === 37 && !state.busy')
             page2.locator('#shutter').click()

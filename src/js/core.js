@@ -31,7 +31,7 @@ function sceneData(index = 0) {
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="780" height="450" viewBox="0 0 780 450"><defs><linearGradient id="light" x2="1" y2="1"><stop stop-color="${p[0]}"/><stop offset="1" stop-color="${p[1]}"/></linearGradient><linearGradient id="floor" x2="0" y2="1"><stop stop-color="${p[2]}"/><stop offset="1" stop-color="#78908b"/></linearGradient></defs><rect width="780" height="450" fill="url(#light)"/><path d="M0 0h86v314L0 383" fill="#829896" opacity=".3"/><path d="M0 365 85 310h626l69 55v85H0" fill="url(#floor)"/><path d="M85 310h625M0 401h780M187 310 107 450M334 310 310 450M481 310 513 450M629 310 718 450" stroke="#ccdad0" opacity=".35" stroke-width="1.4"/>${detail}<path d="M0 361 85 306h60M632 306h78l70 55" stroke="#e1e4d5" stroke-width="8"/><path d="M0 0h780v450H0Z" fill="#173239" opacity=".06"/></svg>`;
     return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
 }
-const state = { buildingMode: 'apartment', active: false, paused: false, session: null, records: [], sessions: [], db: null, location: '', keep: true, filter: 'all', stream: null, recorder: null, chunkSeq: 0, chunkChain: Promise.resolve(), timer: null, origin: 0, pauseAt: 0, pausedMs: 0, busy: false, stopping: false, detailId: null, audioURL: null, wake: null, saveFailures: 0, view: 'capture', liveLocation: '', draftPhoto: '', draftCreatedAt: 0, draftAudioOffsetMs: 0, capturePhase: 'capture', reviewSpeech: null };
+const state = { buildingMode: 'apartment', active: false, paused: false, session: null, records: [], sessions: [], db: null, location: '', keep: true, filter: 'all', stream: null, recorder: null, chunkSeq: 0, chunkChain: Promise.resolve(), timer: null, origin: 0, pauseAt: 0, pausedMs: 0, busy: false, stopping: false, detailId: null, audioURL: null, wake: null, saveFailures: 0, view: 'capture', liveLocation: '', draftPhoto: '', draftCreatedAt: 0, draftAudioOffsetMs: 0 };
 function toast(msg, error = false) { $('toast').textContent = msg; $('toast').classList.toggle('error', error); $('toast').classList.add('visible'); clearTimeout(toast.t); toast.t = setTimeout(() => $('toast').classList.remove('visible'), 3200); }
 function alertBox(msg) { $('runtimeAlert').textContent = msg; $('runtimeAlert').classList.toggle('hidden', !msg); }
 function fmtClock(ms) { const s = Math.floor(Math.max(0, ms) / 1000); return `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`; }
@@ -79,7 +79,9 @@ function renderRecordsCore() {
     $('recentCounter').textContent = `${rs.length}건`;
     $('recentList').innerHTML = rs.length ? rs.slice(0, 3).map(r => `<button class="recent-card" data-record="${r.id}"><img src="${r.photo}" alt="${esc(r.location || '위치 미지정')} 촬영 기록"><div class="recent-body"><div class="recent-meta"><b>${esc(r.location || '위치 미지정')}</b><span>· ${fmtTime(r.createdAt)}</span></div><p class="recent-text">${esc(recordDescription(r))}</p><div class="record-tags">${tagMarkup(r)}</div></div></button>`).join('') : `<div class="empty-recent">${icon('image')}<strong>촬영하면 여기에 쌓입니다.</strong><p>사진을 고르고 설명을 다시 붙이는 대신<br>기록이 남았는지만 확인하세요.</p></div>`;
     const current = state.session ? rs.filter(r => r.sessionId === state.session.id) : [];
-    $('sessionCount').textContent = `${current.length}건`;
+    $('sessionCount').textContent = `${current.length}건 · 방금 기록`;
+    $('lastShortcut').classList.toggle('available', !!current.length);
+    $('lastShortcut').disabled = !current.length;
     $('lastThumb').innerHTML = current.length ? `<img src="${current[0].photo}" alt="최근 등록 사진">` : icon('image');
     const query = $('search').value.trim().toLowerCase();
     const filtered = rs.filter(r => (state.filter === 'all' || state.filter === 'pending' && !r.text) && `${r.location} ${r.text}`.toLowerCase().includes(query));
@@ -91,17 +93,8 @@ function updateViewLegacy(view) { state.view = view; $('captureView').classList.
     toast('목록을 보는 동안 녹음을 일시정지합니다.');
 } }
 function setScene() { $('sceneImage').src = sceneData(0); }
-function setCapturePhase(phase) {
-    state.capturePhase = phase;
-    $('cameraShell').classList.toggle('capture-phase-panel', ['review', 'complete'].includes(phase));
-    $('cameraStage').classList.toggle('hidden', ['review', 'complete'].includes(phase));
-    $('captureReview').classList.toggle('hidden', phase !== 'review');
-    $('captureComplete').classList.toggle('hidden', phase !== 'complete');
-    [...$('captureSteps').children].forEach((step, index) => step.classList.toggle('active', index === ['capture', 'speech', 'review', 'complete'].indexOf(phase)));
-    uiState();
-}
 function uiState() {
-    const describing = !!state.draftPhoto && state.capturePhase === 'speech';
+    const describing = !!state.draftPhoto;
     document.body.classList.toggle('session-on', state.active);
     $('startArea').classList.toggle('hidden', state.active);
     for (const id of ['lastShortcut', 'shutterWrap', 'sessionActions'])
@@ -118,7 +111,7 @@ function uiState() {
     $('shutter').innerHTML = `<span class="shutter-inner">${icon(describing ? 'check' : 'camera')}</span>`;
     $('shutter').ariaLabel = describing ? '음성 설명 완료하고 기록 저장' : '사진 촬영';
     $('shutterLabel').textContent = describing ? '녹음 완료 OK' : '사진 촬영';
-    $('finishBtn').disabled = state.stopping || !!state.draftPhoto;
+    $('finishBtn').disabled = state.stopping || describing;
     $('apartmentMode').disabled = state.active || state.busy;
     $('generalMode').disabled = state.active || state.busy;
     $('locationBtn').disabled = state.stopping;
@@ -193,8 +186,6 @@ async function startSession() {
         state.draftPhoto = '';
         state.draftCreatedAt = 0;
         state.draftAudioOffsetMs = 0;
-        state.reviewSpeech = null;
-        setCapturePhase('capture');
         if (state.recorder)
             state.recorder.start(1000);
         stopSpeechRecognition(true);
@@ -306,8 +297,6 @@ async function finishSession() {
         state.paused = false;
         state.stopping = false;
         state.draftPhoto = '';
-        state.reviewSpeech = null;
-        setCapturePhase('capture');
         clearInterval(state.timer);
         await state.wake?.release().catch(() => { });
         state.wake = null;
@@ -358,61 +347,24 @@ async function capture() {
             $('captionSub').textContent = '설명이 끝나면 녹음 완료 OK를 누르세요.';
             $('saveStatus').textContent = `${fmtTime(state.draftCreatedAt)} · 사진 촬영됨 · 설명 대기`;
             toast('사진 촬영 완료 · 설명한 뒤 녹음 완료 OK를 누르세요.');
-            setCapturePhase('speech');
             return;
         }
         const speech = takeSpeechSnapshot();
+        const text = speech.text, transcriptRaw = speech.raw;
+        const transcriptionStatus = text ? window.AndroidBridge ? 'native' : 'browser' : speechState.supported ? 'pending' : 'not_supported';
         stopSpeechRecognition(true);
         speechState.manualPaused = false;
-        state.reviewSpeech = speech;
-        $('reviewPhoto').src = state.draftPhoto;
-        $('reviewBuilding').value = speech.building || '';
-        $('reviewUnit').value = speech.unit || '';
-        $('reviewFloor').value = speech.floor || '';
-        $('reviewRoom').value = speech.room || '';
-        $('reviewPosition').value = speech.position || '';
-        $('reviewTrade').value = speech.trade || '';
-        $('reviewType').value = speech.defectType || '';
-        $('reviewText').value = speech.text || '';
-        document.querySelectorAll('.apartment-review').forEach(el => el.classList.toggle('hidden', state.buildingMode !== 'apartment'));
-        document.querySelectorAll('.general-review').forEach(el => el.classList.toggle('hidden', state.buildingMode !== 'general'));
-        $('saveStatus').textContent = '인식 결과 확인 중';
-        setCapturePhase('review');
-        return;
-    }
-    catch (e) {
-        $('saveStatus').textContent = '처리 실패 · 다시 확인해 주세요';
-        alertBox(`사진을 처리하지 못했습니다. ${e.message}`);
-        toast('처리 실패 · 기록을 확인하세요.', true);
-    }
-    finally {
-        state.busy = false;
-        uiState();
-    }
-}
-async function saveReviewedCapture() {
-    if (!state.draftPhoto || !state.reviewSpeech || state.busy)
-        return;
-    state.busy = true;
-    $('reviewSave').disabled = true;
-    try {
-        const speech = state.reviewSpeech;
-        const building = $('reviewBuilding').value.trim().replace(/동$/, '');
-        const unit = $('reviewUnit').value.trim().replace(/호$/, '');
-        const floor = $('reviewFloor').value.trim();
-        const room = $('reviewRoom').value.trim();
-        const location = state.buildingMode === 'apartment' ? [building && `${building}동`, unit && `${unit}호`].filter(Boolean).join(' ') : [floor, room].filter(Boolean).join(' ');
-        const text = $('reviewText').value.trim().slice(0, 4000), transcriptRaw = speech.raw;
-        const transcriptionStatus = text ? window.AndroidBridge ? 'native' : 'browser' : speechState.supported ? 'pending' : 'not_supported';
         const photoTime = state.draftCreatedAt, photo = state.draftPhoto, offset = state.draftAudioOffsetMs;
-        const r = { id: uid(), sessionId: state.session.id, number: actualRecords().filter(r => r.sessionId === state.session.id).length + 1, mode: 'live', buildingMode: state.buildingMode, createdAt: photoTime, location: location || state.location, text, transcriptRaw, photo, photoFormat: 'jpg', audioOffsetMs: offset, transcriptionStatus, cloudStatus: 'not_connected', unitOverride: location || state.location || '', positionOverride: $('reviewPosition').value.trim(), tradeOverride: $('reviewTrade').value.trim(), typeOverride: $('reviewType').value.trim(), speechFields: { building, floor, unit, room, missing: [] } };
+        const r = { id: uid(), sessionId: state.session.id, number: actualRecords().filter(r => r.sessionId === state.session.id).length + 1, mode: 'live', buildingMode: state.buildingMode, createdAt: photoTime, location: state.location, text, transcriptRaw, photo, photoFormat: 'jpg', audioOffsetMs: offset, transcriptionStatus, cloudStatus: 'not_connected', unitOverride: speech.location || '', positionOverride: speech.position || '', tradeOverride: speech.trade || '', typeOverride: speech.defectType || '', speechFields: { building: speech.building, floor: speech.floor, unit: speech.unit, room: speech.room, missing: speech.missing } };
         await put('records', r);
         state.records.push(r);
         $('saveStatus').textContent = `${fmtTime(photoTime)} · 사진 ${String(r.number).padStart(2, '0')} 저장됨`;
         state.draftPhoto = '';
         state.draftCreatedAt = 0;
         state.draftAudioOffsetMs = 0;
-        $('completeCard').innerHTML = `<img src="${esc(r.photo)}" alt="저장한 사진"><div><b>${esc(r.location || '위치 미지정')}</b><span>${esc([r.positionOverride, r.tradeOverride].filter(Boolean).join(' · ') || '분류 확인 필요')}</span><p>${esc(r.text || '내용 확인 필요')}</p></div>`;
+        $('sampleBadge').classList.add('hidden');
+        $('sceneImage').classList.add('hidden');
+        $('liveVideo').classList.remove('hidden');
         if (!state.keep) {
             state.location = '';
             if (state.buildingMode === 'apartment') {
@@ -422,41 +374,21 @@ async function saveReviewedCapture() {
             saveSetting(locationSettingKey(), '');
             locationRender();
         }
-        state.reviewSpeech = null;
-        setCapturePhase('complete');
+        $('captionLabel').textContent = '기록 저장 완료';
+        $('captionText').textContent = '다음 사진을 촬영해 주세요.';
+        $('captionSub').textContent = text ? '방금 사진과 인식 문장을 함께 저장했습니다.' : '음성 내용은 확인 필요 상태로 저장했습니다.';
         renderRecords();
         toast(`사진 ${String(r.number).padStart(2, '0')} · 사진과 설명 저장 완료`);
     }
     catch (e) {
-        $('saveStatus').textContent = '저장 실패 · 내용을 확인해 주세요';
+        $('saveStatus').textContent = '저장 실패 · 다시 촬영해 주세요';
         alertBox(`사진이 저장되지 않았습니다. ${e.message}`);
         toast('저장 실패 · 기록을 확인하세요.', true);
     }
     finally {
         state.busy = false;
-        $('reviewSave').disabled = false;
         uiState();
     }
-}
-function retrySpeechCapture() {
-    if (!state.draftPhoto)
-        return;
-    state.reviewSpeech = null;
-    speechState.finalText = '';
-    speechState.interimText = '';
-    speechState.manualPaused = false;
-    setCapturePhase('speech');
-    startSpeechRecognition();
-    toast('음성을 다시 말해 주세요.');
-}
-function nextCapture() {
-    $('sampleBadge').classList.add('hidden');
-    $('sceneImage').classList.add('hidden');
-    $('liveVideo').classList.remove('hidden');
-    setCapturePhase('capture');
-    $('captionLabel').textContent = '다음 기록 준비';
-    $('captionText').textContent = '사진을 먼저 촬영해 주세요.';
-    $('captionSub').textContent = '촬영하면 해당 사진의 설명 녹음이 시작됩니다.';
 }
 function openLocation() { if (state.active && !state.paused)
     pauseSession(true); const general = state.buildingMode === 'general'; $('locationInput').value = state.location; $('locationInputLabel').textContent = general ? '현재 층·실명' : '현재 동·호수'; $('locationInput').placeholder = general ? '예: 지하 1층 기계실' : '예: 101동 1203호'; $('locationHelp').textContent = general ? '점검 중에는 문장 속 층과 실명을 순서와 관계없이 찾습니다. 여기서는 결과를 수동 보정할 수 있습니다.' : '점검 중에는 문장 속 동·호수를 순서와 관계없이 찾습니다. 여기서는 결과를 수동 보정할 수 있습니다.'; $('locationDialog').showModal(); }

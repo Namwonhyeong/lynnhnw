@@ -60,10 +60,6 @@ svg.icon{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;s
 .switch input:focus-visible+span{outline:2px solid var(--accent);outline-offset:3px}
 .text-button{border:0;background:none;color:#5c6e77;font-size:12px;font-weight:600;padding:8px 0;white-space:nowrap}
 .camera-shell{background:white;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
-.camera-shell.capture-phase-panel .controls{display:none}
-.capture-steps{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:#182326;padding:8px 10px;color:#718084;font-size:10px;font-weight:700}
-.capture-steps span{padding:6px 4px;text-align:center;border-bottom:2px solid transparent}
-.capture-steps span.active{color:#45dfbe;border-color:#12b89a}
 .camera-stage{height:370px;position:relative;isolation:isolate;overflow:hidden;background:#243238;color:white}
 .demo-scene,.camera-stage video{width:100%;height:100%;position:absolute;inset:0;object-fit:cover}
 .demo-scene{transition:filter .4s}
@@ -103,6 +99,7 @@ svg.icon{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;s
 .primary:hover{background:var(--accent-dark)}
 .start-description{font-size:12px;color:#7f8b91;line-height:1.7}
 .last-shortcut{display:flex;align-items:center;gap:10px;min-width:100px;border:0;background:none;text-align:left;padding:0}
+.last-shortcut:not(.available){visibility:hidden}
 .last-thumb{width:52px;height:52px;border:1px solid var(--line);border-radius:12px;display:grid;place-items:center;background:#f3f6f6;color:#a2adb3;overflow:hidden}
 .last-thumb img{width:100%;height:100%;object-fit:cover}
 .last-shortcut b{font-size:14px;display:block}
@@ -121,12 +118,6 @@ svg.icon{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;s
 .pause-btn .icon{width:16px;height:16px}
 .finish-btn{border:0;background:none;font-size:11px;color:#6d7c83;padding:6px}
 .camera-footer{border-top:1px solid #edf0f1;padding:12px 18px;font-size:11px;color:#7f8f96;display:flex;justify-content:space-between;align-items:center;gap:10px}
-.capture-review,.capture-complete{background:#0d1517;color:#f5f8f8;min-height:498px;padding:22px}
-.phase-head{display:flex;gap:12px;align-items:flex-start;margin-bottom:15px}.phase-head>span{color:#22c9a8;font-size:12px;font-weight:800;letter-spacing:1px}.phase-head h2{font-size:22px;margin:0 0 4px}.phase-head p{font-size:11px;color:#91a1a5;margin:0}
-.capture-review>img{width:100%;height:130px;object-fit:cover;border-radius:12px;margin-bottom:15px;background:#243238}
-.review-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.review-fields label{font-size:10px;color:#9badb0;font-weight:700}.review-fields input,.review-fields textarea{display:block;width:100%;margin-top:5px;border:1px solid #39484b;background:#172225;color:white;border-radius:9px;padding:10px 11px;font-size:13px}.review-fields input:focus,.review-fields textarea:focus{border-color:#12b89a;outline:2px solid #12b89a33}.review-wide{grid-column:1/-1}.review-fields textarea{resize:vertical;min-height:72px;line-height:1.5}
-.phase-actions{display:grid;grid-template-columns:1fr 2fr;gap:9px;margin-top:15px}.phase-actions .primary{background:#12b89a}.phase-actions .secondary{background:#1a272a;border-color:#3a484b;color:#dce6e7}
-.capture-complete{text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center}.complete-check{width:62px;height:62px;border-radius:50%;display:grid;place-items:center;background:#5ce9ca;color:#08342b;margin-bottom:15px}.complete-check .icon{width:32px;height:32px;stroke-width:2.5}.capture-complete h2{font-size:25px;margin:0 0 7px}.capture-complete>p{color:#9babad;font-size:12px;margin:0 0 22px}.complete-card{width:min(100%,500px);background:white;color:#182529;border-radius:14px;padding:12px;display:flex;text-align:left;gap:13px;align-items:center}.complete-card img{width:100px;height:84px;object-fit:cover;border-radius:9px}.complete-card div{min-width:0}.complete-card b,.complete-card span{display:block}.complete-card b{font-size:16px;margin-bottom:5px}.complete-card span{font-size:12px;font-weight:700;color:#405459}.complete-card p{font-size:11px;color:#65777b;margin:7px 0 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.complete-actions{width:min(100%,500px);display:grid;gap:9px;margin-top:22px}.complete-actions .primary{background:#12b89a}.complete-actions .secondary{background:transparent;border-color:#3d5154;color:#dce8e8}
 .save-status{display:flex;gap:6px;align-items:center}
 .save-status .icon{width:14px;height:14px;color:var(--green)}
 .subhint{margin:14px 3px 0;font-size:11px;color:#8a959b;line-height:1.7;display:flex;align-items:flex-start;gap:7px}
@@ -348,9 +339,21 @@ textarea.field{resize:vertical;min-height:106px;font-size:14px;line-height:1.7}
 
 @media(max-width:480px){.session-on .mode-switch,.session-on .section-intro,.session-on .page-foot{display:none}
 .session-on .topbar{padding-bottom:0;margin-bottom:13px}
-.session-on .camera-stage{height:clamp(260px,calc(100dvh - 410px),520px)}
+.session-on .camera-stage{height:clamp(220px,calc(100dvh - 390px),440px)}
 .session-on .location-card{margin-bottom:10px}
-.capture-steps{font-size:9px;padding:6px 7px}.capture-review,.capture-complete{min-height:calc(100dvh - 315px);padding:18px 15px}.capture-review>img{height:105px}.phase-head h2{font-size:20px}.review-fields{gap:8px}.review-fields input,.review-fields textarea{padding:9px;font-size:12px}.phase-actions{position:sticky;bottom:0;background:#0d1517;padding-top:10px;margin-top:8px}.complete-card img{width:82px;height:74px}.complete-actions{margin-top:18px}
+}
+
+/* UI redesign draft: keeps the existing capture -> voice -> immediate save logic. */
+@media(max-width:480px){
+.session-on{background:#0d1112;color:#f5f8f8}
+.session-on .header,.session-on .app{background:#0d1112}
+.session-on .header{padding-bottom:10px}.session-on .mark{background:#12b89a}.session-on .brand strong{color:white}.session-on .prototype{border-color:#28504a;color:#66ddc4}
+.session-on .topbar{border-color:#273437}.session-on .tab{color:#75868a}.session-on .tab.active{color:white;border-color:#12b89a}.session-on .tab.active .count-pill{background:#12b89a}
+.session-on .building-mode-row,.session-on .location-card{background:#151e20;border-color:#2a373a}.session-on .building-mode-row small,.session-on .location-label{color:#829396}.session-on .mode-switch{background:#0b1214;border-color:#2a373a}.session-on .mode-switch button.selected{background:#203033;color:#62ddc2}.session-on .location-value{color:white}.session-on .location-icon{background:#173b35;color:#51d4b8}.session-on .text-button{color:#70d7c1}
+.session-on .camera-shell{background:#0d1517;border-color:#2b383b;box-shadow:0 18px 50px #0005}.session-on .camera-stage:after{background:linear-gradient(180deg,#0710138c,transparent 35%,transparent 50%,#071013e8)}
+.session-on .controls{background:#0d1517}.session-on .shutter{border-color:#e4eceb;background:#0d1517;box-shadow:0 0 0 4px #ffffff12}.session-on .shutter-inner{background:white;color:#122124}.session-on .shutter.review{border-color:#35d0b0}.session-on .shutter.review .shutter-inner{background:#12b89a;color:white}
+.session-on .last-shortcut{min-width:78px;color:white;border:1px solid #2d8f7c;border-radius:12px;padding:6px 7px;background:#11221f}.session-on .last-thumb{width:36px;height:36px;border:0}.session-on .last-shortcut b{color:#58ddc0}.session-on .last-shortcut small{color:#8ea09f;font-size:8px}
+.session-on .pause-btn{background:#152124;border-color:#304044;color:#dfe8e9}.session-on .finish-btn{color:#93a3a6}.session-on .camera-footer{background:#0d1517;border-color:#293639;color:#829296}.session-on .save-status .icon{color:#51d4b8}.session-on .subhint{color:#758589}
 }
 
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}
