@@ -116,6 +116,7 @@ document.addEventListener('visibilitychange', () => { if (document.hidden && sta
     alertBox('다른 앱·탭으로 이동해 녹음을 일시정지했습니다. 화면을 켠 상태에서 이어하기를 눌러주세요.');
 } });
 window.addEventListener('pagehide', () => { stopSpeechRecognition(true); state.stream?.getTracks().forEach(t => t.stop()); });
+window.addEventListener('resize', () => { if (state.draftPhoto) layoutAnnotation(); });
 (async () => { try {
     state.db = await openDB();
     state.records = await getAll('records');

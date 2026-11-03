@@ -105,6 +105,18 @@ function prepareAnnotation(width, height) {
     for (const id of ['penTool', 'circleTool', 'eraserTool'])
         $(id).classList.remove('active');
     $('annotationTools').classList.remove('hidden');
+    requestAnimationFrame(() => layoutAnnotation());
+}
+function layoutAnnotation() {
+    const canvas = $('annotationCanvas'), stage = $('cameraStage');
+    if (!canvas.width || !canvas.height || !stage.clientWidth || !stage.clientHeight)
+        return;
+    const scale = Math.min(stage.clientWidth / canvas.width, stage.clientHeight / canvas.height);
+    const width = canvas.width * scale, height = canvas.height * scale;
+    canvas.style.width = `${width}px`;
+    canvas.style.height = `${height}px`;
+    canvas.style.left = `${(stage.clientWidth - width) / 2}px`;
+    canvas.style.top = `${(stage.clientHeight - height) / 2}px`;
 }
 function selectAnnotationTool(mode) {
     state.annotationMode = mode;
